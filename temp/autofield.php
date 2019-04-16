@@ -32,7 +32,7 @@
 		function updateHints(field, hintBoxID, type, targetFieldID) {
 			
 			var request = $.ajax({
-  	          url: "",
+  	          url: "/runtime/handler.php",
   	          type: "POST",
   	          data: {
           	  	          	"action" : "hint",
