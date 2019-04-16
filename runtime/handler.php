@@ -7,38 +7,39 @@
         exit();
     }
     
-    if($c->check(['action'], $_POST)){
+    if($c->check(['action'], $_POST))
         switch ($_POST['action']) {
             case 'hint':
                 switch ($_POST['type']) {
                     case 'tecnico':
-                        sendTecnicoHints($_POST['search']);
+                        sendTecnicoHints($_POST['search'], $c->db);
                         exit();
                         
-                    case 'activation':
-                        header('Content-type: text/plain');
-                        $res = $c->db->dml('UPDATE utenti SET Active = 1 WHERE Email = ?', [$_POST['email']]);
-                        echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
-                        break;
-                        
                     default:
-                        ;
                         break;
                 }
                 break;
                 
+            case 'activation':
+                activateUser($_POST['email'], $c->db);
+                exit();
+                
             default:
-                ;
                 break;
         }
-    }
     
-    function sendTecnicoHints($search) {
-        $res = $c->db->ql('SELECT ID, Cognome, Nome, Codice_fiscale
+    function sendTecnicoHints($search, $db) {
+        $res = $db->ql('SELECT ID, Cognome, Nome, Codice_fiscale
                                     FROM tecnici
                                     WHERE Cognome LIKE ? OR Nome LIKE ?
-                                    LIMIT 50',
+                                    LIMIT 20',
                                     ["%$search%", "%$search%"]);
         header('Content-type: application/json');
         echo json_encode($res);
+    }
+    
+    function activateUser($email, $db) {
+        $res = $db->dml('UPDATE utenti SET Active = 1 WHERE Email = ?', [$email]);
+        header('Content-type: text/plain');
+        echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
