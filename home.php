@@ -302,7 +302,6 @@
             return $res->rowCount() == 0 ? ['Non è stato necessario apportare modifiche', FALSE] : ['Modifiche apportate con successo', FALSE];
     }
 ?>
-<
 <html lang="it">
 	<head>
 		<title>PE</title>
