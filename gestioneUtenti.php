@@ -12,21 +12,6 @@
         exit();
     }
     
-    if(isset($_POST['action'])){
-        switch ($_POST['action']) {
-            case 'activation':
-                header('Content-type: text/plain');
-                $res = $c->db->dml('UPDATE utenti SET Active = 1 WHERE Email = ?', [$_POST['email']]);
-                echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
-                break;
-            
-            default:
-                    ;
-                break;
-        }
-        exit();
-    }
-    
     $inattivi = $c->db->ql('SELECT Email FROM utenti WHERE Active = \'0\'');
     $attivi = $c->db->ql('SELECT Email, Type FROM utenti WHERE Active = \'1\'');
 ?>
@@ -100,7 +85,7 @@
     <script type="text/javascript">
     	function activate(email, element) {
     		var request = $.ajax({
-    	          url: "gestioneUtenti.php",
+    	          url: "/runtime/handler.php",
     	          type: "POST",
     	          data: {"action":"activation", "email" : email},
     	          dataType: "text"
