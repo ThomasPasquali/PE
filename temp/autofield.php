@@ -1,9 +1,9 @@
 <?php
-    include_once 'controls.php';
+    include_once '..\controls.php';
     $c = new Controls();
     
     if(!$c->logged()){
-        header('Location: index.php?err=Utente non loggato');
+        header('Location: /index.php?err=Utente non loggato');
         exit();
     }
     
@@ -38,8 +38,8 @@
 ?>
 <html>
 <head>
-	<link rel="stylesheet" href="lib/mini-default.min.css">
-	<script src="lib/jquery-3.3.1.min.js"></script>
+	<link rel="stylesheet" href="/lib/mini-default.min.css">
+	<script src="/lib/jquery-3.3.1.min.js"></script>
 </head>
 <body>
 	<input id="field" type="text" onkeyup="updateHints(this, '#hintBox', 'tecnico', '#fieldValue');" onclick="this.select();">
