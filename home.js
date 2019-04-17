@@ -76,14 +76,14 @@ class FieldsGenIntSoc{
 
 /***********HINTS*************/
 
-function updateHints(field, hintBoxID, type, targetFieldID) {
+function updateHintsTecnici(field, hintBoxID, targetFieldID) {
 	
 	var request = $.ajax({
         url: "/runtime/handler.php",
         type: "POST",
         data: {
   	  	          	"action" : "hint",
-          			"type" : type,
+          			"type" : "tecnico",
           			"search" : field.value
       			},
         dataType: "text"
@@ -103,7 +103,41 @@ function updateHints(field, hintBoxID, type, targetFieldID) {
 	      	$(hintBoxID).css("display", "block");
 	      	for (let el of hints) {
 	        	let a = document.createElement('a');
-	        	a.innerHTML = el.Cognome+' '+el.Nome;
+	        	a.innerHTML = el.Cognome+' '+el.Nome+' ('+el.cf+')';
+	        	a.setAttribute('onclick', 'setValue("'+targetFieldID+'", "'+el.ID+'"); setValue("#'+field.id+'", "'+a.innerHTML+'"); $("'+hintBoxID+'").css("display", "none");');
+	        	$(hintBoxID).append(a);
+			}
+      });
+}
+
+function updateHintsImprese(field, hintBoxID, targetFieldID) {
+	
+	var request = $.ajax({
+        url: "/runtime/handler.php",
+        type: "POST",
+        data: {
+  	  	          	"action" : "hint",
+          			"type" : "impresa",
+          			"search" : field.value
+      			},
+        dataType: "text"
+      });
+
+		request.error = function(msg) {
+          alert( "Errore: " + msg);
+    };
+	
+	    request.fail(function(jqXHR, textStatus) {
+	         request.error(textStatus);
+      });
+      
+      request.done(function(hints) {
+	        hints = JSON.parse(hints);
+	      	$(hintBoxID).empty();
+	      	$(hintBoxID).css("display", "block");
+	      	for (let el of hints) {
+	        	let a = document.createElement('a');
+	        	a.innerHTML = el.Intestazione+' ('+el.cf+' - '+el.piva+')';
 	        	a.setAttribute('onclick', 'setValue("'+targetFieldID+'", "'+el.ID+'"); setValue("#'+field.id+'", "'+a.innerHTML+'"); $("'+hintBoxID+'").css("display", "none");');
 	        	$(hintBoxID).append(a);
 			}

@@ -305,15 +305,11 @@
 <html lang="it">
 	<head>
 		<title>PE</title>
+		<!-- CSS -->
 		<script src="lib/jquery-3.3.1.min.js"></script>
 		<link rel="stylesheet" href="lib/mini-default.min.css">
 		<link rel="stylesheet" href="lib/fontawesome/css/all.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-		<script type="text/javascript">$(document).ready(function() {$('.js-example-basic-single').select2();});</script>
 		<link rel="stylesheet" type="text/css" href="home.css">
-		<link rel="icon" type="image/ico" href="favicon.ico">
 		<style type="text/css">
     	   .hintBox{
     	       background-color: #272727;
@@ -325,7 +321,11 @@
     	       display: block;
     	       color: white;
     	   }
-	</style>
+	   </style>
+		
+		<!-- OTHER -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" type="image/ico" href="favicon.ico">
 	</head>
 	<body>
 		<script type="text/javascript" src="home.js"></script>
@@ -640,12 +640,19 @@
          	   				</div>
             			</div>
             			
-            			<?php //TODO tecnico ed altri ?>
          	   			<label>Tecnico<br>
-         	   				<input id="tecnico" type="text" onkeyup="updateHints(this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
+         	   				<input id="tecnico" type="text" onkeyup="updateHintsTecnici(this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
          	   				<input id="tecnicoID" name="tecnico" type="hidden">
      	   				</label>
          	   			<div id="hintsTecnici" class="hintBox"></div>
+         	   			
+         	   			<label>Impresa<br>
+         	   				<input id="impresa" type="text" onkeyup="updateHintsImprese(this, '#hintsImprese', 'impresa', '#impresaID');" onclick="this.select();">
+         	   				<input id="impresaID" name="impresa" type="hidden">
+     	   				</label>
+         	   			<div id="hintsImprese" class="hintBox"></div>
+         	   			
+         	   			<?php //TODO altri ?>
          	   			
          	   			<label>Impresa<br><select name="impresa" class="js-example-basic-single"><?php generaListImprese($_POST['impresa']??NULL); ?></select></label>
          	   			<label>Direzione lavori<br><select name="direzione_lavori" class="js-example-basic-single"><?php generaListTecnici($_POST['direzione_lavori']??NULL); ?></select></label>

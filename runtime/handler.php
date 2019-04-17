@@ -15,6 +15,10 @@
                         sendTecnicoHints($_POST['search'], $c->db);
                         exit();
                         
+                    case 'impresa':
+                        sendImpresaHints($_POST['search'], $c->db);
+                        exit();
+                        
                     default:
                         break;
                 }
@@ -41,11 +45,21 @@
         }
     
     function sendTecnicoHints($search, $db) {
-        $res = $db->ql('SELECT ID, Cognome, Nome, Codice_fiscale
+        $res = $db->ql('SELECT ID, Cognome, Nome, Codice_fiscale cf
                                     FROM tecnici
                                     WHERE Cognome LIKE ? OR Nome LIKE ?
                                     LIMIT 20',
                                     ["%$search%", "%$search%"]);
+        header('Content-type: application/json');
+        echo json_encode($res);
+    }
+    
+    function sendImpresaHints($search, $db) {
+        $res = $db->ql('SELECT ID, Intestazione, Codice_fiscale cf, Partita_iva piva
+                                FROM imprese
+                                WHERE Intestazione LIKE ?
+                                LIMIT 20',
+            ["%$search%"]);
         header('Content-type: application/json');
         echo json_encode($res);
     }
