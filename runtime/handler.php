@@ -20,16 +20,20 @@
                 }
                 break;
                 
-            case 'activation':
+            case 'accountActivation':
                 activateUser($_POST['email'], $c->db);
                 exit();
                 
-            case 'deactivation':
+            case 'accountDeactivation':
                 deactivateUser($_POST['email'], $c->db);
                 exit();
                 
             case 'userPermissionsChange':
                 changeUserPermissions($_POST['email'], $_POST['type'], $c->db);
+                exit();
+                
+            case 'accountDelete':
+                deleteUser($_POST['email'], $c->db);
                 exit();
                 
             default:
@@ -64,6 +68,10 @@
         echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
     
-    
+    function deleteUser($email, $db) {
+        $res = $db->dml('DELETE FROM utenti WHERE Email = ?', [$email]);
+        header('Content-type: text/plain');
+        echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
+    }
     
     
