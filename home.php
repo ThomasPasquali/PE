@@ -228,24 +228,6 @@
         return (empty($var) ? $otherVal : $var);
     }
     
-    function generaListStradario($selected = NULL) {
-        $res = $GLOBALS['c']->db->ql('SELECT Identificativo_nazionale i, Denominazione d FROM stradario');
-        foreach ($res as $strad)
-            echo "  <option value=\"$strad[i]\"".($strad['i'] == $selected ? 'selected="selected"':'').">$strad[d]</option>";
-    }
-    
-    function generaListTecnici($selected = NULL) {
-        $res = $GLOBALS['c']->db->ql('SELECT Nome n, Cognome c, Codice_fiscale cf, ID FROM tecnici');
-        foreach ($res as $tecnico)
-            echo "  <option value=\"$tecnico[ID]\"".($tecnico['ID'] == $selected ? 'selected="selected"':'').">$tecnico[c] $tecnico[n] - $tecnico[cf]</option>";
-    }
-    
-    function generaListImprese($selected = NULL) {
-        $res = $GLOBALS['c']->db->ql('SELECT ID, Intestazione i, Codice_fiscale cf, Partita_iva piva FROM imprese');
-        foreach ($res as $impresa)
-            echo "  <option value=\"$impresa[ID]\"".($impresa['ID'] == $selected ? 'selected="selected"':'').">$impresa[i] - $impresa[cf] - $impresa[piva]</option>";
-    }
-    
     function generaListEdifici($selected = NULL) {
         $res = $GLOBALS['c']->db->ql("SELECT e.ID,
                                                     		CONCAT(e.Foglio, ' -', 
@@ -620,7 +602,6 @@
          	   			<label>Data<input type="date" name="data" value="<?= $_POST['data']??date('Y-m-d') ?>"></label>
          	   			<label>Protocollo<input type="number" name="protocollo" value="<?= $_POST['protocollo']??'' ?>"></label>
          	   			<label>Edificio (Foglio - Mappale/i)<br><select name="edificio" class="js-example-basic-single" style="width: 100%;"><?php generaListEdifici($_POST['edificio']??NULL); ?></select></label>
-         	   			<label>Stradario<br><select name="stradario" class="js-example-basic-single"><?php generaListStradario($_POST['stradario']??NULL); ?></select></label>
          	   			<div class="extensible">
          	   				<label>Intestatari persone<br>
              	   				<div id="fieldsIntPers"></div>
@@ -640,21 +621,34 @@
          	   				</div>
             			</div>
             			
+            			
+            			
+            			<label>Stradario<br>
+         	   				<input id="stradario" type="text" onkeyup="updateHints('stradario', this, '#hintsStradari', '#stradarioID');" onclick="this.select();">
+         	   				<input id="stradarioID" name="stradario" type="hidden">
+     	   				</label>
+         	   			<div id="hintsStradari" class="hintBox"></div>
+            			
          	   			<label>Tecnico<br>
-         	   				<input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
+         	   				<input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
          	   				<input id="tecnicoID" name="tecnico" type="hidden">
      	   				</label>
          	   			<div id="hintsTecnici" class="hintBox"></div>
          	   			
          	   			<label>Impresa<br>
-         	   				<input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', 'impresa', '#impresaID');" onclick="this.select();">
+         	   				<input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', '#impresaID');" onclick="this.select();">
          	   				<input id="impresaID" name="impresa" type="hidden">
      	   				</label>
          	   			<div id="hintsImprese" class="hintBox"></div>
          	   			
+         	   			<label>Direzione lavori<br>
+         	   				<input id="direzione_lavori" type="text" onkeyup="updateHints('tecnico', this, '#hintsDirezione_lavori', '#direzione_lavoriID');" onclick="this.select();">
+         	   				<input id="direzione_lavoriID" name="direzione_lavori" type="hidden">
+     	   				</label>
+         	   			<div id="hintsDirezione_lavori" class="hintBox"></div>
+         	   			
          	   			<?php //TODO altri ?>
          	   			
-         	   			<label>Direzione lavori<br><select name="direzione_lavori" class="js-example-basic-single"><?php generaListTecnici($_POST['direzione_lavori']??NULL); ?></select></label>
          	   			<label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
          	   			<label>Documento elettronico<input type="text" name="documento_elettronico" value="<?= $_POST['documento_elettronico']??'' ?>"></label>
          	   			<label>Data inizio lavori<input type="date" name="data_inizio_lavori" value="<?= $_POST['data_inizio_lavori']??'' ?>"></label>

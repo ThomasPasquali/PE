@@ -19,6 +19,10 @@
                         sendImpresaHints($_POST['search'], $c->db);
                         exit();
                         
+                    case 'stradario':
+                        sendStradarioHints($_POST['search'], $c->db);
+                        exit();
+                        
                     default:
                         break;
                 }
@@ -58,6 +62,16 @@
         $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Intestazione, \' (\', Codice_fiscale, \'-\',Partita_iva, \')\') Description
                                 FROM imprese
                                 WHERE Intestazione LIKE ?
+                                LIMIT 20',
+            ["%$search%"]);
+        header('Content-type: application/json');
+        echo json_encode($res);
+    }
+    
+    function sendStradarioHints($search, $db) {
+        $res = $db->ql('SELECT Identificativo_nazionale ID, Denominazione Description
+                                FROM stradario
+                                WHERE Denominazione LIKE ?
                                 LIMIT 20',
             ["%$search%"]);
         header('Content-type: application/json');
