@@ -28,6 +28,10 @@
                 deactivateUser($_POST['email'], $c->db);
                 exit();
                 
+            case 'userPermissionsChange':
+                changeUserPermissions($_POST['email'], $_POST['type'], $c->db);
+                exit();
+                
             default:
                 break;
         }
@@ -53,4 +57,13 @@
         header('Content-type: text/plain');
         echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
+    
+    function changeUserPermissions($email, $type, $db) {
+        $res = $db->dml('UPDATE utenti SET Active = \'0\' WHERE Email = ?', [$email]);
+        header('Content-type: text/plain');
+        echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
+    }
+    
+    
+    
     

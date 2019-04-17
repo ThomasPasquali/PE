@@ -78,8 +78,11 @@
             <div class="w3-container">
                 <?php 
                     foreach ($attivi as $account) 
-                        echo "<div><p>$account[Email]</p>
-                                    <button onclick=\"deactivate('$account[Email]', this);\">Disattiva</button></div>";
+                        echo "<div>
+                                    <p>$account[Email]</p>
+                                    <button onclick=\"deactivate('$account[Email]', this);\">Disattiva</button>
+                                    <button onclick=\"changeAccountType('$account[Email]', '".($account['Type']=='ADMIN'?'USER':'ADMIN')."', this);\">".($account['Type']=='ADMIN'?'Declassa ad utente':'Promuovi ad admin')."</button>
+                                 </div>";
                 ?>
             </div>
         </div>
@@ -129,6 +132,25 @@
     	        	}else
     	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
     	        });
+		}
+
+		function changeAccountType(email, type, element) {
+			var request = $.ajax({
+  	          url: "/runtime/handler.php",
+  	          type: "POST",
+  	          data: {"action":"userPermissionsChange", "email" : email, "type" : type},
+  	          dataType: "text"
+  	        });
+      	    request.fail(function(jqXHR, textStatus) {
+      	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
+  	        });
+  	        request.done(function(msg) {
+  	        	if(msg == 'DONE'){
+  	        		displayMessage('Cambiamento effettuato', element.parentNode.parentNode.parentNode, 'info');
+  	        		element.parentNode.remove();
+  	        	}else
+  	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
+  	        });
 		}
 
     	function reloadPageWithFlag(flag){
