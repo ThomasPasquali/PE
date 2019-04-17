@@ -48,6 +48,11 @@
         .closebtn:hover {
           color: black;
         }
+        
+        .row{
+            font-size: 0.7em;
+            margin-top: 15px;
+        }
 	</style>
 </head>
 <body>
@@ -66,8 +71,10 @@
             <div class="w3-container">
                 <?php 
                 foreach ($inattivi as $account) 
-                    echo "<div><p>$account[Email]</p>
-                               <button onclick=\"activate('$account[Email]', this);\">Attiva</button></div>";
+                    echo "<div class=\"row\">
+                                <p>$account[Email]</p>
+                                <button onclick=\"activate('$account[Email]', this);\">Attiva</button>
+                              </div>";
                 ?>
             </div>
         </div>
@@ -78,7 +85,7 @@
             <div class="w3-container">
                 <?php 
                     foreach ($attivi as $account) 
-                        echo "<div>
+                        echo "<div class=\"row\">
                                     <p>$account[Email]</p>
                                     <button onclick=\"deactivate('$account[Email]', this);\">Disattiva</button>
                                     <button onclick=\"changeAccountType('$account[Email]', '".($account['Type']=='ADMIN'?'USER':'ADMIN')."', this);\">".($account['Type']=='ADMIN'?'Declassa ad utente':'Promuovi ad admin')."</button>
@@ -146,8 +153,7 @@
   	        });
   	        request.done(function(msg) {
   	        	if(msg == 'DONE'){
-  	        		displayMessage('Cambiamento effettuato', element.parentNode.parentNode.parentNode, 'info');
-  	        		element.parentNode.remove();
+  	        		reloadPageWithFlag('gestione');
   	        	}else
   	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
   	        });

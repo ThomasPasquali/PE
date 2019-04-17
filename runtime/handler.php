@@ -59,7 +59,7 @@
     }
     
     function changeUserPermissions($email, $type, $db) {
-        $res = $db->dml('UPDATE utenti SET Active = \'0\' WHERE Email = ?', [$email]);
+        $res = $db->dml('UPDATE utenti SET Type = ? WHERE Email = ?', [$type, $email]);
         header('Content-type: text/plain');
         echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
