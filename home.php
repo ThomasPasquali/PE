@@ -654,7 +654,6 @@
          	   			
          	   			<?php //TODO altri ?>
          	   			
-         	   			<label>Impresa<br><select name="impresa" class="js-example-basic-single"><?php generaListImprese($_POST['impresa']??NULL); ?></select></label>
          	   			<label>Direzione lavori<br><select name="direzione_lavori" class="js-example-basic-single"><?php generaListTecnici($_POST['direzione_lavori']??NULL); ?></select></label>
          	   			<label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
          	   			<label>Documento elettronico<input type="text" name="documento_elettronico" value="<?= $_POST['documento_elettronico']??'' ?>"></label>
