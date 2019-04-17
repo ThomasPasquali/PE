@@ -345,7 +345,7 @@
  				<button type="submit"  name="destroy" class="secondary" >Logout<i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i></button>
  				<?=
  			        $GLOBALS['c']->isAdmin()?
- 			        '<a target="_blank" href="gestioneUtenti.php">Gestione utenti<i class="fas fa-cogs"></i></a>'
+ 			        '<a target="_blank" href="/gestione/utenti.php">Gestione utenti<i class="fas fa-cogs"></i></a>'
                     :'';
  				?>
  				<a>Impostazioni<i class="fas fa-cogs"></i>	</a>

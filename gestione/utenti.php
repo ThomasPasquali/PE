@@ -1,5 +1,5 @@
 <?php
-    include_once 'controls.php';
+    include_once '../controls.php';
     $c = new Controls();
     
     if(!$c->logged()){
@@ -18,8 +18,8 @@
 <html>
 <head>
 	<title>Gestione utenti</title>
-	<link rel="stylesheet" href="gestioneUtenti.css">
-	<script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
+	<link rel="stylesheet" href="utenti.css">
+	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
 	<style type="text/css">
 	   .alert {
           padding: 20px;
@@ -97,7 +97,7 @@
         </div>
         
     </div>
-    <script type="text/javascript" src="lib/misc.js"></script>
+    <script type="text/javascript" src="/lib/misc.js"></script>
     <script type="text/javascript">
     	if(getParameter("flag") == 'gestione')
     		changeContent('gestione');
@@ -185,7 +185,7 @@
 		}
 
     	function reloadPageWithFlag(flag){
-    		window.location.replace("/gestioneUtenti.php?flag="+flag);
+    		window.location.replace("/gestione/utenti.php?flag="+flag);
     	}
     	
     </script>
