@@ -45,17 +45,17 @@
         }
     
     function sendTecnicoHints($search, $db) {
-        $res = $db->ql('SELECT ID, Cognome, Nome, Codice_fiscale cf
-                                    FROM tecnici
-                                    WHERE Cognome LIKE ? OR Nome LIKE ?
-                                    LIMIT 20',
-                                    ["%$search%", "%$search%"]);
+        $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
+                                FROM tecnici
+                                WHERE Cognome LIKE ? OR Nome LIKE ?
+                                LIMIT 20',
+                                ["%$search%", "%$search%"]);
         header('Content-type: application/json');
-        echo json_encode($res);
+        echo  json_encode($res);
     }
     
     function sendImpresaHints($search, $db) {
-        $res = $db->ql('SELECT ID, Intestazione, Codice_fiscale cf, Partita_iva piva
+        $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Intestazione, \' (\', Codice_fiscale, \'-\',Partita_iva, \')\') Description
                                 FROM imprese
                                 WHERE Intestazione LIKE ?
                                 LIMIT 20',

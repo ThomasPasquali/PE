@@ -641,13 +641,13 @@
             			</div>
             			
          	   			<label>Tecnico<br>
-         	   				<input id="tecnico" type="text" onkeyup="updateHintsTecnici(this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
+         	   				<input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
          	   				<input id="tecnicoID" name="tecnico" type="hidden">
      	   				</label>
          	   			<div id="hintsTecnici" class="hintBox"></div>
          	   			
          	   			<label>Impresa<br>
-         	   				<input id="impresa" type="text" onkeyup="updateHintsImprese(this, '#hintsImprese', 'impresa', '#impresaID');" onclick="this.select();">
+         	   				<input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', 'impresa', '#impresaID');" onclick="this.select();">
          	   				<input id="impresaID" name="impresa" type="hidden">
      	   				</label>
          	   			<div id="hintsImprese" class="hintBox"></div>
