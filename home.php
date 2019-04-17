@@ -314,6 +314,18 @@
 		<script type="text/javascript">$(document).ready(function() {$('.js-example-basic-single').select2();});</script>
 		<link rel="stylesheet" type="text/css" href="home.css">
 		<link rel="icon" type="image/ico" href="favicon.ico">
+		<style type="text/css">
+    	   .hintBox{
+    	       background-color: #272727;
+    	       max-height: 200px;
+    	       overflow-y: scroll;
+    	   }
+    	   .hintBox a{
+    	       background-color: #272727;
+    	       display: block;
+    	       color: white;
+    	   }
+	</style>
 	</head>
 	<body>
 		<script type="text/javascript" src="home.js"></script>
@@ -627,7 +639,14 @@
              	   				<button type="button" onclick="genSoc.addField();">+</button>
          	   				</div>
             			</div>
-         	   			<label>Tecnico<br><select name="tecnico" class="js-example-basic-single"><?php generaListTecnici($_POST['tecnico']??NULL); ?></select></label>
+            			
+            			<?php //TODO tecnico ed altri ?>
+         	   			<label>Tecnico<br>
+         	   				<input id="tecnico" type="text" onkeyup="updateHints(this, '#hintsTecnici', 'tecnico', '#tecnicoID');" onclick="this.select();">
+         	   				<input id="tecnicoID" name="tecnico" type="hidden">
+     	   				</label>
+         	   			<div id="hintsTecnici" class="hintBox"></div>
+         	   			
          	   			<label>Impresa<br><select name="impresa" class="js-example-basic-single"><?php generaListImprese($_POST['impresa']??NULL); ?></select></label>
          	   			<label>Direzione lavori<br><select name="direzione_lavori" class="js-example-basic-single"><?php generaListTecnici($_POST['direzione_lavori']??NULL); ?></select></label>
          	   			<label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
