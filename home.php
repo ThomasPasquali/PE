@@ -338,6 +338,7 @@
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
                 	<a onclick="changeContent('gestMappEX');">Gestione mappali EX</a>
+                	<a href="/gestione/edifici.php">Gestione edifici</a>
             	</div>
  			</div>
  			
