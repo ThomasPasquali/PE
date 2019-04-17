@@ -53,8 +53,8 @@
 <body>
     <!-- Sidebar -->
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
-      <p onclick="changeContent('richieste');" class="w3-bar-item w3-button">Richieste di<br>attivazione</p>
-      <p onclick="changeContent('gestione');" class="w3-bar-item w3-button">Gestione<br>accounts</p>
+      <p onclick="reloadPageWithFlag('richieste')" class="w3-bar-item w3-button">Richieste di<br>attivazione</p>
+      <p onclick="reloadPageWithFlag('gestione')" class="w3-bar-item w3-button">Gestione<br>accounts</p>
     </div>
     
     <!-- Page Content -->
@@ -66,8 +66,8 @@
             <div class="w3-container">
                 <?php 
                 foreach ($inattivi as $account) 
-                    echo "<p>$account[Email]</p>
-                               <button onclick=\"activate('$account[Email]', this);\">Attiva</button>";
+                    echo "<div><p>$account[Email]</p>
+                               <button onclick=\"activate('$account[Email]', this);\">Attiva</button></div>";
                 ?>
             </div>
         </div>
@@ -76,13 +76,23 @@
         	<div class="w3-container w3-teal"><h1>Gestione accounts</h1></div>
             
             <div class="w3-container">
-                
+                <?php 
+                    foreach ($attivi as $account) 
+                        echo "<div><p>$account[Email]</p>
+                                    <button onclick=\"deactivate('$account[Email]', this);\">Disattiva</button></div>";
+                ?>
             </div>
         </div>
         
     </div>
     <script type="text/javascript" src="lib/misc.js"></script>
     <script type="text/javascript">
+    	if(getParameter("flag") == 'gestione')
+    		changeContent('gestione');
+		else
+    		changeContent('richieste');
+    	
+    
     	function activate(email, element) {
     		var request = $.ajax({
     	          url: "/runtime/handler.php",
@@ -91,17 +101,39 @@
     	          dataType: "text"
     	        });
         	    request.fail(function(jqXHR, textStatus) {
-        	        	displayMessage(textStatus, element.parentNode.parentNode);
+        	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
     	        });
     	        request.done(function(msg) {
     	        	if(msg == 'DONE'){
-    	        		displayMessage('Utente attivato', element.parentNode.parentNode, 'info');
+    	        		displayMessage('Utente attivato', element.parentNode.parentNode.parentNode, 'info');
     	        		element.parentNode.remove();
     	        	}else
-    	        		displayMessage(msg, element.parentNode.parentNode);
+    	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
     	        });
 		}
 
+    	function deactivate(email, element) {
+    		var request = $.ajax({
+    	          url: "/runtime/handler.php",
+    	          type: "POST",
+    	          data: {"action":"deactivation", "email" : email},
+    	          dataType: "text"
+    	        });
+        	    request.fail(function(jqXHR, textStatus) {
+        	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
+    	        });
+    	        request.done(function(msg) {
+    	        	if(msg == 'DONE'){
+    	        		displayMessage('Utente disattivato', element.parentNode.parentNode.parentNode, 'info');
+    	        		element.parentNode.remove();
+    	        	}else
+    	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
+    	        });
+		}
+
+    	function reloadPageWithFlag(flag){
+    		window.location.replace("/gestioneUtenti.php?flag="+flag);
+    	}
     	
     </script>
 </body>

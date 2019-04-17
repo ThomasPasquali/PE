@@ -24,6 +24,10 @@
                 activateUser($_POST['email'], $c->db);
                 exit();
                 
+            case 'deactivation':
+                deactivateUser($_POST['email'], $c->db);
+                exit();
+                
             default:
                 break;
         }
@@ -43,3 +47,10 @@
         header('Content-type: text/plain');
         echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
+    
+    function deactivateUser($email, $db) {
+        $res = $db->dml('UPDATE utenti SET Active = \'0\' WHERE Email = ?', [$email]);
+        header('Content-type: text/plain');
+        echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
+    }
+    
