@@ -16,6 +16,7 @@ function addFiledMappale() {
 	field.pattern = '\\d{1,4}';
 	field.onKeyUp = function(){
 		console.log('stoca');
+		//TODO NON VA
 	}
 	let div = document.createElement('div');
 	div.appendChild(field);
