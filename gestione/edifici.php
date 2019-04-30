@@ -25,10 +25,11 @@
 	<link rel="stylesheet" href="style_gestione.css">
 	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
 	<style type="text/css">
-	   #mappali-new-ed input{
-	       /*display: block;*/
-	   }
-	</style>
+        .hintBox *{
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -45,7 +46,9 @@
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>
             <div class="w3-container">
             	<form method="post">
+            		<h2>Foglio</h2>
             		<input type="number" name="foglio" placeholder="Foglio..." value="<?= $_POST['foglio']??'' ?>">
+            		<h2>Mappale/i</h2>
             		<input type="number" name="mappale" placeholder="Mappale..." value="<?= $_POST['mappale']??'' ?>">
             		<input type="submit" value="Cerca">
             	</form>
@@ -56,10 +59,22 @@
         	<div class="w3-container w3-teal"><h1>Nuovo edificio</h1></div>
             <div class="w3-container">
             	<form method="post">
-            		<input id="foglio-new-ed" onkeyup="checkAllMappali();" type="number" name="foglio" placeholder="Foglio...">
+            		<h2>Foglio</h2>
+            		<input id="foglio-new-ed" onkeyup="checkAllMappali();" type="number" name="foglio" max="9999" placeholder="Foglio...">
+            		
+            		<h2>Mappale/i</h2>
             		<div id="mappali-new-ed"></div>
             		<button type="button" onclick="addFiledMappale();">+</button>
-            		<!-- ✔ -->
+            		
+            		<h2>Stradario</h2>
+ 	   				<input id="stradario" type="text" onkeyup="updateHints('stradario', this, '#hintsStradari', '#stradarioID');" onclick="this.select();" placeholder="Stradario...">
+ 	   				<input id="stradarioID" name="stradario" type="hidden">
+     	   			<div id="hintsStradari" class="hintBox"></div>
+            		
+            		<h2>Note</h2>
+            		<textarea rows="3" cols="40" placeholder="Inserire qui eventuali note..."></textarea>
+            		
+            		<br>
             		<input type="button" onclick="submitNewEdificio();" value="CREA NUOVO EDIFICIO">
             	</form>
             </div>

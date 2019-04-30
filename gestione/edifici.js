@@ -18,8 +18,11 @@ function addFiledMappale() {
 	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this);')
 	let div = document.createElement('div');
 	div.appendChild(field);
-	div.appendChild(document.createElement('span'));
+	let span = document.createElement('span');
+	span.className = 'esitiCheckMappali';
+	div.appendChild(span);
 	$('#mappali-new-ed').append(div);
+	checkIfMappaleIsFree(field);
 	mappaliNewEdCount++;
 }
 
@@ -37,12 +40,13 @@ function checkIfMappaleIsFree(el) {
         	alert('Errore: '+textStatus);
     });
     request.done(function(msg) {
-			console.log(msg);
 			let span = el.parentNode.lastChild;
 			span.innerHTML = (msg=='OK'?'✔':'✖');
+			return msg=='OK';
     });
 	}else{
 		el.parentNode.lastChild.innerHTML = 'Specificare il foglio';
+		return false;
 	}
 }
 
@@ -52,6 +56,16 @@ function checkAllMappali() {
 	});
 }
 
+var b;
+function areAllMappaliOk(){
+	b = true;
+	$(".esitiCheckMappali").each(function(){
+		 if($(this).html() !== '✔') b = false;
+	});
+	return b;
+}
+
 function submitNewEdificio() {
 	//TODO
+	console.log(areAllMappaliOk());
 }

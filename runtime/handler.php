@@ -107,10 +107,14 @@
     }
 
     function checkIfMappaleIsFree($foglio, $mappale, $db) {
-        $res = $db->ql('SELECT *
-                              FROM fogli_mappali_edifici
-                              WHERE Foglio LIKE ? AND Mappale LIKE ?',
-                              ["%$foglio%", "%$mappale%"]);
         header('Content-type: text/plain');
+        if(empty($foglio)||empty($mappale)){
+            echo 'NO';
+            exit();
+        }
+        $res = $db->ql('SELECT *
+                                  FROM fogli_mappali_edifici
+                                  WHERE Foglio LIKE ? AND Mappale LIKE ?',
+                                  ["%$foglio%", "%$mappale%"]);
         echo count($res) > 0?'NO':'OK';
     }
