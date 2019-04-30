@@ -18,7 +18,7 @@
 <html>
 <head>
 	<title>Gestione utenti</title>
-	<link rel="stylesheet" href="utenti.css">
+	<link rel="stylesheet" href="style_gestione.css">
 	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
 	<style type="text/css">
 	   .alert {
@@ -98,96 +98,6 @@
         
     </div>
     <script type="text/javascript" src="/lib/misc.js"></script>
-    <script type="text/javascript">
-    	if(getParameter("flag") == 'gestione')
-    		changeContent('gestione');
-		else
-    		changeContent('richieste');
-    	
-    
-    	function activate(email, element) {
-    		var request = $.ajax({
-	          url: "/runtime/handler.php",
-	          type: "POST",
-	          data: {"action":"accountActivation", "email" : email},
-	          dataType: "text"
-	        });
-    	    request.fail(function(jqXHR, textStatus) {
-    	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
-	        });
-	        request.done(function(msg) {
-	        	if(msg == 'DONE'){
-	        		displayMessage('Utente attivato', element.parentNode.parentNode.parentNode, 'info');
-	        		element.parentNode.remove();
-	        	}else
-	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
-	        });
-		}
-
-    	function deactivate(email, element) {
-    		var request = $.ajax({
-	          url: "/runtime/handler.php",
-	          type: "POST",
-	          data: {"action":"accountDeactivation", "email" : email},
-	          dataType: "text"
-	        });
-    	    request.fail(function(jqXHR, textStatus) {
-    	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
-	        });
-	        request.done(function(msg) {
-	        	if(msg == 'DONE'){
-	        		displayMessage('Utente disattivato', element.parentNode.parentNode.parentNode, 'info');
-	        		element.parentNode.remove();
-	        	}else
-	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
-	        });
-		}
-
-		function changeType(email, type, element) {
-			var request = $.ajax({
-  	          url: "/runtime/handler.php",
-  	          type: "POST",
-  	          data: {"action":"userPermissionsChange", "email" : email, "type" : type},
-  	          dataType: "text"
-  	        });
-      	    request.fail(function(jqXHR, textStatus) {
-      	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
-  	        });
-  	        request.done(function(msg) {
-  	        	if(msg == 'DONE'){
-  	        		reloadPageWithFlag('gestione');
-  	        	}else
-  	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
-  	        });
-		}
-
-		function deleteAccount(email, element) {
-			console.log("diosc");
-			var result = confirm("Sei sicuro di voler eliminare l'account?");
-			if (result) {
-				var request = $.ajax({
-    	          url: "/runtime/handler.php",
-    	          type: "POST",
-    	          data: {"action":"accountDelete", "email" : email},
-    	          dataType: "text"
-    	        });
-        	    request.fail(function(jqXHR, textStatus) {
-        	        	displayMessage(textStatus, element.parentNode.parentNode.parentNode);
-    	        });
-    	        request.done(function(msg) {
-    	        	if(msg == 'DONE'){
-    	        		displayMessage('Utente eliminato', element.parentNode.parentNode.parentNode, 'info');
-    	        		element.parentNode.remove();
-    	        	}else
-    	        		displayMessage(msg, element.parentNode.parentNode.parentNode);
-    	        });
-			}
-		}
-
-    	function reloadPageWithFlag(flag){
-    		window.location.replace("/gestione/utenti.php?flag="+flag);
-    	}
-    	
-    </script>
+    <script type="text/javascript" src="utenti.js"></script>
 </body>
 </html>
