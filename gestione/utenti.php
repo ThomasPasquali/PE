@@ -64,6 +64,6 @@
         
     </div>
     <script type="text/javascript" src="/lib/misc.js"></script>
-    <script type="text/javascript" src="utenti.js"></script>
+    <script type="text/javascript" src="/js/gestione_utenti.js"></script>
 </body>
 </html>

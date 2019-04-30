@@ -83,7 +83,7 @@
     </div>
 
     <script type="text/javascript" src="/js/misc.js"></script>
-	<script type="text/javascript" src="/js/edifici.js"></script>
+	<script type="text/javascript" src="/js/gestione_edifici.js"></script>
     <script type="text/javascript">addFiledMappale();</script>
 
 </body>
