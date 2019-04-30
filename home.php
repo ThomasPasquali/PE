@@ -2,77 +2,77 @@
     include_once 'controls.php';
     $GLOBALS['c'] = new Controls();
     $err = $_GET['err']??'';
-    
+
     if(!$GLOBALS['c']->logged()){
         header('Location: index.php?err=Utente non loggato');
         exit();
     }
-    
+
    $GLOBALS['c']->echoCode($_POST);
-   
+
    $esitoGestMapp = '';
-    
+
     if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)){
         switch ($_POST['btn']) {
             case 'inserimentoAnagrafica':
                 inserimentoAnagrafiche();
                 break;
-            
+
             case 'inserimentoPratica':
                 inserimentoPratiche();
                 break;
-            
+
             case 'mappaliEX':
                 $esitoGestMapp = gestioneMappaliEX();
                 $GLOBALS[$esitoGestMapp[1]?'err':'succ'] = $esitoGestMapp[0];
                 break;
-            
+
             default:
                 ;
             break;
         }
     }
-    
+
     function inserimentoAnagrafiche() {
         switch ($_POST['tipo']) {
             case 'persone':
             inserisciPersona();
             break;
-            
+
             case 'societa':
             inserisciSocieta();
             break;
-                
+
             case 'tecnici':
             inserisciTecnico();
             break;
-            
+
             case 'impresa':
             inserisciImpresa();
             break;
-            
+
             default:
                 ;
             break;
         }
     }
-    
+
     function inserimentoPratiche() {
         switch ($_POST['tipo']) {
             case 'pe':
             inserisciPraticaPE();
             break;
-                
+
             case 'tec':
             inserisciPraticaTEC();
             break;
-                
+
             default:
             ;
             break;
         }
     }
-    
+
     function inserisciPraticaPE() {
         if($GLOBALS['c']->check(['tipo_pratica', 'mappale', 'anno', 'numero', 'edificio'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
@@ -95,14 +95,14 @@
                 ':data_il' => getValueORNULL($_POST['data_inizio_lavori']),
                 ':doc_el' => getValueORNULL($_POST['documento_elettronico']),
                 ':note' => getValueORNULL($_POST['note'])]);
-                
+
             if($stmt->errorInfo()[0] == 0){
                 $GLOBALS['succ'] = 'Pratica inserita correttamente';
-                
+
                 $idPratica =  $GLOBALS['c']->db->ql(
                     'SELECT ID FROM pe_pratiche WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
                     [$_POST['tipo_pratica'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0]['ID'];
-                
+
                  //inserimento intestatari persone
                 $i = 0;
                 $tryNext = true;
@@ -116,7 +116,7 @@
                 $tryNext = false;
                     $i++;
                 }
-                
+
                 //inserimento intestatari societa
                 $i = 0;
                 $tryNext = true;
@@ -135,15 +135,15 @@
         }else
             $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
     }
-    
+
     function inserisciPraticaTEC() {
         ;//TODO
     }
-    
+
     function inserisciPersona() {
         if($GLOBALS['c']->check(['nome', 'cognome', 'cf'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
-                'INSERT INTO intestatari_persone (Nome, Cognome, Codice_fiscale, Indirizzo, Citta, Provincia, Note) 
+                'INSERT INTO intestatari_persone (Nome, Cognome, Codice_fiscale, Indirizzo, Citta, Provincia, Note)
                 VALUES (:n, :c, :cf, :ind, :citta, :prov, :note)',
                 [':n' => $_POST['nome'],
                 ':c' => $_POST['cognome'],
@@ -152,7 +152,7 @@
                 ':citta' => getValueORNULL($_POST['citta']),
                 ':prov' => getValueORNULL($_POST['provincia']),
                 ':note' => getValueORNULL($_POST['note'])]);
-                
+
             if($stmt->errorInfo()[0] == 0)
                 $GLOBALS['succ'] = 'Anagrafica inserita correttamente';
             else
@@ -160,7 +160,7 @@
         }else
         $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
     }
-    
+
     function inserisciTecnico() {
         if($GLOBALS['c']->check(['nome', 'cognome', 'cf', 'piva'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
@@ -177,7 +177,7 @@
                 ':citta' => getValueORNULL($_POST['citta']),
                 ':prov' => getValueORNULL($_POST['provincia']),
                 ':note' => getValueORNULL($_POST['note'])]);
-            
+
             if($stmt->errorInfo()[0] == 0)
                 $GLOBALS['succ'] = 'Tecnico inserito correttamente';
             else
@@ -185,7 +185,7 @@
         }else
             $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
     }
-    
+
     function inserisciSocieta() {
         if($GLOBALS['c']->check(['intestazione', 'piva'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
@@ -197,7 +197,7 @@
                 ':citta' => getValueORNULL($_POST['citta']),
                 ':prov' => getValueORNULL($_POST['provincia']),
                 ':note' => getValueORNULL($_POST['note'])]);
-            
+
             if($stmt->errorInfo()[0] == 0)
                 $GLOBALS['succ'] = 'Societa inserita correttamente';
                 else
@@ -205,7 +205,7 @@
         }else
             $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
     }
-    
+
     function inserisciImpresa() {
         if($GLOBALS['c']->check(['intestazione'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
@@ -215,7 +215,7 @@
                 ':piva' => getValueORNULL($_POST['piva']),
                 ':cf' => getValueORNULL($_POST['cf']),
                 ':note' => getValueORNULL($_POST['note'])]);
-                
+
                 if($stmt->errorInfo()[0] == 0)
                     $GLOBALS['succ'] = 'Impresa inserita correttamente';
                     else
@@ -223,16 +223,16 @@
         }else
             $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
     }
-    
+
     function getValueORNULL($var, $otherVal = NULL) {
         return (empty($var) ? $otherVal : $var);
     }
-    
+
     function generaListEdifici($selected = NULL) {
         $res = $GLOBALS['c']->db->ql("SELECT e.ID,
-                                                    		CONCAT(e.Foglio, ' -', 
+                                                    		CONCAT(e.Foglio, ' -',
                                                     				GROUP_CONCAT(
-                                                    					CONCAT(' ', m.Mappale, ' ', IF(m.EX IS NULL, '', m.EX)) 
+                                                    					CONCAT(' ', m.Mappale, ' ', IF(m.EX IS NULL, '', m.EX))
                                                     					ORDER BY e.Foglio ASC, m.Mappale ASC, m.EX DESC)) tot
                                                             FROM pe_edifici e
                                                             	JOIN pe_mappali_edifici m ON e.ID = m.Edificio
@@ -240,38 +240,38 @@
         foreach ($res as $edificio)
             echo "  <option value=\"$edificio[ID]\"".($edificio['ID'] == $selected ? 'selected="selected"':'').">$edificio[tot]</option>";
     }
-    
+
     function generaListIntestatariPersone($selected = NULL) {
         $res = $GLOBALS['c']->db->ql('SELECT ID, Cognome c, Nome n FROM intestatari_persone ORDER BY Cognome');
         foreach ($res as $persona)
             echo "  <option value=\"$persona[ID]\"".($persona['ID'] == $selected ? 'selected="selected"':'').">".str_replace('\'', '\\\'',$persona['c']).' '.str_replace('\'', '\\\'',$persona['n'])."</option>";
     }
-    
+
     function generaListIntestatariSocieta($selected = NULL) {
         $res = $GLOBALS['c']->db->ql('SELECT ID, Intestazione i FROM intestatari_societa ORDER BY Intestazione');
         foreach ($res as $societa)
             echo "  <option value=\"$societa[ID]\"".($societa['ID'] == $selected ? 'selected="selected"':'').">".str_replace('\'', '\\\'',$societa['i'])."</option>";
     }
-    
+
     function gestioneMappaliEX() {
         $foglio = $_POST['foglio'];
         $mappale = $_POST['mappale'];
         $ex = (($_POST['ex'] === 'yes') ? TRUE : (($_POST['ex'] === 'no') ? FALSE : NULL));
-        
+
         if(!is_numeric($foglio)||is_null($ex))
             return ['Richiesta non valida!', TRUE];
-        
+
         $res = $GLOBALS['c']->db->ql(
-            'SELECT * 
+            'SELECT *
             FROM pe_mappali_edifici m
             JOIN pe_edifici e ON e.ID = m.Edificio
             WHERE m.Mappale = :mapp AND e.Foglio = :fg',
             [':mapp' => $mappale,
             ':fg' => $foglio]);
-            
+
         if(count($res) == 0)
             return ["La coppia foglio $foglio, mappale $mappale non esiste", TRUE];
-            
+
         $res = $GLOBALS['c']->db->dml(
             'UPDATE pe_mappali_edifici m
             JOIN pe_edifici e ON e.ID = m.Edificio
@@ -280,7 +280,7 @@
             [':ex' => $ex?'EX':NULL,
             ':mapp' => $mappale,
             ':fg' => $foglio]);
-            
+
             return $res->rowCount() == 0 ? ['Non è stato necessario apportare modifiche', FALSE] : ['Modifiche apportate con successo', FALSE];
     }
 ?>
@@ -289,9 +289,9 @@
 		<title>PE</title>
 		<!-- CSS -->
 		<script src="lib/jquery-3.3.1.min.js"></script>
-		<link rel="stylesheet" href="lib/mini-default.min.css">
-		<link rel="stylesheet" href="lib/fontawesome/css/all.css">
-		<link rel="stylesheet" type="text/css" href="home.css">
+		<link rel="stylesheet" href="/lib/mini-default.min.css">
+		<link rel="stylesheet" href="/lib/fontawesome/css/all.css">
+		<link rel="stylesheet" type="text/css" href="/css/home.css">
 		<style type="text/css">
     	   .hintBox{
     	       background-color: #272727;
@@ -304,14 +304,14 @@
     	       color: white;
     	   }
 	   </style>
-		
+
 		<!-- OTHER -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" type="image/ico" href="favicon.ico">
 	</head>
 	<body>
-		<script type="text/javascript" src="home.js"></script>
-	
+		<script type="text/javascript" src="/js/home.js"></script>
+
 		<div id="navbar" class="navbar sticky">
             <div class="dropdown active">
             	<button class="dropbtn">Interrogazioni<i class="fas fa-caret-down" style="margin-left: 10px;"></i></button>
@@ -321,7 +321,7 @@
                     <a onclick="changeContent('intPra');">Pratiche</a>
                 </div>
             </div>
-            
+
             <div class="dropdown active">
             	<button class="dropbtn">Inserimenti<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
@@ -333,7 +333,7 @@
                     <a onclick="changeContent('insAnagImprese');">Impresa</a>
                 </div>
             </div>
- 			
+
  			<div class="dropdown active">
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
@@ -341,7 +341,7 @@
                 	<a href="/gestione/edifici.php">Gestione edifici</a>
             	</div>
  			</div>
- 			
+
  			<form action="index.php" method="post" id="logoutForm">
  				<button type="submit"  name="destroy" class="secondary" >Logout<i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i></button>
  				<?=
@@ -353,22 +353,22 @@
  				<a target="_blank" href="/phpmyadmin/">Database<i class="fas fa-database"></i></a>
  			</form>
         </div>
-        
+
         <h2 style="margin-top: 70px; text-align: center;">Comune di Canale d'Agordo - UTC</h2>
-        
-        <?php 
+
+        <?php
         if(isset($GLOBALS['err'])&&!empty($GLOBALS['err']))
                  echo "<pre style=\"border-left-color: red;\" class=\"info\">$GLOBALS[err]</pre>";
          if(isset($GLOBALS['succ'])&&!empty($GLOBALS['succ']))
                 echo "<pre class=\"info\">$GLOBALS[succ]</pre>";
         ?>
-        
+
         <div id="intAnag" class="content">
         	<div class="form">
         		<h1>Report anagrafiche</h1>
-        	
+
             	<form action="" method="post">
-            	
+
             		<div class="section">Tipologia</div>
             		<script type="text/javascript">
 						function chg(el) {
@@ -379,7 +379,7 @@
 							case 'impresa':
 								hide('nome-cognome'); show('piva'); show('intestazione'); show('cf');
 								break;
-								
+
 							case 'persona':
 								hide('intestazione'); hide('piva'); show('nome-cognome'); show('cf');
 								break;
@@ -387,17 +387,17 @@
 							case 'societa':
 								hide('nome-cognome'); show('piva'); show('intestazione'); hide('cf');
 								break;
-								
+
 							case 'tecnico':
 								hide('intestazione'); show('piva'); show('nome-cognome'); show('cf');
 								break;
-								
+
 							default:
 								break;
 							}
 							var sel = document.getElementById('tipo');
 						  	var opts = sel.options;
-						  	for (var opt, j = 0; opt = opts[j]; j++) 
+						  	for (var opt, j = 0; opt = opts[j]; j++)
 						    	if (opt.value == val) {
     						      sel.selectedIndex = j;
     						      break;
@@ -412,7 +412,7 @@
                     			<option value="impresa">Impresa</option>
                     		</select>
             		</div>
-            		
+
             		<div class="section">Dati personali</div>
             		<div class="inner-wrap">
             			<div id="nome-cognome">
@@ -429,48 +429,48 @@
             				<label>Partita iva<input type="text" name="piva" value="<?= $_POST['piva']??'' ?>"></label>
             			</div>
             		</div>
-            		
+
             		<button type="submit" name="btn" value="reportAnagrafica">Cerca</button>
             	</form>
         	</div>
-        	<?php 
+        	<?php
         	if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)&&$_POST['btn'] == 'reportAnagrafica'){
         	    include_once 'lib/reports.php';
         	    switch ($_POST['tipo']) {
         	        case 'persona':
         	            Reports::anagraficaIntestatario($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf']);
         	           break;
-        	        
+
         	        case 'societa':
         	            Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva']);
         	            break;
-        	        
+
         	        case 'tecnico':
         	            Reports::anagraficaTecnico($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf'], $_POST['piva']);
         	            break;
-        	            
+
         	        case 'impresa':
         	            Reports::anagraficaImprese($GLOBALS['c']->db, $_POST['intestazione'], $_POST['cf'], $_POST['piva']);
         	            break;
-        	            
+
         	        case 'pratica':
         	            //TODO
         	            break;
-        	            
+
         	        default:
         	            echo '<h1 style="color: red;">Report non supportato!<h1>';
         	           break;
         	    }
         	    echo "<script>directChg('$_POST[tipo]')</script>";
         	}
-        	       
+
     	    ?>
         </div>
-        
+
         <div id="intPra" class="content">
         	<div class="form">
             	<h1>Report pratiche</h1>
-            	
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="pratica">
             		<div class="inner-wrap">
@@ -492,11 +492,11 @@
             	</form>
         	</div>
         </div>
-        
+
         <div id="insAnagIntestPers" class="content">
         	<div class="form">
         		<h1>Inserimento intestatari persone</h1>
-        	
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="persone">
             		<div class="section">Dati</div>
@@ -513,11 +513,11 @@
 				</form>
 			</div>
         </div>
-        
+
         <div id="insAnagTecnici" class="content">
         	<div class="form">
         		<h1>Inserimento Tecnici</h1>
-        	
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="tecnici">
             		<div class="section">Dati</div>
@@ -538,11 +538,11 @@
 				</form>
 			</div>
         </div>
-        
+
          <div id="insAnagSocieta" class="content">
         	<div class="form">
         		<h1>Inserimento Società</h1>
-        	
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="societa">
             		<div class="section">Dati</div>
@@ -557,12 +557,12 @@
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
 				</form>
 			</div>
-        </div>     
-        
+        </div>
+
         <div id="insAnagImprese" class="content">
         	<div class="form">
         		<h1>Inserimento Impresa</h1>
-        	
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="impresa">
             		<div class="section">Dati</div>
@@ -575,12 +575,12 @@
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
 				</form>
 			</div>
-        </div>  
-        
+        </div>
+
         <div id="insPratiche" class="content">
         	<div class="form">
         		<h1>Inserimento pratiche</h1>
-        
+
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="pe">
             		<div class="section">Dati</div>
@@ -621,35 +621,35 @@
              	   				<button type="button" onclick="genSoc.addField();">+</button>
          	   				</div>
             			</div>
-            			
-            			
-            			
+
+
+
             			<label>Stradario<br>
          	   				<input id="stradario" type="text" onkeyup="updateHints('stradario', this, '#hintsStradari', '#stradarioID');" onclick="this.select();">
          	   				<input id="stradarioID" name="stradario" type="hidden">
      	   				</label>
          	   			<div id="hintsStradari" class="hintBox"></div>
-            			
+
          	   			<label>Tecnico<br>
          	   				<input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
          	   				<input id="tecnicoID" name="tecnico" type="hidden">
      	   				</label>
          	   			<div id="hintsTecnici" class="hintBox"></div>
-         	   			
+
          	   			<label>Impresa<br>
          	   				<input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', '#impresaID');" onclick="this.select();">
          	   				<input id="impresaID" name="impresa" type="hidden">
      	   				</label>
          	   			<div id="hintsImprese" class="hintBox"></div>
-         	   			
+
          	   			<label>Direzione lavori<br>
          	   				<input id="direzione_lavori" type="text" onkeyup="updateHints('tecnico', this, '#hintsDirezione_lavori', '#direzione_lavoriID');" onclick="this.select();">
          	   				<input id="direzione_lavoriID" name="direzione_lavori" type="hidden">
      	   				</label>
          	   			<div id="hintsDirezione_lavori" class="hintBox"></div>
-         	   			
+
          	   			<?php //TODO altri ?>
-         	   			
+
          	   			<label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
          	   			<label>Documento elettronico<input type="text" name="documento_elettronico" value="<?= $_POST['documento_elettronico']??'' ?>"></label>
          	   			<label>Data inizio lavori<input type="date" name="data_inizio_lavori" value="<?= $_POST['data_inizio_lavori']??'' ?>"></label>
@@ -659,11 +659,11 @@
 				</form>
 			</div>
         </div>
-        
+
         <div id="intEdificio" class="content">
         	<div class="form">
         		<h1>Storico edificio</h1>
-        	
+
             	<form action="reports/edificio.php" method="post" target="_blank">
             		<div class="section">Dati</div>
             		<div class="inner-wrap">
@@ -674,11 +674,11 @@
 				</form>
 			</div>
         </div>
-        
+
         <div id="gestMappEX" class="content">
         	<div class="form">
         		<h1>Gestione mappali EX</h1>
-        	
+
             	<form method="post">
             		<input type="hidden" name="tipo">
             		<div class="inner-wrap">
@@ -695,13 +695,13 @@
 			</div>
         </div>
         <?= isset($_POST['btn'])&&$_POST['btn']=='mappaliEX'?'<script type="text/javascript">changeContent(\'gestMappEX\');</script>':'' ?>
-        
+
         <script type="text/javascript">
     		var genPers = new FieldsGenIntPers(document.getElementById('fieldsIntPers'), '<?php generaListIntestatariPersone(); ?>');
     		var genSoc = new FieldsGenIntSoc(document.getElementById('fieldsIntSoc'), '<?php generaListIntestatariSocieta(); ?>');
 		</script>
-        
-        <?php 
+
+        <?php
             if(isset($GLOBALS['err'])&&isset($_POST['btn'])&&$_POST['btn'] == 'inserimentoAnagrafica')
                 switch ($_POST['tipo']) {
                     case 'persone':
