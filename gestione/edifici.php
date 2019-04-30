@@ -1,23 +1,23 @@
 <?php
     include_once '../controls.php';
     $c = new Controls();
-    
+
     if(!$c->logged()){
         header('Location: index.php?err=Utente non loggato');
         exit();
     }
-    
+
     if($c->check(['foglio', 'mappale'], $_POST)){
         $res = $c->db->ql('SELECT *
                                     FROM fogli_mappali_edifici
                                     WHERE Foglio LIKE ? AND Mappale LIKE ?',
                                     ["%$_POST[Foglio]%", "%$_POST[Mappale]%"]);
         print_r($res);
-            
+
     }
-    
+
     print_r($_POST);
-    
+
 ?>
 <html>
 <head>
@@ -31,16 +31,16 @@
 	</style>
 </head>
 <body>
-	
+
 	<!-- Sidebar -->
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
       <p onclick="reloadPageWithFlag('vis-mod')" class="w3-bar-item w3-button">Visualizza/<br>modifica</p>
       <p onclick="reloadPageWithFlag('new-ed')" class="w3-bar-item w3-button">Nuovo<br>edificio</p>
     </div>
-    
+
     <!-- Page Content -->
     <div id="pageContent" style="margin-left:17%">
-        
+
         <div id="vis-mod" class="content">
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>
             <div class="w3-container">
@@ -51,12 +51,12 @@
             	</form>
             </div>
         </div>
-        
+
         <div id="new-ed" class="content" style="display: none;">
         	<div class="w3-container w3-teal"><h1>Nuovo edificio</h1></div>
             <div class="w3-container">
             	<form method="post">
-            		<input type="number" name="foglio" placeholder="Foglio...">
+            		<input id="foglio-new-ed" onkeyup="checkAllMappali();" type="number" name="foglio" placeholder="Foglio...">
             		<div id="mappali-new-ed"></div>
             		<button type="button" onclick="addFiledMappale();">+</button>
             		<!-- ✔ -->
@@ -64,12 +64,12 @@
             	</form>
             </div>
         </div>
-        
+
     </div>
-    
+
     <script type="text/javascript" src="/lib/misc.js"></script>
 	<script type="text/javascript" src="edifici.js"></script>
     <script type="text/javascript">addFiledMappale();</script>
-    
+
 </body>
 </html>
