@@ -1,11 +1,10 @@
-let f = getParameter("flag");
-if(f) changeContent(f);
-
 var mappaliNewEdCount = 1;
-var validNewEdSubmit = false;
 
-function reloadPageWithFlag(flag){
-	window.location.replace("/gestione/edifici.php?flag="+flag);
+function changeContent(divID) {
+	var contents = document.getElementsByClassName('content');
+	for(var i = 0; i < contents.length; i++)
+		contents.item(i).className = 'content';
+	document.getElementById(divID).classList.add('active');
 }
 
 function addFiledMappale() {

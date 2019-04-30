@@ -109,8 +109,8 @@ path {
   width: 100%;
   padding-left: 10px;
 }
-.form input::-moz-focus-inner { 
-  border: 0; 
+.form input::-moz-focus-inner {
+  border: 0;
 }
 #submit {
   border: 0;

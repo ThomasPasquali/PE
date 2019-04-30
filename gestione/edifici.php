@@ -35,14 +35,14 @@
 
 	<!-- Sidebar -->
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
-      <p onclick="reloadPageWithFlag('vis-mod')" class="w3-bar-item w3-button">Visualizza/<br>modifica</p>
-      <p onclick="reloadPageWithFlag('new-ed')" class="w3-bar-item w3-button">Nuovo<br>edificio</p>
+      <p onclick="changeContent('vis-mod')" class="w3-bar-item w3-button">Visualizza/<br>modifica</p>
+      <p onclick="changeContent('new-ed')" class="w3-bar-item w3-button">Nuovo<br>edificio</p>
     </div>
 
     <!-- Page Content -->
     <div id="pageContent" style="margin-left:17%">
 
-        <div id="vis-mod" class="content">
+        <div id="vis-mod" class="content active">
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>
             <div class="w3-container">
             	<form method="post">
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div id="new-ed" class="content" style="display: none;">
+        <div id="new-ed" class="content">
         	<div class="w3-container w3-teal"><h1>Nuovo edificio</h1></div>
             <div class="w3-container">
             	<form method="post">
