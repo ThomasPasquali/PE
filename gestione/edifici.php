@@ -23,9 +23,15 @@
                         [$edID, $_POST['foglioNewEd'],$value]
                     );
     }
-    
+
     print_r($_POST);
 
+    function getMappaliEdificio($edID, $db){
+      return $db->ql('SELECT Mappale, EX
+                        FROM fogli_mappali_edifici
+                        WHERE Edificio = ?',
+                        [$edID]);
+    }
 ?>
 <html>
 <head>
@@ -39,7 +45,7 @@
             margin-top: 10px;
         }
         #form-editing-ed{
-        
+
         }
         #search-editing-ed *{
             display: inline-flex;
@@ -53,7 +59,7 @@
     </style>
 </head>
 <body>
-	
+
 	<!-- Sidebar -->
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
       <p onclick="changeContent('vis-mod')" class="w3-bar-item w3-button">Visualizza/<br>modifica</p>
@@ -73,9 +79,9 @@
                 		<h2>Mappale/i</h2>
                 		<input type="number" name="searchMappale" placeholder="Mappale..." value="<?= $_POST['searchMappale']??'' ?>">
                 		<input type="submit" value="Cerca">
-                		
+
                 		<div id="search-results">
-                			<?php 
+                			<?php
                                 if($c->check(['searchFoglio', 'searchMappale'], $_POST)){
                                      $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
                                                                  FROM fogli_mappali_edifici fm
@@ -84,13 +90,22 @@
                                                                  WHERE fm.Foglio LIKE ? AND fm.Mappale LIKE ?',
                                                                  ["%$_POST[searchFoglio]%", "%$_POST[searchMappale]%"]);
                                      foreach ($res as $ed) {
-                                         echo "<p onclick=\"editEdificio($ed[id]);\">$ed[foglio](Foglio) $ed[strad](Stradario) $ed[note](Note)</p>";
+                                         echo "<p onclick=\"editEdificio($ed[id]);\">";
+                                         echo "Foglio $ed[foglio]";
+                                         $mappali = getMappaliEdificio($ed['id'], $c->db);
+                                         $strMappali = '';
+                                         foreach ($mappali as $mappale)
+                                            $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
+                                         echo " Mappale/i ".substr($strMappali, 2);
+                                         echo " Stradario $ed[strad]";
+                                         echo empty($ed['note'])?'':" $ed[note]";
+                                         echo "</p>";
                                      }
                                  }
                 			?>
                 		</div>
-                		
-                		<?php 
+
+                		<?php
                 		if($c->check(['editingEdificio'], $_POST)){
                 		    $ed = $c->db->ql('SELECT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
                                                         FROM fogli_mappali_edifici fm
@@ -100,10 +115,7 @@
                 		                              [$_POST['editingEdificio']]);
                 		    if(count($ed) > 0){
                 		        $ed = $ed[0];
-                		        $mappali = $c->db->ql('   SELECT Mappale, EX
-                                                                    FROM fogli_mappali_edifici
-                                                                    WHERE Edificio = ?',
-                		                                          [$_POST['editingEdificio']]);
+                                $mappali = getMappaliEdificio($_POST['editingEdificio'], $c->db);
                                 print_r($ed);
                                 print_r($mappali);
                 		?>
@@ -113,7 +125,7 @@
                     			<h4>Foglio</h4>
                     			<input name="foglio-editing-ed" autocomplete="off" type="number" max="9999" placeholder="Foglio..." required="required" value="<?= $ed['foglio'] ?>">
                     		</div>
-                		<?php 
+                		<?php
                 		    }
                 		}
                 		?>
