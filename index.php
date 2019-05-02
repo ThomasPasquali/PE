@@ -37,7 +37,7 @@
 ?>
 <html lang="it">
 <head>
-	<link href='index.css' rel='stylesheet' type='text/css'>
+	<link href='/css/index.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
     <div class="page">

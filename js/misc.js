@@ -22,7 +22,7 @@ function displayMessage(msg, element, type='') {
     let div = document.createElement('div');
     div.classList.add('alert');
     if(type !== '') div.classList.add(type);
-    
+
     let span = document.createElement('span');
     span.classList.add('closebtn');
     span.innerHTML = '&times';
@@ -31,22 +31,21 @@ function displayMessage(msg, element, type='') {
 	    div.style.opacity = "0";
 	    setTimeout(function(){ div.style.display = "none"; }, 600);
 	  }
-    
+
     div.innerHTML = msg;
     div.appendChild(span);
-    
+
 	element.insertBefore(div, element.children[1]);
 };
 
 /***********HINTS*************/
 
 function updateHints(type, field, hintBoxID, targetFieldID) {
-	
 	var request = $.ajax({
         url: "/runtime/handler.php",
         type: "POST",
         data: {
-  	  	          	"action" : "hint",
+  	          	"action" : "hint",
           			"type" : type,
           			"search" : field.value
       			},
@@ -56,13 +55,15 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
 		request.error = function(msg) {
           alert( "Errore: " + msg);
     };
-	
+
 	    request.fail(function(jqXHR, textStatus) {
 	         request.error(textStatus);
       });
-      
+
       request.done(function(hints) {
-	        hints = JSON.parse(hints);
+				console.log(hints);
+				if(hints){
+					hints = JSON.parse(hints);
 	      	$(hintBoxID).empty();
 	      	$(hintBoxID).css("display", "block");
 	      	for (let el of hints) {
@@ -70,8 +71,8 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
 	        	a.innerHTML = el.Description;
 	        	a.setAttribute('onclick', 'setValue("'+targetFieldID+'", "'+el.ID+'"); setValue("#'+field.id+'", "'+a.innerHTML+'"); $("'+hintBoxID+'").css("display", "none");');
 	        	$(hintBoxID).append(a);
-			}
-      });
+				}
+			}});
 }
 
 function setValue(elID, newValue) {

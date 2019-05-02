@@ -1,4 +1,5 @@
 var mappaliNewEdCount = 1;
+var b;
 
 function changeContent(divID) {
 	var contents = document.getElementsByClassName('content');
@@ -14,7 +15,8 @@ function addFiledMappale() {
 	field.placeholder = mappaliNewEdCount+'° mappale';
 	field.type = 'text';
 	field.pattern = '\\d{1,4}';
-	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this);')
+	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this);');
+	field.setAttribute('autocomplete', 'off');
 	let div = document.createElement('div');
 	div.appendChild(field);
 	let span = document.createElement('span');
@@ -28,6 +30,17 @@ function addFiledMappale() {
 function checkIfMappaleIsFree(el) {
 	let foglio = $('#foglio-new-ed').val();
 	if(foglio){
+		//local check TODO NON VAAAAAAA
+		b = true;
+		$(".mappale").each(function(){
+			console.log('TAsssss:'+$(this).val());
+			if($(this).val() == foglio)
+				return false;
+		});
+		if(!b) return false;
+		console.log('db check');
+		
+		//db check
 		var request = $.ajax({
       url: "/runtime/handler.php",
       type: "POST",
@@ -54,7 +67,6 @@ function checkAllMappali() {
 	});
 }
 
-var b;
 function areAllMappaliOk(){
 	b = true;
 	$(".esitiCheckMappali").each(function(){
@@ -64,6 +76,8 @@ function areAllMappaliOk(){
 }
 
 function submitNewEdificio() {
-	//TODO
-	console.log(areAllMappaliOk());
+	if(areAllMappaliOk()&&$('#stradarioID-new-ed').val())
+		$('#form-new-ed').submit();
+	else
+		displayMessage('Completare tutti i campi e riprovare', document.getElementById('container-new-ed'));
 }
