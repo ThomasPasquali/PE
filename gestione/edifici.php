@@ -7,15 +7,6 @@
         exit();
     }
 
-    /*if($c->check(['foglio', 'mappale'], $_POST)){
-        $res = $c->db->ql('SELECT *
-                                    FROM fogli_mappali_edifici
-                                    WHERE Foglio LIKE ? AND Mappale LIKE ?',
-                                    ["%$_POST[Foglio]%", "%$_POST[Mappale]%"]);
-        print_r($res);
-
-    }*/
-    
     $edInserted = false;
     if($c->check(['foglioNewEd','stradarioNewEd'], $_POST)&&isset($_POST['noteNewEd'])){
         $edID = $c->db->ql('SELECT MAX(ID)+1 id FROM edifici')[0]['id'];
@@ -50,8 +41,14 @@
         #form-editing-ed{
         
         }
-        #search-editing-ed{
-        
+        #search-editing-ed *{
+            display: inline-flex;
+        }
+        #search-editing-ed div{
+            display: block;
+        }
+        #search-results *{
+            display: block;
         }
     </style>
 </head>
@@ -72,10 +69,54 @@
             	<form id="form-editing-ed" method="post">
             		<div id="search-editing-ed">
                 		<h2>Foglio</h2>
-                		<input type="number" name="foglio" placeholder="Foglio..." value="<?= $_POST['foglio']??'' ?>">
+                		<input type="number" name="searchFoglio" placeholder="Foglio..." value="<?= $_POST['searchFoglio']??'' ?>">
                 		<h2>Mappale/i</h2>
-                		<input type="number" name="mappale" placeholder="Mappale..." value="<?= $_POST['mappale']??'' ?>">
+                		<input type="number" name="searchMappale" placeholder="Mappale..." value="<?= $_POST['searchMappale']??'' ?>">
                 		<input type="submit" value="Cerca">
+                		
+                		<div id="search-results">
+                			<?php 
+                                if($c->check(['searchFoglio', 'searchMappale'], $_POST)){
+                                     $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
+                                                                 FROM fogli_mappali_edifici fm
+                                                                JOIN edifici e ON e.ID = fm.Edificio
+                                                                JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
+                                                                 WHERE fm.Foglio LIKE ? AND fm.Mappale LIKE ?',
+                                                                 ["%$_POST[searchFoglio]%", "%$_POST[searchMappale]%"]);
+                                     foreach ($res as $ed) {
+                                         echo "<p onclick=\"editEdificio($ed[id]);\">$ed[foglio](Foglio) $ed[strad](Stradario) $ed[note](Note)</p>";
+                                     }
+                                 }
+                			?>
+                		</div>
+                		
+                		<?php 
+                		if($c->check(['editingEdificio'], $_POST)){
+                		    $ed = $c->db->ql('SELECT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
+                                                        FROM fogli_mappali_edifici fm
+                                                        JOIN edifici e ON e.ID = fm.Edificio
+                                                        JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
+                                                        WHERE e.ID = ?',
+                		                              [$_POST['editingEdificio']]);
+                		    if(count($ed) > 0){
+                		        $ed = $ed[0];
+                		        $mappali = $c->db->ql('   SELECT Mappale, EX
+                                                                    FROM fogli_mappali_edifici
+                                                                    WHERE Edificio = ?',
+                		                                          [$_POST['editingEdificio']]);
+                                print_r($ed);
+                                print_r($mappali);
+                		?>
+                    		<div id="editing-edificio">
+                    			<h2>Modifica edificio</h2>
+                    			<br>
+                    			<h4>Foglio</h4>
+                    			<input name="foglio-editing-ed" autocomplete="off" type="number" max="9999" placeholder="Foglio..." required="required" value="<?= $ed['foglio'] ?>">
+                    		</div>
+                		<?php 
+                		    }
+                		}
+                		?>
             		</div>
             	</form>
             </div>
@@ -86,14 +127,14 @@
             <div id="container-new-ed" class="w3-container">
             	<form id="form-new-ed" method="post">
             		<h2>Foglio</h2>
-            		<input id="foglio-new-ed" autocomplete="off" onkeyup="checkAllMappali();" type="number" name="foglioNewEd" max="9999" placeholder="Foglio...">
+            		<input id="foglio-new-ed" autocomplete="off" required="required" onkeyup="checkAllMappali();" type="number" name="foglioNewEd" max="9999" placeholder="Foglio...">
 
             		<h2>Mappale/i</h2>
             		<div id="mappali-new-ed"></div>
             		<button type="button" onclick="addFiledMappale();">+</button>
 
             		<h2>Stradario</h2>
- 	   				<input id="stradario-new-ed" type="text" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-new-ed', '#stradarioID-new-ed');" onclick="this.select();" placeholder="Stradario...">
+ 	   				<input id="stradario-new-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-new-ed', '#stradarioID-new-ed');" onclick="this.select();" placeholder="Stradario...">
  	   				<input id="stradarioID-new-ed" name="stradarioNewEd" type="hidden">
      	   			<div id="hintsStradari-new-ed" class="hintBox"></div>
 

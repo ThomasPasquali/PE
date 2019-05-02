@@ -33,13 +33,13 @@ function checkIfMappaleIsFree(el) {
 		//local check TODO NON VAAAAAAA
 		b = true;
 		$(".mappale").each(function(){
-			console.log('TAsssss:'+$(this).val());
+			//console.log('TAsssss:'+$(this).val());
 			if($(this).val() == foglio)
 				return false;
 		});
 		if(!b) return false;
-		console.log('db check');
-		
+		//console.log('db check');
+
 		//db check
 		var request = $.ajax({
       url: "/runtime/handler.php",
@@ -80,4 +80,11 @@ function submitNewEdificio() {
 		$('#form-new-ed').submit();
 	else
 		displayMessage('Completare tutti i campi e riprovare', document.getElementById('container-new-ed'));
+}
+
+
+function editEdificio(ID){
+	var input = $('<input>').attr("type", "hidden").attr("name", "editingEdificio").val(ID);
+	$('#form-editing-ed').append(input);
+	$('#form-editing-ed').submit();
 }
