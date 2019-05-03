@@ -29,6 +29,13 @@
             }
         }
         
+        /**
+         * 
+         * @param string $sql query text
+         * @param array $params parameters to bind to the query
+         * @throws PDOException
+         * @return PDOStatement the result statement
+         */
         public function dml($sql, $params=NULL) {
             try {
                 $this->beginTransaction();

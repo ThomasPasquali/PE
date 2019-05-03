@@ -7,14 +7,20 @@
         exit();
     }
 
-    $edInserted = false;
+    print_r($_POST);
+    
+    //INSERT EDIFICIO
+    $edInserted = FALSE;
     if($c->check(['foglioNewEd','stradarioNewEd'], $_POST)&&isset($_POST['noteNewEd'])){
+        //NEW ID EXTRACTION
         $edID = $c->db->ql('SELECT MAX(ID)+1 id FROM edifici')[0]['id'];
         $res = $c->db->dml(
             'INSERT INTO edifici (ID, Foglio, Stradario, Note) VALUES(?,?,?,?)',
             [$edID,$_POST['foglioNewEd'],$_POST['stradarioNewEd'],empty($_POST['noteNewEd'])?NULL:$_POST['noteNewEd']]
         );
         $edInserted = $res->errorCode() == '0';
+        
+        //INSERT MAPPALI
         if($edInserted)
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('mappNewEd')) === 'mappNewEd'&&!empty($value))
@@ -24,8 +30,59 @@
                     );
     }
 
-    print_r($_POST);
+    //UPDATDE EDIFICIO
+    $edUpdated = FALSE;
+    $edUpdateError = FALSE;
+    if($c->check(['foglioEditingEd', 'stradarioEditingEd', 'noteEditingEd', 'edificioEditingEd'], $_POST)){
+        //UPDATE TABLE EDIFICI
+        $res =$c->db->dml(
+            'UPDATE edifici SET Foglio = ?, Stradario = ?, Note = ? WHERE ID = ?',
+            [$_POST['foglioEditingEd'], $_POST['stradarioEditingEd'], $_POST['noteEditingEd'], $_POST['edificioEditingEd']]);
+    
+        if($res->errorCode() != 0)
+            $edUpdateError = $res->errorInfo()[2];
+        else
+        //UPDATE TABLE MAPPALI
+            /*Array (
+             * [mappEditingEd1] => 1
+             * [isExMappEditingEd1] => EX
+             * [mappEditingEd2] => 3
+             * [isExMappEditingEd2] => EX
+             * [mappEditingEd3] => 123
+             * )*/
+             foreach ($_POST as $key => $value) {
+                if(substr($key, 0, strlen('mappEditingEd')) == 'mappEditingEd'){
+                    
+                    //CHECK IF EXISTS
+                    $res = $c->db->ql(
+                        'SELECT EX FROM fogli_mappali_edifici 
+                        WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                        [$_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
+                    
+                    if(count($res) > 0){
+                        //IF EXISTS AND EX HAS CHANGED
+                        $mappaleNum = substr($key, strlen('mappEditingEd')+1, strlen($key));
+                        echo $mappaleNum;
+                        $exFromUser = isset($_POST["isExMappEditingEd$mappaleNum"]);
+                        $exFromDB = $res['EX'] == 'EX';
+                        
+                        if($exFromDB != $exFromUser){
+                            //CHANGE DB VALUE OF EX
+                            $c->db->dml(
+                                'UPDATE fogli_mappali_edifici SET EX = ? WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                                [($exFromUser?'EX':NULL), $_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
+                        }else {
+                            //TODO IF DOESN'T EXIST
+                            
+                        }
+                    }
+                }
+             }
+        $edUpdated = TRUE;
+    }
 
+    
+    //MISC FUNCTIONS
     function getMappaliEdificio($edID, $db){
       return $db->ql('SELECT Mappale, EX
                         FROM fogli_mappali_edifici
@@ -92,7 +149,7 @@
 
         <div id="vis-mod" class="content active">
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>
-            <div class="w3-container">
+            <div id="container-editing-ed" class="w3-container">
             	<form id="form-search-ed" method="post">
             		<div id="search-editing-ed">
                 		<h2>Foglio</h2>
@@ -206,12 +263,19 @@
 	<script type="text/javascript" src="/js/gestione_edifici.js"></script>
     <script type="text/javascript">addFiledMappaleNewEd();</script>
     <?php
-	 echo '<script>';
-	 foreach ($mappali as $mappale) 
-	     echo "addFiledMappaleEditingEd($mappale[Mappale], ".($mappale['EX']=='EX'?'true':'false').", $_POST[editingEdificio]);";
-	 echo '</script>';
-	?>
-	<?php if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>" ?>
+    if(isset($mappali)){
+        echo '<script>';
+        foreach ($mappali as $mappale)
+            echo "addFiledMappaleEditingEd($mappale[Mappale], ".($mappale['EX']=='EX'?'true':'false').", $_POST[editingEdificio]);";
+        echo '</script>';
+    }
+    if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>";
+    if($edUpdated)
+        if($edUpdateError === FALSE)
+            echo "<script>displayMessage('Edificio $_POST[edificioEditingEd] modificato con successo', document.body, 'info');</script>";
+        else
+         echo "<script>displayMessage('Errore durante la modifica dell'edificio $_POST[edificioEditingEd]: $edUpdateError', document.body);</script>";
+    ?>
 	
 </body>
 </html>

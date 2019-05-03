@@ -47,7 +47,7 @@ function addFiledMappaleEditingEd(mappale, isEX, edificio) {
 	if(isEX) fieldEX.checked = 'checked';
 
 	let span = document.createElement('span');
-	span.className = 'esitiCheckMappali';
+	span.className = 'esitiCheckMappaliEditingEd';
 	
 	let p = document.createElement('p');
 	p.innerHTML = 'EX';
@@ -110,22 +110,27 @@ function checkAllMappaliEditingEd() {
 	});
 }
 
-function areAllMappaliNewEdOk(){
+function areAllMappaliOk(classCheckMappali){
 	b = true;
-	$(".esitiCheckMappaliNewEd").each(function(){
+	$("."+classCheckMappali).each(function(){
 		 if($(this).html() !== '✔') b = false;
 	});
 	return b;
 }
 
 function submitNewEdificio() {
-	if(areAllMappaliNewEdOk()&&$('#stradarioID-new-ed').val())
+	if(areAllMappaliOk('esitiCheckMappaliNewEd')&&$('#stradarioID-new-ed').val())
 		$('#form-new-ed').submit();
 	else
 		displayMessage('Completare tutti i campi e riprovare', document.getElementById('container-new-ed'));
 }
 
-//TODO submit edit edificio
+function submitModificheEdificio() {
+	if(areAllMappaliOk('esitiCheckMappaliEditingEd'))
+		$('#form-edit-ed').submit();
+	else
+		displayMessage('Correggi i dati e riprovare', document.getElementById('container-editing-ed'));
+}
 
 function editEdificio(ID){
 	var input = $('<input>').attr("type", "hidden").attr("name", "editingEdificio").val(ID);
