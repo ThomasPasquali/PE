@@ -45,7 +45,7 @@
                 exit();
 
             case 'checkMappale':
-              checkIfMappaleIsFree($_POST['foglio'], $_POST['mappale'], $c->db);
+                checkIfMappaleIsFree($_POST['foglio'], $_POST['mappale'], $_POST['edificioToExclude'], $c->db);
               exit();
 
             default:
@@ -106,15 +106,19 @@
         echo $res->errorCode() == 0?'DONE':$res->errorInfo()[2];
     }
 
-    function checkIfMappaleIsFree($foglio, $mappale, $db) {
+    function checkIfMappaleIsFree($foglio, $mappale, $edificioToExclude, $db) {
         header('Content-type: text/plain');
         if(empty($foglio)||empty($mappale)){
             echo 'NO';
             exit();
         }
+        $params = [$foglio, $mappale];
+        if(!empty($edificioToExclude)) $params[] = $edificioToExclude;
         $res = $db->ql('SELECT *
-                                  FROM fogli_mappali_edifici
-                                  WHERE Foglio LIKE ? AND Mappale LIKE ?',
-                                  ["%$foglio%", "%$mappale%"]);
+                              FROM fogli_mappali_edifici
+                              WHERE Foglio = ? AND Mappale = ? '
+                            .(empty($edificioToExclude)?'':'AND Edificio <> ?'),
+                              $params);
+        //print_r($res);
         echo count($res) > 0?'NO':'OK';
     }

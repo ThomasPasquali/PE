@@ -1,4 +1,5 @@
 var mappaliNewEdCount = 1;
+var mappaliEditingEdCount = 1;
 var b;
 
 function changeContent(divID) {
@@ -8,31 +9,66 @@ function changeContent(divID) {
 	document.getElementById(divID).classList.add('active');
 }
 
-function addFiledMappale() {
+function addFiledMappaleNewEd() {
 	let field = document.createElement('input');
 	field.name = 'mappNewEd'+mappaliNewEdCount;
-	field.className = 'mappale';
+	field.className = 'mappaleNewEd';
 	field.placeholder = mappaliNewEdCount+'° mappale';
 	field.type = 'text';
 	field.pattern = '\\d{1,4}';
-	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this);');
+	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this, "foglio-new-ed", "mappaleNewEd");');
 	field.setAttribute('autocomplete', 'off');
 	let div = document.createElement('div');
 	div.appendChild(field);
 	let span = document.createElement('span');
-	span.className = 'esitiCheckMappali';
+	span.className = 'esitiCheckMappaliNewEd';
 	div.appendChild(span);
 	$('#mappali-new-ed').append(div);
-	checkIfMappaleIsFree(field);
+	checkIfMappaleIsFree(field, "foglio-new-ed", "mappaleNewEd");
 	mappaliNewEdCount++;
 }
 
-function checkIfMappaleIsFree(el) {
-	let foglio = $('#foglio-new-ed').val();
+function addFiledMappaleEditingEd(mappale, isEX, edificio) {
+	//TODO ex
+	let field = document.createElement('input');
+	field.name = 'mappEditingEd'+mappaliEditingEdCount;
+	field.className = 'mappaleEditingEd';
+	field.placeholder = mappaliEditingEdCount+'° mappale';
+	field.type = 'text';
+	field.pattern = '\\d{1,4}';
+	field.value = mappale;
+	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this, "foglio-editing-ed", "mappaleEditingEd", '+edificio+');');
+	field.setAttribute('autocomplete', 'off');
+	
+	let fieldEX = document.createElement('input');
+	fieldEX.name = 'isExMappEditingEd'+mappaliEditingEdCount;
+	fieldEX.type = 'checkbox';
+	fieldEX.value = 'EX'
+	if(isEX) fieldEX.checked = 'checked';
+
+	let span = document.createElement('span');
+	span.className = 'esitiCheckMappali';
+	
+	let p = document.createElement('p');
+	p.innerHTML = 'EX';
+	
+	let div = document.createElement('div');
+	div.appendChild(field);
+	div.appendChild(p);
+	div.appendChild(fieldEX);
+	div.appendChild(span);
+	
+	$('#mappali-editing-ed').append(div);
+	checkIfMappaleIsFree(field, "foglio-editing-ed", "mappaleEditingEd", edificio)
+	mappaliEditingEdCount++;
+}
+
+function checkIfMappaleIsFree(el, foglioFieldID, mappaliClass, edificioToExcludeID = '') {
+	let foglio = $('#'+foglioFieldID).val();
 	if(foglio){
 		//local check TODO NON VAAAAAAA
 		b = true;
-		$(".mappale").each(function(){
+		$('.'+mappaliClass).each(function(){
 			//console.log('TAsssss:'+$(this).val());
 			if($(this).val() == foglio)
 				return false;
@@ -41,19 +77,20 @@ function checkIfMappaleIsFree(el) {
 		//console.log('db check');
 
 		//db check
-		var request = $.ajax({
+	var request = $.ajax({
       url: "/runtime/handler.php",
       type: "POST",
-      data: {"action":"checkMappale", "foglio" : foglio, "mappale" : el.value},
+      data: {"action":"checkMappale", "foglio" : foglio, "mappale" : el.value, "edificioToExclude" : edificioToExcludeID},
       dataType: "text"
     });
     request.fail(function(jqXHR, textStatus) {
-        	alert('Errore: '+textStatus);
+    	alert('Errore: '+textStatus);
     });
     request.done(function(msg) {
-			let span = el.parentNode.lastChild;
-			span.innerHTML = (msg=='OK'?'✔':'✖');
-			return msg=='OK';
+    	//console.log(msg);
+		let span = el.parentNode.lastChild;
+		span.innerHTML = (msg=='OK'?'✔':'✖');
+		return msg=='OK';
     });
 	}else{
 		el.parentNode.lastChild.innerHTML = 'Specificare il foglio';
@@ -61,30 +98,37 @@ function checkIfMappaleIsFree(el) {
 	}
 }
 
-function checkAllMappali() {
-	$(".mappale").each(function(){
+function checkAllMappaliNewEd() {
+	$(".mappaleNewEd").each(function(){
 		$(this).keyup();
 	});
 }
 
-function areAllMappaliOk(){
+function checkAllMappaliEditingEd() {
+	$(".mappaleEditingEd").each(function(){
+		$(this).keyup();
+	});
+}
+
+function areAllMappaliNewEdOk(){
 	b = true;
-	$(".esitiCheckMappali").each(function(){
+	$(".esitiCheckMappaliNewEd").each(function(){
 		 if($(this).html() !== '✔') b = false;
 	});
 	return b;
 }
 
 function submitNewEdificio() {
-	if(areAllMappaliOk()&&$('#stradarioID-new-ed').val())
+	if(areAllMappaliNewEdOk()&&$('#stradarioID-new-ed').val())
 		$('#form-new-ed').submit();
 	else
 		displayMessage('Completare tutti i campi e riprovare', document.getElementById('container-new-ed'));
 }
 
+//TODO submit edit edificio
 
 function editEdificio(ID){
 	var input = $('<input>').attr("type", "hidden").attr("name", "editingEdificio").val(ID);
-	$('#form-editing-ed').append(input);
-	$('#form-editing-ed').submit();
+	$('#form-search-ed').append(input);
+	$('#form-search-ed').submit();
 }
