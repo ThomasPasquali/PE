@@ -8,7 +8,7 @@
     }
 
     print_r($_POST);
-    
+
     //INSERT EDIFICIO
     $edInserted = FALSE;
     if($c->check(['foglioNewEd','stradarioNewEd'], $_POST)&&isset($_POST['noteNewEd'])){
@@ -19,7 +19,7 @@
             [$edID,$_POST['foglioNewEd'],$_POST['stradarioNewEd'],empty($_POST['noteNewEd'])?NULL:$_POST['noteNewEd']]
         );
         $edInserted = $res->errorCode() == '0';
-        
+
         //INSERT MAPPALI
         if($edInserted)
             foreach ($_POST as $key => $value)
@@ -32,56 +32,66 @@
 
     //UPDATDE EDIFICIO TODO subalterni
     $edUpdated = FALSE;
-    $edUpdateError = FALSE;
+    $edUpdateErrors = [];
+    $edUpdateInfos = [];
+
     if($c->check(['foglioEditingEd', 'stradarioEditingEd', 'noteEditingEd', 'edificioEditingEd'], $_POST)){
-        //UPDATE TABLE EDIFICI
-        $res =$c->db->dml(
-            'UPDATE edifici SET Foglio = ?, Stradario = ?, Note = ? WHERE ID = ?',
-            [$_POST['foglioEditingEd'], $_POST['stradarioEditingEd'], $_POST['noteEditingEd'], $_POST['edificioEditingEd']]);
-    
-        if($res->errorCode() != 0)
-            $edUpdateError = $res->errorInfo()[2];
-        else
+      $edUpdated = TRUE;
+      //UPDATE TABLE EDIFICI
+      $res =$c->db->dml(
+          'UPDATE edifici SET Foglio = ?, Stradario = ?, Note = ? WHERE ID = ?',
+          [$_POST['foglioEditingEd'], $_POST['stradarioEditingEd'], $_POST['noteEditingEd'], $_POST['edificioEditingEd']]);
+
+      if($res->errorCode() != 0)
+          $edUpdateErrors[] = $res->errorInfo()[2];
+      else {
+        $edUpdateInfos[] = "Edificio $_POST[edificioEditingEd] modificato con successo";
         //UPDATE TABLE MAPPALI
-            /*Array (
-             * [mappEditingEd1] => 1
-             * [isExMappEditingEd1] => EX
-             * [mappEditingEd2] => 3
-             * [isExMappEditingEd2] => EX
-             * [mappEditingEd3] => 123
-             * )*/
-             foreach ($_POST as $key => $value) {
-                if(substr($key, 0, strlen('mappEditingEd')) == 'mappEditingEd'){
-                    
-                    //CHECK IF EXISTS
-                    $res = $c->db->ql(
-                        'SELECT EX FROM fogli_mappali_edifici 
-                        WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                        [$_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
-                    
-                    if(count($res) > 0){
-                        //IF EXISTS AND EX HAS CHANGED
-                        $mappaleNum = substr($key, strlen('mappEditingEd')+1, strlen($key));
-                        echo $mappaleNum;
-                        $exFromUser = isset($_POST["isExMappEditingEd$mappaleNum"]);
-                        $exFromDB = $res['EX'] == 'EX';
-                        
-                        if($exFromDB != $exFromUser){
-                            //CHANGE DB VALUE OF EX
-                            $c->db->dml(
-                                'UPDATE fogli_mappali_edifici SET EX = ? WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                                [($exFromUser?'EX':NULL), $_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
-                        }else {
-                            //TODO IF DOESN'T EXIST
-                            
-                        }
-                    }
+         $mappali = [];
+         foreach ($_POST as $key => $value) {
+            if(substr($key, 0, strlen('mappEditingEd')) == 'mappEditingEd'){
+                $mappali[] = $value;
+                //CHECK IF EXISTS
+                $res = $c->db->ql(
+                    'SELECT EX FROM fogli_mappali_edifici
+                    WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                    [$_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
+
+                $mappaleNum = substr($key, strlen('mappEditingEd'), strlen($key));
+                $exFromUser = isset($_POST["isExMappEditingEd$mappaleNum"]);
+
+                if(count($res) > 0){
+                  //IF EXISTS AND EX HAS CHANGED
+                  $exFromDB = $res[0]['EX'] == 'EX';
+                  if($exFromDB != $exFromUser){
+                    //CHANGE DB VALUE OF EX
+                    $c->db->dml(
+                        'UPDATE fogli_mappali_edifici SET EX = ? WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                        [($exFromUser?'EX':NULL), $_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value]);
+                        $edUpdateInfos[] = "Valore di EX del mappale $value modificato a: ".($exFromUser?'EX':'NULL');
+                  }
+                }else{
+                  //IF DOESN'T EXIST
+                  $res = $c->db->dml(
+                      'INSERT INTO fogli_mappali_edifici (Edificio, Foglio, Mappale, EX) VALUES (?,?,?,?)',
+                      [$_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $value, ($exFromUser?'EX':NULL)]);
+                  if($res->errorCode() == '0')
+                    $edUpdateInfos[] = "Mappale $value inserito");
+                  else
+                    $edUpdateErrors[] = //TODO
                 }
-             }
-        $edUpdated = TRUE;
+              }
+           }
+           //DELETE OMITTED MAPPALI
+           $mappaliFromDB = getMappaliEdificio($_POST['edificioEditingEd'], $c->db);
+           foreach ($mappaliFromDB as $mappaleFromDB)
+             if(!in_array($mappaleFromDB, $mappali))
+               $c->db->dml(
+                   'DELETE FROM fogli_mappali_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                   [$_POST['edificioEditingEd'], $_POST['foglioEditingEd'], $mappaleFromDB['Mappale']]);
+         }
     }
 
-    
     //MISC FUNCTIONS
     function getMappaliEdificio($edID, $db){
       return $db->ql('SELECT Mappale, EX
@@ -157,43 +167,54 @@
                 		<h2>Mappale/i</h2>
                 		<input type="number" name="searchMappale" placeholder="Mappale..." value="<?= $_POST['searchMappale']??'' ?>">
                 		<input type="submit" value="Cerca">
-        		
+
 
                 		<div id="search-results">
                 			<?php
-                                if($c->check(['searchFoglio', 'searchMappale'], $_POST)){
-                                     $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
-                                                                 FROM fogli_mappali_edifici fm
-                                                                JOIN edifici e ON e.ID = fm.Edificio
-                                                                JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
-                                                                 WHERE fm.Foglio LIKE ? AND fm.Mappale LIKE ?',
-                                                                 ["%$_POST[searchFoglio]%", "%$_POST[searchMappale]%"]);
-                                     foreach ($res as $ed) {
-                                         echo "<p class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
-                                         echo "<strong>ID edificio </strong>$ed[id]";
-                                         echo "<strong>Foglio </strong>$ed[foglio]";
-                                         $mappali = getMappaliEdificio($ed['id'], $c->db);
-                                         $strMappali = '';
-                                         foreach ($mappali as $mappale)
-                                            $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
-                                         echo "<strong>Mappale/i </strong>".substr($strMappali, 2);
-                                         echo "<strong>Stradario </strong>$ed[strad]";
-                                         echo empty($ed['note'])?'':"<strong>Note </strong>$ed[note]";
-                                         echo "</p>";
-                                     }
-                                 }
-                			?>
+                      if(isset($_POST['searchFoglio'])&&isset($_POST['searchMappale'])){
+                        $where = [];
+                        $params = [];
+                        if(!empty($_POST['searchFoglio'])){
+                          $where[] = 'e.Foglio LIKE ?';
+                          $params[] = "%$_POST[searchFoglio]%";
+                        }
+                        if(!empty($_POST['searchMappale'])){
+                          $where[] = 'fm.Mappale LIKE ?';
+                          $params[] = "%$_POST[searchMappale]%";
+                        }
+                        $where = implode(' AND ', $where);
+                       $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
+                                                  FROM edifici e
+                                                  LEFT JOIN fogli_mappali_edifici fm ON e.ID = fm.Edificio
+                                                  JOIN stradario s ON s.Identificativo_nazionale = e.Stradario'.
+                                                  (empty($where)?'':" WHERE $where").
+                                                  ' LIMIT 50',
+                                                   $params);
+                       foreach ($res as $ed) {
+                           echo "<p class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
+                           echo "<strong>ID edificio </strong>$ed[id]";
+                           echo "<strong>Foglio </strong>$ed[foglio]";
+                           $mappali = getMappaliEdificio($ed['id'], $c->db);
+                           $strMappali = '';
+                           foreach ($mappali as $mappale)
+                              $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
+                           echo "<strong>Mappale/i </strong>".substr($strMappali, 2);
+                           echo "<strong>Stradario </strong>$ed[strad]";
+                           echo empty($ed['note'])?'':"<strong>Note </strong>$ed[note]";
+                           echo "</p>";
+                         }
+                       }
+  			              ?>
                 		</div>
                 		</div>
             		</form>
-            		
+
             		<form id="form-edit-ed" action="" method="post">
                 		<div id="editing-edificio">
                     		<?php
                     		if($c->check(['editingEdificio'], $_POST)){
                     		    $ed = $c->db->ql('SELECT e.ID id, e.Foglio foglio, s.Denominazione strad, s.Identificativo_nazionale stradID, e.Note note
-                                                            FROM fogli_mappali_edifici fm
-                                                            JOIN edifici e ON e.ID = fm.Edificio
+                                                            FROM edifici e
                                                             JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
                                                             WHERE e.ID = ?',
                     		                              [$_POST['editingEdificio']]);
@@ -206,22 +227,22 @@
                     			<h2>Modifica edificio N° <?= $_POST['editingEdificio'] ?></h2>
                     			<input type="hidden" name="edificioEditingEd" value="<?= $ed['id'] ?>">
                     			<br>
-                    			
+
                     			<h4>Foglio</h4>
                     			<input id="foglio-editing-ed" name="foglioEditingEd" autocomplete="off" type="number" onkeyup="checkAllMappaliEditingEd();" max="9999" placeholder="Foglio..." required="required" value="<?= $ed['foglio'] ?>">
-                    			
+
                     			<h4>Mappale/i</h4>
                         		<div id="mappali-editing-ed"></div>
                         		<button type="button" onclick="addFiledMappaleEditingEd('', false, <?= $_POST['editingEdificio'] ?>);">+</button>
-            
+
                         		<h4>Stradario</h4>
              	   				<input id="stradario-editing-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-editing-ed', '#stradarioID-editing-ed');" onclick="this.select();" value="<?= $ed['strad'] ?>" placeholder="Stradario...">
              	   				<input id="stradarioID-editing-ed" name="stradarioEditingEd" type="hidden" value="<?= $ed['stradID'] ?>">
                  	   			<div id="hintsStradari-editing-ed" class="hintBox"></div>
-            
+
                         		<h4>Note</h4>
                         		<textarea id="note-new-ed" name="noteEditingEd" rows="3" cols="40" placeholder="Inserire qui eventuali note..."><?= $ed['note'] ?></textarea>
-                    		
+
                     			<br>
             					<input type="button" onclick="submitModificheEdificio();" value="APPLICA MODIFICHE">
                 			<?php
@@ -271,11 +292,11 @@
     }
     if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>";
     if($edUpdated)
-        if($edUpdateError === FALSE)
-            echo "<script>displayMessage('Edificio $_POST[edificioEditingEd] modificato con successo', document.body, 'info');</script>";
+        if($edUpdateErrors === [])
+            echo "<script>displayMessage('".implode('<br>', $edUpdateInfos)."', document.body, 'info');</script>";
         else
-         echo "<script>displayMessage('Errore durante la modifica dell'edificio $_POST[edificioEditingEd]: $edUpdateError', document.body);</script>";
+         echo "<script>displayMessage('Errore durante la modifica dell'edificio $_POST[edificioEditingEd]: ".implode('<br>', $edUpdateErrors).'\', document.body);</script>';
     ?>
-	
+
 </body>
 </html>
