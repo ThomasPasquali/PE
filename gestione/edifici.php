@@ -30,7 +30,7 @@
                     );
     }
 
-    //UPDATDE EDIFICIO
+    //UPDATDE EDIFICIO TODO subalterni
     $edUpdated = FALSE;
     $edUpdateError = FALSE;
     if($c->check(['foglioEditingEd', 'stradarioEditingEd', 'noteEditingEd', 'edificioEditingEd'], $_POST)){
