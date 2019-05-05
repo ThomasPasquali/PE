@@ -1,5 +1,6 @@
 var mappaliNewEdCount = 1;
 var mappaliEditingEdCount = 1;
+var subalterniEditingEdCount = 1;
 var b;
 
 function changeContent(divID) {
@@ -29,7 +30,6 @@ function addFiledMappaleNewEd() {
 }
 
 function addFiledMappaleEditingEd(mappale, isEX, edificio) {
-	//TODO ex
 	let field = document.createElement('input');
 	field.name = 'mappEditingEd'+mappaliEditingEdCount;
 	field.className = 'mappaleEditingEd';
@@ -40,27 +40,58 @@ function addFiledMappaleEditingEd(mappale, isEX, edificio) {
 	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this, "foglio-editing-ed", "mappaleEditingEd", '+edificio+');');
 	field.setAttribute('autocomplete', 'off');
 	
+	let p = document.createElement('p');
+	p.innerHTML = 'EX';
+	
 	let fieldEX = document.createElement('input');
 	fieldEX.name = 'isExMappEditingEd'+mappaliEditingEdCount;
 	fieldEX.type = 'checkbox';
 	fieldEX.value = 'EX'
 	if(isEX) fieldEX.checked = 'checked';
-
+	
 	let span = document.createElement('span');
 	span.className = 'esitiCheckMappaliEditingEd';
 	
-	let p = document.createElement('p');
-	p.innerHTML = 'EX';
-	
 	let div = document.createElement('div');
+	
+	let delBtn = document.createElement('input');
+	delBtn.type = 'button';
+	delBtn.value = 'Elimina mappale';
+	delBtn.addEventListener('click', function(){ div.remove(); });
+	
 	div.appendChild(field);
 	div.appendChild(p);
 	div.appendChild(fieldEX);
+	div.appendChild(delBtn);
 	div.appendChild(span);
 	
 	$('#mappali-editing-ed').append(div);
 	checkIfMappaleIsFree(field, "foglio-editing-ed", "mappaleEditingEd", edificio)
 	mappaliEditingEdCount++;
+}
+
+function addFiledSubalternoEditingEd(subalterno, edificio) {
+	let field = document.createElement('input');
+	field.name = 'subEditingEd'+subalterniEditingEdCount;
+	field.className = 'subalternoEditingEd';
+	field.placeholder = subalterniEditingEdCount+'° subalterno';
+	field.type = 'text';
+	field.pattern = '\\d{1,4}';
+	field.value = subalterno;
+	field.setAttribute('autocomplete', 'off');
+	
+	let div = document.createElement('div');
+	
+	let delBtn = document.createElement('input');
+	delBtn.type = 'button';
+	delBtn.value = 'Elimina subalterno';
+	delBtn.addEventListener('click', function(){ div.remove(); });
+	
+	div.appendChild(field);
+	div.appendChild(delBtn);
+	
+	$('#subalterni-editing-ed').append(div);
+	subalterniEditingEdCount++;
 }
 
 function checkIfMappaleIsFree(el, foglioFieldID, mappaliClass, edificioToExcludeID = '') {
@@ -76,7 +107,8 @@ function checkIfMappaleIsFree(el, foglioFieldID, mappaliClass, edificioToExclude
 		if(!b) return false;
 		//console.log('db check');
 
-		//db check
+		
+	//db check
 	var request = $.ajax({
       url: "/runtime/handler.php",
       type: "POST",
