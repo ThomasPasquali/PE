@@ -2,7 +2,7 @@
     include_once 'controls.php';
     $controls =  new Controls();
     $err = '';
-    
+
     if($_SERVER['REQUEST_METHOD'] == 'POST')
         if ($_POST['singin'] == 'normal') {
             $user = $_POST['email'] ?? '';
@@ -20,11 +20,11 @@
                 $err = 'Impossibile richiedere l\'account';
             }
         }
-    
+
 ?>
 <html lang="it">
 <head>
-	<link href='index.css' rel='stylesheet' type='text/css'>
+	<link href='css/index.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
     <div class="page">

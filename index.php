@@ -3,17 +3,17 @@
     $controls =  new Controls();
     $err = '';
     $info = '';
-    
+
     if($controls->logged()&&!isset($_POST['destroy'])){
         header('Location: home.php');
         exit();
     }
-    
+
     if(isset($_GET['err']))
         $err = $_GET['err'];
     if(isset($_GET['info']))
         $info = $_GET['info'];
-    
+
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(isset($_POST['destroy']))
             $controls->logout();
@@ -30,14 +30,14 @@
                         header('Location: home.php');
                         exit();
                     }else
-               $err = $res[1];     
+               $err = $res[1];
                 }
             }
         }
 ?>
 <html lang="it">
 <head>
-	<link href='/css/index.css' rel='stylesheet' type='text/css'>
+	<link href='css/index.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
     <div class="page">

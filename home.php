@@ -289,9 +289,9 @@
 		<title>PE</title>
 		<!-- CSS -->
 		<script src="lib/jquery-3.3.1.min.js"></script>
-		<link rel="stylesheet" href="/lib/mini-default.min.css">
-		<link rel="stylesheet" href="/lib/fontawesome/css/all.css">
-		<link rel="stylesheet" type="text/css" href="/css/home.css">
+		<link rel="stylesheet" href="lib/mini-default.min.css">
+		<link rel="stylesheet" href="lib/fontawesome/css/all.css">
+		<link rel="stylesheet" type="text/css" href="css/home.css">
 		<style type="text/css">
     	   .hintBox{
     	       background-color: #272727;
@@ -648,8 +648,8 @@
      	   				</label>
          	   			<div id="hintsDirezione_lavori" class="hintBox"></div>
 
-         	   			<?php 
-                	    //TODO altri 
+         	   			<?php
+                	    //TODO altri
                 	    ?>
 
          	   			<label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>

@@ -41,9 +41,9 @@
       $res =$c->db->dml(
           'UPDATE edifici SET Foglio = ?, Stradario = ?, Note = ? WHERE ID = ?',
           [$_REQUEST['foglioEditingEd'], $_REQUEST['stradarioEditingEd'], empty($_REQUEST['noteEditingEd'])?NULL:$_REQUEST['noteEditingEd'], $_REQUEST['edificioEditingEd']]);
-        
+
       $c->echoCode($res->errorInfo()[2]);
-      
+
       if($res->errorCode() != 0)
           $edUpdateErrors[] = $res->errorInfo()[2];
       else {
@@ -106,12 +106,12 @@
                                    [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $mappaleFromDB['Mappale']]);
                if($res->errorCode() == '0')
                    $edUpdateInfos[] = "Mappale $mappaleFromDB[Mappale] eliminato con successo";
-               else 
+               else
             $edUpdateErrors[] = $res->errorInfo()[2];
             }
-       
+
        // TODO DELETE OMITTED SUBALIERNI
-       
+
          }
     }
 
@@ -126,8 +126,8 @@
 <html>
 <head>
 	<title>Gestione edifici</title>
-	<link rel="stylesheet" href="/css/gestione.css">
-	<link rel="stylesheet" href="/css/alerts.css">
+	<link rel="stylesheet" href="../css/gestione.css">
+	<link rel="stylesheet" href="../css/alerts.css">
 	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
 	<style type="text/css">
         .hintBox *{
