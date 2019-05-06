@@ -14,6 +14,7 @@
     if($c->check(['foglioNewEd','stradarioNewEd'], $_REQUEST)&&isset($_REQUEST['noteNewEd'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
         //NEW ID EXTRACTION
         $edID = $c->db->ql('SELECT MAX(ID)+1 id FROM edifici')[0]['id'];
+        if($edID === NULL) $edID = 1;
         $res = $c->db->dml(
             'INSERT INTO edifici (ID, Foglio, Stradario, Note) VALUES(?,?,?,?)',
             [$edID,$_REQUEST['foglioNewEd'],$_REQUEST['stradarioNewEd'],empty($_REQUEST['noteNewEd'])?NULL:$_REQUEST['noteNewEd']]
@@ -24,10 +25,10 @@
         if($edInserted)
             foreach ($_REQUEST as $key => $value)
                 if(substr($key, 0, strlen('mappNewEd')) === 'mappNewEd'&&!empty($value))
-                    $c->db->dml(
-                        'INSERT INTO fogli_mappali_edifici (Edificio,Foglio,Mappale) VALUES(?,?,?)',
-                        [$edID, $_REQUEST['foglioNewEd'],$value]
-                    );
+                  $c->db->dml(
+                      'INSERT INTO fogli_mappali_edifici (Edificio,Foglio,Mappale) VALUES(?,?,?)',
+                      [$edID, $_REQUEST['foglioNewEd'],$value]
+                  );
     }
 
     //UPDATDE EDIFICIO
@@ -50,7 +51,7 @@
         $edUpdateInfos[] = "Edificio $_REQUEST[edificioEditingEd] modificato con successo";
         //UPDATE TABLE MAPPALI
          $mappali = [];
-         foreach ($_REQUEST as $key => $value) {
+         foreach ($_REQUEST as $key => $value)
              //IF PARAM IS FOR MAPPALE
             if(substr($key, 0, strlen('mappEditingEd')) == 'mappEditingEd'){
                 $mappali[] = $value;
@@ -83,20 +84,27 @@
                   else
                 $edUpdateErrors[] = $res->errorInfo()[2];
                 }
-                //IF PARAM IS FOR MAPPALE
-            }else if(substr($key, 0, strlen('subEditingEd')) == 'subEditingEd'){
+            }
+
+        //UPDATE TABLE SUBALTERNI
+         $subalterni = [];
+          foreach ($_REQUEST as $key => $value)
+            if(substr($key, 0, strlen('subEditingEd')) == 'subEditingEd'){
                 //INSERT SUBALTERNI
-                if(!empty($value)){
+                $subalterni[] = $value;
+                $mappale = $_REQUEST['mappSubEditingEd'.substr($key, strlen('subEditingEd'), strlen($key))]??'';
+
+                if(!empty($value)&&!empty($mappale)){
                     $res = $c->db->dml(
-                        'INSERT INTO subalterni_edifici (Edificio, Subalterno) VALUES (?,?)',
-                        [$_REQUEST['edificioEditingEd'], $value]);
+                        'INSERT INTO subalterni_edifici (Edificio, Mappale, Subalterno) VALUES (?,?,?)',
+                        [$_REQUEST['edificioEditingEd'], $mappale,$value]);
                     if($res->errorCode() == '0')
                         $edUpdateInfos[] = "Subalterno $value aggiunto correttamente";
                     else
-                $edUpdateErrors[] = $res->errorInfo()[2];
+                        $edUpdateErrors[] = $res->errorInfo()[2];
                 }
             }
-       }
+
        //DELETE OMITTED MAPPALI
        $mappaliFromDB = getMappaliEdificio($_REQUEST['edificioEditingEd'], $c->db);
        foreach ($mappaliFromDB as $mappaleFromDB)
@@ -110,8 +118,18 @@
             $edUpdateErrors[] = $res->errorInfo()[2];
             }
 
-       // TODO DELETE OMITTED SUBALIERNI
-
+       // TODO DELETE OMITTED SUBALIERNI FINIRE
+       $subalterniFromDB = getSubalterniEdificio($_REQUEST['edificioEditingEd'], $c->db);
+       foreach ($subalterniFromDB as $subalternoFromDB)
+           if(!in_array($subalternoFromDB['Mappale'], $subalterni)){
+               $res = $c->db->dml(
+                                   'DELETE FROM fogli_mappali_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                                   [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $mappaleFromDB['Mappale']]);
+               if($res->errorCode() == '0')
+                   $edUpdateInfos[] = "Mappale $mappaleFromDB[Mappale] eliminato con successo";
+               else
+            $edUpdateErrors[] = $res->errorInfo()[2];
+            }
          }
     }
 
@@ -122,6 +140,14 @@
                         WHERE Edificio = ?',
                         [$edID]);
     }
+
+    function getSubalterniEdificio($edID, $db){
+      return $db->ql('SELECT Mappale, Subalterno
+                        FROM subalterni_edifici
+                        WHERE Edificio = ?',
+                        [$edID]);
+    }
+
 ?>
 <html>
 <head>
@@ -242,8 +268,7 @@
                                                             WHERE e.ID = ?',
                     		                              [$_REQUEST['editingEdificio']]);
                                 if(count($ed) > 0){
-                    		        $ed = $ed[0];
-                                    $mappali = getMappaliEdificio($_REQUEST['editingEdificio'], $c->db);
+                    		            $ed = $ed[0];
                                       //print_r($ed);
                                     //print_r($mappali);
                     		?>
@@ -258,9 +283,9 @@
                         		<div id="mappali-editing-ed"></div>
                         		<button type="button" onclick="addFiledMappaleEditingEd('', false, <?= $_REQUEST['editingEdificio'] ?>);">+</button>
 
-								<h4>Subalterni</h4>
+			                    <h4>Subalterni</h4>
                         		<div id="subalterni-editing-ed"></div>
-                        		<button type="button" onclick="addFiledSubalternoEditingEd('', <?= $_REQUEST['editingEdificio'] ?>);">+</button>
+                        		<button type="button" onclick="addFiledSubalternoEditingEd('', '');">+</button>
 
                         		<h4>Stradario</h4>
              	   				<input id="stradario-editing-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-editing-ed', '#stradarioID-editing-ed');" onclick="this.select();" value="<?= $ed['strad'] ?>" placeholder="Stradario...">
@@ -313,8 +338,10 @@
     <?php
     if(isset($mappali)){
         echo '<script>';
-        foreach ($mappali as $mappale)
+        foreach ($mappaliFromDB as $mappale)
             echo "addFiledMappaleEditingEd($mappale[Mappale], ".($mappale['EX']=='EX'?'true':'false').", $_REQUEST[editingEdificio]);";
+        foreach ($subalterniFromDB as $subalterno)
+            echo "addFiledSubalternoEditingEd('$subalterno[Subalterno]', '$subalterno[Mappale]');";
         echo '</script>';
     }
     if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>";
