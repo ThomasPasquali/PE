@@ -10,7 +10,7 @@ function changeContent(divID) {
 	document.getElementById(divID).classList.add('active');
 }
 
-function addFiledMappaleNewEd() {
+function addFieldMappaleNewEd() {
 	let field = document.createElement('input');
 	field.name = 'mappNewEd'+mappaliNewEdCount;
 	field.className = 'mappaleNewEd';
@@ -29,7 +29,7 @@ function addFiledMappaleNewEd() {
 	mappaliNewEdCount++;
 }
 
-function addFiledMappaleEditingEd(mappale, isEX, edificio) {
+function addFieldMappaleEditingEd(mappale, isEX, edificio) {
 	let field = document.createElement('input');
 	field.name = 'mappEditingEd'+mappaliEditingEdCount;
 	field.className = 'mappaleEditingEd';
@@ -70,7 +70,7 @@ function addFiledMappaleEditingEd(mappale, isEX, edificio) {
 	mappaliEditingEdCount++;
 }
 
-function addFiledSubalternoEditingEd(subalterno, mappale) {
+function addFieldSubalternoEditingEd(subalterno, mappale) {
 	let fieldMapp = document.createElement('input');
 	fieldMapp.name = 'mappSubEditingEd'+subalterniEditingEdCount;
 	fieldMapp.className = 'mappaleSubEditingEd';
@@ -185,7 +185,7 @@ function submitModificheEdificio() {
 	if(areAllMappaliOk('esitiCheckMappaliEditingEd'))
 		$('#form-edit-ed').submit();
 	else
-		displayMessage('Correggi i dati e riprovare', document.getElementById('container-editing-ed'));
+		displayMessage('Correggi i dati e riprova', document.getElementById('container-editing-ed'));
 }
 
 function editEdificio(ID){

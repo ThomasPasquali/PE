@@ -8,7 +8,7 @@
     }
 
     $c->echoCode($_REQUEST);
-
+    
     //INSERT EDIFICIO
     $edInserted = FALSE;
     if($c->check(['foglioNewEd','stradarioNewEd'], $_REQUEST)&&isset($_REQUEST['noteNewEd'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -31,6 +31,7 @@
                   );
     }
 
+    
     //UPDATDE EDIFICIO
     $edUpdated = FALSE;
     $edUpdateErrors = [];
@@ -91,22 +92,21 @@
           foreach ($_REQUEST as $key => $value)
             if(substr($key, 0, strlen('subEditingEd')) == 'subEditingEd'){
                 //INSERT SUBALTERNI
-                $subalterni[] = $value;
                 $mappale = $_REQUEST['mappSubEditingEd'.substr($key, strlen('subEditingEd'), strlen($key))]??'';
-
+                $subalterni[] = ['Mappale' => $mappale, 'Subalterno' => $value];
+                
                 if(!empty($value)&&!empty($mappale)){
                     $res = $c->db->dml(
                         'INSERT INTO subalterni_edifici (Edificio, Mappale, Subalterno) VALUES (?,?,?)',
                         [$_REQUEST['edificioEditingEd'], $mappale,$value]);
+                    echo $res->columnCount();
                     if($res->errorCode() == '0')
-                        $edUpdateInfos[] = "Subalterno $value aggiunto correttamente";
-                    else
-                        $edUpdateErrors[] = $res->errorInfo()[2];
+                        $edUpdateInfos[] = "Subalterno $value del mappale $mappale aggiunto correttamente";
                 }
             }
 
        //DELETE OMITTED MAPPALI
-       $mappaliFromDB = getMappaliEdificio($_REQUEST['edificioEditingEd'], $c->db);
+        $mappaliFromDB = getMappaliEdificio($_REQUEST['edificioEditingEd'], $c->db);
        foreach ($mappaliFromDB as $mappaleFromDB)
            if(!in_array($mappaleFromDB['Mappale'], $mappali)){
                $res = $c->db->dml(
@@ -118,15 +118,15 @@
             $edUpdateErrors[] = $res->errorInfo()[2];
             }
 
-       // TODO DELETE OMITTED SUBALIERNI FINIRE
+       //DELETE OMITTED SUBALIERNI FINIRE
        $subalterniFromDB = getSubalterniEdificio($_REQUEST['edificioEditingEd'], $c->db);
        foreach ($subalterniFromDB as $subalternoFromDB)
-           if(!in_array($subalternoFromDB['Mappale'], $subalterni)){
+           if(!in_array($subalternoFromDB, $subalterni)){
                $res = $c->db->dml(
-                                   'DELETE FROM fogli_mappali_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                                   [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $mappaleFromDB['Mappale']]);
+                                   'DELETE FROM subalterni_edifici WHERE Edificio = ? AND Mappale = ?  AND Subalterno = ?',
+                   [$_REQUEST['edificioEditingEd'], $subalternoFromDB['Mappale'], $subalternoFromDB['Subalterno']]);
                if($res->errorCode() == '0')
-                   $edUpdateInfos[] = "Mappale $mappaleFromDB[Mappale] eliminato con successo";
+                   $edUpdateInfos[] = "Subalterno $subalternoFromDB[Subalterno] del mappale $subalternoFromDB[Mappale] eliminato con successo";
                else
             $edUpdateErrors[] = $res->errorInfo()[2];
             }
@@ -281,11 +281,11 @@
 
                     			<h4>Mappale/i</h4>
                         		<div id="mappali-editing-ed"></div>
-                        		<button type="button" onclick="addFiledMappaleEditingEd('', false, <?= $_REQUEST['editingEdificio'] ?>);">+</button>
+                        		<button type="button" onclick="addFieldMappaleEditingEd('', false, <?= $_REQUEST['editingEdificio'] ?>);">+</button>
 
 			                    <h4>Subalterni</h4>
                         		<div id="subalterni-editing-ed"></div>
-                        		<button type="button" onclick="addFiledSubalternoEditingEd('', '');">+</button>
+                        		<button type="button" onclick="addFieldSubalternoEditingEd('', '');">+</button>
 
                         		<h4>Stradario</h4>
              	   				<input id="stradario-editing-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-editing-ed', '#stradarioID-editing-ed');" onclick="this.select();" value="<?= $ed['strad'] ?>" placeholder="Stradario...">
@@ -315,7 +315,7 @@
 
             		<h2>Mappale/i</h2>
             		<div id="mappali-new-ed"></div>
-            		<button type="button" onclick="addFiledMappaleNewEd();">+</button>
+            		<button type="button" onclick="addFieldMappaleNewEd();">+</button>
 
             		<h2>Stradario</h2>
  	   				<input id="stradario-new-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-new-ed', '#stradarioID-new-ed');" onclick="this.select();" placeholder="Stradario...">
@@ -334,17 +334,21 @@
 
     <script type="text/javascript" src="/js/misc.js"></script>
 	<script type="text/javascript" src="/js/gestione_edifici.js"></script>
-    <script type="text/javascript">addFiledMappaleNewEd();</script>
+    <script type="text/javascript">addFieldMappaleNewEd();</script>
     <?php
-    if(isset($mappali)){
+    if(isset($_REQUEST['editingEdificio'])){
+        $mappaliFromDB = getMappaliEdificio($_REQUEST['editingEdificio'], $c->db);
+        $subalterniFromDB = getSubalterniEdificio($_REQUEST['editingEdificio'], $c->db);
         echo '<script>';
         foreach ($mappaliFromDB as $mappale)
-            echo "addFiledMappaleEditingEd($mappale[Mappale], ".($mappale['EX']=='EX'?'true':'false').", $_REQUEST[editingEdificio]);";
+            echo "addFieldMappaleEditingEd($mappale[Mappale], ".($mappale['EX']=='EX'?'true':'false').", $_REQUEST[editingEdificio]);";
         foreach ($subalterniFromDB as $subalterno)
-            echo "addFiledSubalternoEditingEd('$subalterno[Subalterno]', '$subalterno[Mappale]');";
+            echo "addFieldSubalternoEditingEd('$subalterno[Subalterno]', '$subalterno[Mappale]');";
         echo '</script>';
     }
+    
     if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>";
+    
     if($edUpdated){
         if(count($edUpdateInfos) > 0)
             echo "<script>displayMessage('".str_replace('\'', '\\\'', implode('<br>', $edUpdateInfos))."', document.body, 'info');</script>";

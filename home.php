@@ -669,7 +669,7 @@
             	<form action="reports/edificio.php" method="post" target="_blank">
             		<div class="section">Dati</div>
             		<div class="inner-wrap">
-            			<label>Foglio<input type="number" name="foglio" required="required" value="<?= $_POST['foglio']??'' ?>"></label>
+            			<label>Foglio<input type="number" name="foglio" required="required" min="1" value="<?= $_POST['foglio']??'' ?>"></label>
             			<label>Mappale (qualsiasi)<input type="number" name="mappale" required="required" value="<?= $_POST['mappale']??'' ?>"></label>
             		</div>
             		<button type="submit">Genera report</button>
