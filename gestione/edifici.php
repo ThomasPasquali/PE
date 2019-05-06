@@ -44,8 +44,6 @@
           'UPDATE edifici SET Foglio = ?, Stradario = ?, Note = ? WHERE ID = ?',
           [$_REQUEST['foglioEditingEd'], $_REQUEST['stradarioEditingEd'], empty($_REQUEST['noteEditingEd'])?NULL:$_REQUEST['noteEditingEd'], $_REQUEST['edificioEditingEd']]);
 
-      $c->echoCode($res->errorInfo()[2]);
-
       if($res->errorCode() != 0)
           $edUpdateErrors[] = $res->errorInfo()[2];
       else {
@@ -99,7 +97,6 @@
                     $res = $c->db->dml(
                         'INSERT INTO subalterni_edifici (Edificio, Mappale, Subalterno) VALUES (?,?,?)',
                         [$_REQUEST['edificioEditingEd'], $mappale,$value]);
-                    echo $res->columnCount();
                     if($res->errorCode() == '0')
                         $edUpdateInfos[] = "Subalterno $value del mappale $mappale aggiunto correttamente";
                 }
@@ -351,9 +348,9 @@
     
     if($edUpdated){
         if(count($edUpdateInfos) > 0)
-            echo "<script>displayMessage('".str_replace('\'', '\\\'', implode('<br>', $edUpdateInfos))."', document.body, 'info');</script>";
+            echo "<script>displayMessage('".str_replace('\'', '\\\'', implode('<br>', $edUpdateInfos))."', document.getElementById('vis-mod'), 'info');</script>";
         if(count($edUpdateErrors) > 0)
-            echo "<script>displayMessage('Errore durante la modifica dell\'edificio $_REQUEST[edificioEditingEd]: ".str_replace('\'', '\\\'', implode('<br>', $edUpdateErrors)).'\', document.body);</script>';
+            echo "<script>displayMessage('Errore durante la modifica dell\'edificio $_REQUEST[edificioEditingEd]: ".str_replace('\'', '\\\'', implode('<br>', $edUpdateErrors)).'\', document.getElementById(\'vis-mod\'));</script>';
     }
     ?>
 </body>
