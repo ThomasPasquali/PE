@@ -7,7 +7,7 @@
         exit();
     }
 
-    $c->echoCode($_REQUEST);
+    //$c->echoCode($_REQUEST);
     
     //INSERT EDIFICIO
     $edInserted = FALSE;
