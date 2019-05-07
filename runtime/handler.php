@@ -45,7 +45,11 @@
                 exit();
 
             case 'checkMappale':
-                checkIfMappaleIsFree($_POST['foglio'], $_POST['mappale'], $_POST['edificioToExclude'], $c->db);
+              checkIfMappaleIsFree($_POST['foglio'], $_POST['mappale'], $_POST['edificioToExclude'], $c->db);
+              exit();
+
+            case 'searchEdificio':
+              echo 'SEeeeee';
               exit();
 
             default:
