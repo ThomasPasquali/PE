@@ -166,8 +166,12 @@
         #search-editing-ed div{
             display: block;
         }
-        #search-results *{
-            display: block;
+        #search-results{
+            display: grid;
+            grid-template-columns: auto auto auto;
+            <?php 
+            //TODO display grid
+            ?>
         }
         .search-result{
             border: 1px solid black;
@@ -221,12 +225,12 @@
                                 $where = [];
                                 $params = [];
                                 if(!empty($_REQUEST['searchFoglio'])){
-                                  $where[] = 'e.Foglio LIKE ?';
-                                  $params[] = "%$_REQUEST[searchFoglio]%";
+                                  $where[] = 'e.Foglio = ?';
+                                  $params[] = $_REQUEST['searchFoglio'];
                                 }
                                 if(!empty($_REQUEST['searchMappale'])){
-                                  $where[] = 'fm.Mappale LIKE ?';
-                                  $params[] = "%$_REQUEST[searchMappale]%";
+                                  $where[] = 'fm.Mappale = ?';
+                                  $params[] = $_REQUEST['searchMappale'];
                                 }
                                 $where = implode(' AND ', $where);
                                $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
@@ -237,17 +241,17 @@
                                                           ' LIMIT 50',
                                                            $params);
                                foreach ($res as $ed) {
-                                   echo "<p class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
-                                   echo "<strong>ID edificio </strong>$ed[id]";
-                                   echo "<strong>Foglio </strong>$ed[foglio]";
+                                   echo "<div class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
+                                   echo "<strong>ID edificio </strong>$ed[id]<br>";
+                                   echo "<strong>Foglio </strong>$ed[foglio]<br>";
                                    $mappali = getMappaliEdificio($ed['id'], $c->db);
                                    $strMappali = '';
                                    foreach ($mappali as $mappale)
                                       $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
-                                   echo "<strong>Mappale/i </strong>".substr($strMappali, 2);
-                                   echo "<strong>Stradario </strong>$ed[strad]";
-                                   echo empty($ed['note'])?'':"<strong>Note </strong>$ed[note]";
-                                   echo "</p>";
+                                   echo "<strong>Mappale/i </strong>".substr($strMappali, 2).'<br>';
+                                   echo "<strong>Stradario </strong>$ed[strad]<br>";
+                                   echo empty($ed['note'])?'':"<strong>Note </strong>$ed[note]<br>";
+                                   echo "</div>";
                                  }
                                }
   			              ?>

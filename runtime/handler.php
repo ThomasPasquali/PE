@@ -130,18 +130,19 @@
     function searchEdificio($foglio, $mappale, $db) {
         header('Content-type: text/json');
         $params = [];
-        if(!empty($foglio)) $params[] = "%$foglio%";
-        if(!empty($mappale)) $params[] = "%$mappale%";
+        if(!empty($foglio)) $params[] = $foglio;
+        if(!empty($mappale)) $params[] = $mappale;
         
         $where = [];
-        if(!empty($foglio)) ' fm.Foglio LIKE ? AND ':'').
-            (!empty($mappale)?' fm.Mappale LIKE ? ':'').
+        if(!empty($foglio)) $where[] = 'fm.Foglio = ?';
+        if(!empty($mappale)) $where[] = ' fm.Mappale = ?';
         
         $res = $db->ql(
             ' SELECT DISTINCT e.ID
               FROM edifici e
               JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID'.
             (count($params) > 0?' WHERE ':'').
+            //TODO tutto
             
              ' LIMIT 10',
             $params);

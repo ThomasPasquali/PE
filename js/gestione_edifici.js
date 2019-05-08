@@ -178,7 +178,7 @@ function submitNewEdificio() {
 	if(areAllMappaliOk('esitiCheckMappaliNewEd')&&$('#stradarioID-new-ed').val())
 		$('#form-new-ed').submit();
 	else
-		displayMessage('Completare tutti i campi e riprovare', document.getElementById('container-new-ed'));
+		displayMessage('Correggere i dati e riprovare', document.getElementById('container-new-ed'));
 }
 
 function submitModificheEdificio() {
