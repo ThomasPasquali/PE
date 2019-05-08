@@ -17,29 +17,12 @@
     };
 })(jQuery);
 
-$('#ricerca-edificio').submit(function (e) {
-    console.log('sssdsd');
-    e.preventDefault();
-    var data = $(this).serializeFormJSON();
-    console.log(data);
-
-    /* Object
-        email: "value"
-        name: "value"
-        password: "value"
-     */
+$( "#ricerca-edificio > input" ).keyup(function() {
+  ricercaEdificio($('#ricerca-edificio'));
 });
 
-
-
-
-function submitRicercaEdificio(){
-  console.log(document.getElementById('ricerca-edificio'));
-  $('#ricerca-edificio').submit();
-  $('#ricerca-edificio').remove();
-  return;
-
-  let data = $('#ricerca-edificio').serialize();
+function ricercaEdificio(form){
+  var data = form.serializeFormJSON();
   let request = $.ajax({
     url: "../runtime/handler.php",
     type: "POST",

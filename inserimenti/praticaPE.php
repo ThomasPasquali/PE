@@ -94,105 +94,100 @@
 <body>
   <div class="form">
     <h1>Inserimento pratiche</h1>
+      <input type="hidden" name="tipo" value="pe">
+      <div class="section">Edificio</div>
+      <div class="inner-wrap">
 
-      <form action="" method="post">
-        <input type="hidden" name="tipo" value="pe">
-        <div class="section">Dati</div>
-        <div class="inner-wrap">
-
-          <div>
-            <label>Edificio</label>
-            <form id="ricerca-edificio">
-              <input type="hidden" name="action" value="searchEdificio">
-              <input name="foglio" placeholder="Foglio..." value="ddd">
-              <input name="mappale" placeholder="Mappale...">
-              <input type="submit">
-            </form>
+          <label>Trova edificio</label>
+          <form id="ricerca-edificio">
+            <input type="hidden" name="action" value="searchEdificio">
+            <input name="foglio" type="number" placeholder="Foglio...">
+            <input name="mappale" type="number" placeholder="Mappale...">
+          </form>
+          <div id="risultati-ricerca-edificio">
+            
           </div>
+      </div>
 
-          <div class="field">
-            <label>Mappale/i</label>
+      <div class="inner-wrap">
 
-            <input>
-          </div>
+        <div class="field">
+          <label>Mappale/i</label>
 
-          <?php
-          //TODO eliminare
-          exit();
-          ?>
-
-          <div class="field">
-            <label>Tipo</label>
-            <select name="tipo_pratica">
-              <?php
-              $types = getEnumValues('pe_pratiche', 'Tipo', $c->db);
-              foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
-              ?>
-            </select>
-          </div>
-
-          <label>Subalterno/i<input type="text" name="subalterno" pattern="^(\d{1,4}-)*\d{1,4}$" value="<?= $_POST['subalterno']??'' ?>"></label>
-          <label>Anno<input type="number" name="anno" required="required" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
-          <label>Numero<input type="number" name="numero" required="required" value="<?= $_POST['numero']??'' ?>"></label>
-          <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
-          <label>Data<input type="date" name="data" value="<?= $_POST['data']??date('Y-m-d') ?>"></label>
-          <label>Protocollo<input type="number" name="protocollo" value="<?= $_POST['protocollo']??'' ?>"></label>
-          <div class="extensible">
-            <label>Intestatari persone<br>
-                <div id="fieldsIntPers"></div>
-            </label>
-            <div style="display:inline-flex;">
-              <button type="button" style="background-color:red;" onclick="genPers.removeField();">-</button>
-                <button type="button" onclick="genPers.addField();">+</button>
-            </div>
-          </div>
-          <div class="extensible">
-            <label>Intestatari societ&aacute<br>
-                <div id="fieldsIntSoc"></div>
-            </label>
-            <div style="display:inline-flex;">
-              <button type="button" style="background-color:red;" onclick="genSoc.removeField();">-</button>
-                <button type="button" onclick="genSoc.addField();">+</button>
-            </div>
-          </div>
-
-
-
-          <label>Stradario<br>
-            <input id="stradario" type="text" onkeyup="updateHints('stradario', this, '#hintsStradari', '#stradarioID');" onclick="this.select();">
-            <input id="stradarioID" name="stradario" type="hidden">
-        </label>
-          <div id="hintsStradari" class="hintBox"></div>
-
-          <label>Tecnico<br>
-            <input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
-            <input id="tecnicoID" name="tecnico" type="hidden">
-        </label>
-          <div id="hintsTecnici" class="hintBox"></div>
-
-          <label>Impresa<br>
-            <input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', '#impresaID');" onclick="this.select();">
-            <input id="impresaID" name="impresa" type="hidden">
-        </label>
-          <div id="hintsImprese" class="hintBox"></div>
-
-          <label>Direzione lavori<br>
-            <input id="direzione_lavori" type="text" onkeyup="updateHints('tecnico', this, '#hintsDirezione_lavori', '#direzione_lavoriID');" onclick="this.select();">
-            <input id="direzione_lavoriID" name="direzione_lavori" type="hidden">
-        </label>
-          <div id="hintsDirezione_lavori" class="hintBox"></div>
-
-          <?php
-              //TODO altri
-              ?>
-
-          <label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
-          <label>Documento elettronico<input type="text" name="documento_elettronico" value="<?= $_POST['documento_elettronico']??'' ?>"></label>
-          <label>Data inizio lavori<input type="date" name="data_inizio_lavori" value="<?= $_POST['data_inizio_lavori']??'' ?>"></label>
-            <label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
+          <input>
         </div>
-        <button type="submit" name="btn" value="inserimentoPratica">Inserisci</button>
-    </form>
+
+        <div class="field">
+          <label>Tipo</label>
+          <select name="tipo_pratica">
+            <?php
+            $types = getEnumValues('pe_pratiche', 'Tipo', $c->db);
+            foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
+            ?>
+          </select>
+        </div>
+
+        <label>Subalterno/i<input type="text" name="subalterno" pattern="^(\d{1,4}-)*\d{1,4}$" value="<?= $_POST['subalterno']??'' ?>"></label>
+        <label>Anno<input type="number" name="anno" required="required" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
+        <label>Numero<input type="number" name="numero" required="required" value="<?= $_POST['numero']??'' ?>"></label>
+        <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
+        <label>Data<input type="date" name="data" value="<?= $_POST['data']??date('Y-m-d') ?>"></label>
+        <label>Protocollo<input type="number" name="protocollo" value="<?= $_POST['protocollo']??'' ?>"></label>
+        <div class="extensible">
+          <label>Intestatari persone<br>
+              <div id="fieldsIntPers"></div>
+          </label>
+          <div style="display:inline-flex;">
+            <button type="button" style="background-color:red;" onclick="genPers.removeField();">-</button>
+              <button type="button" onclick="genPers.addField();">+</button>
+          </div>
+        </div>
+        <div class="extensible">
+          <label>Intestatari societ&aacute<br>
+              <div id="fieldsIntSoc"></div>
+          </label>
+          <div style="display:inline-flex;">
+            <button type="button" style="background-color:red;" onclick="genSoc.removeField();">-</button>
+              <button type="button" onclick="genSoc.addField();">+</button>
+          </div>
+        </div>
+
+
+
+        <label>Stradario<br>
+          <input id="stradario" type="text" onkeyup="updateHints('stradario', this, '#hintsStradari', '#stradarioID');" onclick="this.select();">
+          <input id="stradarioID" name="stradario" type="hidden">
+      </label>
+        <div id="hintsStradari" class="hintBox"></div>
+
+        <label>Tecnico<br>
+          <input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
+          <input id="tecnicoID" name="tecnico" type="hidden">
+      </label>
+        <div id="hintsTecnici" class="hintBox"></div>
+
+        <label>Impresa<br>
+          <input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', '#impresaID');" onclick="this.select();">
+          <input id="impresaID" name="impresa" type="hidden">
+      </label>
+        <div id="hintsImprese" class="hintBox"></div>
+
+        <label>Direzione lavori<br>
+          <input id="direzione_lavori" type="text" onkeyup="updateHints('tecnico', this, '#hintsDirezione_lavori', '#direzione_lavoriID');" onclick="this.select();">
+          <input id="direzione_lavoriID" name="direzione_lavori" type="hidden">
+      </label>
+        <div id="hintsDirezione_lavori" class="hintBox"></div>
+
+        <?php
+            //TODO altri
+            ?>
+
+        <label>Intervento<textarea rows="3" name="intervento"><?= $_POST['intervento']??'' ?></textarea></label>
+        <label>Documento elettronico<input type="text" name="documento_elettronico" value="<?= $_POST['documento_elettronico']??'' ?>"></label>
+        <label>Data inizio lavori<input type="date" name="data_inizio_lavori" value="<?= $_POST['data_inizio_lavori']??'' ?>"></label>
+          <label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
+      </div>
+      <button type="submit" name="btn" value="inserimentoPratica">Inserisci</button>
   </div>
 
   <script src="../js/ins_pratPE.js"></script>
