@@ -39,13 +39,18 @@ function ricercaEdificio(form){
    						let div = $('<div></div>');
    						div.addClass('risultato-ricerca-edificio');
    						div.click(function(){
-   							$('#edificio').val(ed.ID);
+   							$('#ricerca-edificio-field').val(ed.ID);
    						});
    						
    						for(let attr in ed){
+   							let row = $('<div></div>');
    							let p = $('<p></p>');
-   							p.text(attr + ': ' + ed[attr]);
-   							div.append(p);
+   							p.text(ed[attr]);
+   							let strong = $('<strong></strong>');
+   							strong.text(attr + ':');
+   							row.append(strong);
+   							row.append(p);
+   							div.append(row);
    						}
    						
    						$('#risultati-ricerca-edificio').append(div);
@@ -56,9 +61,12 @@ function ricercaEdificio(form){
 }
 
 function freezeEdificio() {
-	if($('#ricerca-edificio-field').val()){
+	let edID = $('#ricerca-edificio-field').val();
+	if(edID){
 		$('#dati-pratica').show();
 		$('#dati-edificio').hide();
+		$('#info-edificio').html('Edificio N° '+edID);
+		$('#edificio').val(edID);
 	}else
 		alert('Selezionare un edificio');
 }

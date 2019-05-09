@@ -92,7 +92,7 @@
     }
     #risultati-ricerca-edificio{
         display: grid;
-        grid-template-columns: auto auto auto;
+        grid-template-columns: auto auto auto auto;
     }
     .risultato-ricerca-edificio{
         border: solid 1px black;
@@ -106,17 +106,24 @@
     .risultato-ricerca-edificio:hover{
         text-decoration: underline;
     }
+    .risultato-ricerca-edificio > div p,strong{
+        display: inline-flex;
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+    .risultato-ricerca-edificio > div strong{
+        margin-right: 3px;
+    }
     #dati-pratica{
         display: none;
     }
   </style>
 </head>
 <body>
-  <div id="dati-edificio" class="form">
+  <div class="form">
     <h1>Inserimento pratiche</h1>
       <input type="hidden" name="tipo" value="pe">
-      <div class="section">Edificio</div>
-      <div class="inner-wrap">
+      <div id="dati-edificio" class="inner-wrap">
 
           <label>Trova edificio</label>
           <form id="ricerca-edificio">
@@ -135,7 +142,7 @@
 		?>
       <div id="dati-pratica" class="inner-wrap">
 
-		<h4 id="info"></h4>
+		<h4 id="info-edificio"></h4>
 		<input type="hidden" name="edificio" id="edificio">
 
         <div class="field">

@@ -178,7 +178,7 @@
         }
         #search-results{
             display: grid;
-            grid-template-columns: auto auto auto;
+            grid-template-columns: auto auto auto auto;
         }
         .search-result{
             border: 1px solid black;
@@ -344,7 +344,7 @@
         echo '</script>';
     }
     
-    if($edInserted) echo "<script>displayMessage('Edificio creato', document.body, 'info');</script>";
+    if($edInserted) echo "<script>displayMessage('Edificio creato', document.getElementById('vis-mod'), 'info');</script>";
     
     if($edUpdated){
         if(count($edUpdateInfos) > 0)
