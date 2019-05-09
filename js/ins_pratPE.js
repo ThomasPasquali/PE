@@ -32,7 +32,33 @@ function ricercaEdificio(form){
             alert('Errore: '+textStatus);
            },
    success: function(msg) {
-              console.log(msg);
-            }
+   					msg = JSON.parse(msg)
+   					console.log(msg);
+   					$('#risultati-ricerca-edificio').empty();
+   					for (let ed of msg) {
+   						let div = $('<div></div>');
+   						div.addClass('risultato-ricerca-edificio');
+   						div.click(function(){
+   							$('#edificio').val(ed.ID);
+   						});
+   						
+   						for(let attr in ed){
+   							let p = $('<p></p>');
+   							p.text(attr + ': ' + ed[attr]);
+   							div.append(p);
+   						}
+   						
+   						$('#risultati-ricerca-edificio').append(div);
+					}
+   					
+	            }
   });
+}
+
+function freezeEdificio() {
+	if($('#ricerca-edificio-field').val()){
+		$('#dati-pratica').show();
+		$('#dati-edificio').hide();
+	}else
+		alert('Selezionare un edificio');
 }

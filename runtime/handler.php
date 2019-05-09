@@ -138,16 +138,18 @@
         if(!empty($mappale)) $where[] = ' fm.Mappale = ?';
         
         $res = $db->ql(
-            ' SELECT DISTINCT e.ID
-              FROM edifici e
-              JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID'.
-            (count($params) > 0?' WHERE ':'').
-            //TODO tutto
-            
-             ' LIMIT 10',
+            'SELECT  e.ID ID, e.Foglio Foglio, 
+            	           GROUP_CONCAT(CONCAT(fm.Mappale, IF(fm.EX IS NULL, \'\', \'(EX)\')) ORDER BY fm.Mappale SEPARATOR \', \') Mappali,
+                           s.Denominazione Stradario, e.Note Note
+            FROM edifici e
+            JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID
+            JOIN stradario s ON s.Identificativo_nazionale = e.Stradario '.
+            (count($params) > 0?' WHERE '.implode(' AND ', $where):'').
+             ' GROUP BY e.ID
+               LIMIT 10',
             $params);
         
-        echo json_encode($res);
+        echo json_encode($res, TRUE);
     }
     
     

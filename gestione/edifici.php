@@ -160,26 +160,8 @@
         #form-editing-ed{
 
         }
-        #search-editing-ed *{
+        #search-editing-ed h2,input{
             display: inline-flex;
-        }
-        #search-editing-ed div{
-            display: block;
-        }
-        #search-results{
-            display: grid;
-            grid-template-columns: auto auto auto;
-            <?php 
-            //TODO display grid
-            ?>
-        }
-        .search-result{
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-        }
-        .search-result:hover{
-            text-decoration: underline;
         }
         #editing-edificio *{
             display: block;
@@ -193,6 +175,21 @@
         #mappali-editing-ed div span{
             margin-left:10px;
             font-size: 1.7em;
+        }
+        #search-results{
+            display: grid;
+            grid-template-columns: auto auto auto;
+        }
+        .search-result{
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+        }
+        .search-result > p{
+            display: block;
+        }
+        .search-result:hover{
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -221,7 +218,7 @@
 
                 		<div id="search-results">
                 			<?php
-                              if(isset($_REQUEST['searchFoglio'])&&isset($_REQUEST['searchMappale'])){
+                			if(isset($_REQUEST['searchFoglio'])&&isset($_REQUEST['searchMappale'])&&!isset($_REQUEST['editingEdificio'])){
                                 $where = [];
                                 $params = [];
                                 if(!empty($_REQUEST['searchFoglio'])){
@@ -242,15 +239,15 @@
                                                            $params);
                                foreach ($res as $ed) {
                                    echo "<div class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
-                                   echo "<strong>ID edificio </strong>$ed[id]<br>";
-                                   echo "<strong>Foglio </strong>$ed[foglio]<br>";
+                                   echo "<p><strong>ID edificio </strong>$ed[id]</p>";
+                                   echo "<p><strong>Foglio </strong>$ed[foglio]</p>";
                                    $mappali = getMappaliEdificio($ed['id'], $c->db);
                                    $strMappali = '';
                                    foreach ($mappali as $mappale)
                                       $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
-                                   echo "<strong>Mappale/i </strong>".substr($strMappali, 2).'<br>';
-                                   echo "<strong>Stradario </strong>$ed[strad]<br>";
-                                   echo empty($ed['note'])?'':"<strong>Note </strong>$ed[note]<br>";
+                                   echo "<p><strong>Mappale/i </strong>".substr($strMappali, 2).'</p>';
+                                   echo "<p><strong>Stradario </strong>$ed[strad]<br>";
+                                   echo empty($ed['note'])?'':"<p style=\"white-space: pre-line;\"><strong>Note </strong><br>$ed[note]</p>";
                                    echo "</div>";
                                  }
                                }
@@ -275,7 +272,6 @@
                     		?>
                     			<h2>Modifica edificio N° <?= $_REQUEST['editingEdificio'] ?></h2>
                     			<input type="hidden" name="edificioEditingEd" value="<?= $ed['id'] ?>">
-                    			<br>
 
                     			<h4>Foglio</h4>
                     			<input id="foglio-editing-ed" name="foglioEditingEd" autocomplete="off" type="number" onkeyup="checkAllMappaliEditingEd();" max="9999" placeholder="Foglio..." required="required" value="<?= $ed['foglio'] ?>">
@@ -284,7 +280,7 @@
                         		<div id="mappali-editing-ed"></div>
                         		<button type="button" onclick="addFieldMappaleEditingEd('', false, <?= $_REQUEST['editingEdificio'] ?>);">+</button>
 
-			                    <h4>Subalterni</h4>
+								<h4>Subalterni</h4>
                         		<div id="subalterni-editing-ed"></div>
                         		<button type="button" onclick="addFieldSubalternoEditingEd('', '');">+</button>
 

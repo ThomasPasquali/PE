@@ -75,6 +75,7 @@
   function getEnumValues($table, $field, $db){
     $query = $db->query("SHOW COLUMNS FROM $table WHERE Field = '$field'");
     $type = $query->fetch(PDO::FETCH_ASSOC)['Type'];
+    $matches = [];
     preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
     $enum = explode("','", $matches[1]);
     return $enum;
@@ -89,10 +90,29 @@
     .form{
       width: 90%;
     }
+    #risultati-ricerca-edificio{
+        display: grid;
+        grid-template-columns: auto auto auto;
+    }
+    .risultato-ricerca-edificio{
+        border: solid 1px black;
+        margin: 5px;
+        padding-left: 10px;
+        overflow: scroll;
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: pre-line;
+    }
+    .risultato-ricerca-edificio:hover{
+        text-decoration: underline;
+    }
+    #dati-pratica{
+        display: none;
+    }
   </style>
 </head>
 <body>
-  <div class="form">
+  <div id="dati-edificio" class="form">
     <h1>Inserimento pratiche</h1>
       <input type="hidden" name="tipo" value="pe">
       <div class="section">Edificio</div>
@@ -104,12 +124,19 @@
             <input name="foglio" type="number" placeholder="Foglio...">
             <input name="mappale" type="number" placeholder="Mappale...">
           </form>
-          <div id="risultati-ricerca-edificio">
-            
-          </div>
+          <div id="risultati-ricerca-edificio"></div>
+          
+          <label>N° Edificio</label>
+          <input type="number" id="ricerca-edificio-field" required="required" disabled="disabled">
+          <button type="button" onclick="freezeEdificio();">Blocca edificio</button>
       </div>
+		<?php 
+		//TODO
+		?>
+      <div id="dati-pratica" class="inner-wrap">
 
-      <div class="inner-wrap">
+		<h4 id="info"></h4>
+		<input type="hidden" name="edificio" id="edificio">
 
         <div class="field">
           <label>Mappale/i</label>

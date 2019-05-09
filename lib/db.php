@@ -11,6 +11,7 @@
 
         public function ql($sql, $params=NULL, $fetchType = PDO::FETCH_ASSOC) {
             try {
+                //echo $sql;
                 $this->beginTransaction();
 
                 $stmt = $this->prepare($sql);
