@@ -51,10 +51,19 @@
             case 'searchEdificio':
                 searchEdificio($_POST['foglio'], $_POST['mappale'], $c->db);
                 exit();
-                
+
             case 'getMappaliEdificio':
                 getMappaliEdificio($_POST['edificio'], $c->db);
                 exit();
+
+            case 'getSubalterniEdificio':
+                getSubalterniEdificio($_POST['edificio'], $c->db);
+                exit();
+
+            case 'getPraticaNumberForAnno':
+                getPraticaNumberForAnno($_POST['anno'], $c->db);
+                exit();
+
 
             default:
                 break;
@@ -130,50 +139,61 @@
         //print_r($res);
         echo count($res) > 0?'NO':'OK';
     }
-    
+
     function searchEdificio($foglio, $mappale, $db) {
         $params = [];
         if(!empty($foglio)) $params[] = $foglio;
         if(!empty($mappale)) $params[] = $mappale;
-        
+
         $where = [];
-        if(!empty($foglio)) $where[] = 'fm.Foglio = ?';
+        if(!empty($foglio)) $where[] = 'e.Foglio = ?';
         if(!empty($mappale)) $where[] = ' fm.Mappale = ?';
-        
+
         $res = $db->ql(
-            'SELECT  e.ID ID, e.Foglio Foglio, 
+            'SELECT  e.ID ID, e.Foglio Foglio,
             	           GROUP_CONCAT(CONCAT(fm.Mappale, IF(fm.EX IS NULL, \'\', \'(EX)\')) ORDER BY fm.Mappale SEPARATOR \', \') Mappali,
                            s.Denominazione Stradario, e.Note Note
             FROM edifici e
-            JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID
+            LEFT JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID
             JOIN stradario s ON s.Identificativo_nazionale = e.Stradario '.
             (count($params) > 0?' WHERE '.implode(' AND ', $where):'').
              ' GROUP BY e.ID
                LIMIT 10',
             $params);
-        
+
         header('Content-type: text/json');
         echo json_encode($res, TRUE);
     }
-    
+
     function getMappaliEdificio($edificio, $db){
         $res = $db->ql(
             'SELECT Mappale, EX
              FROM fogli_mappali_edifici
              WHERE Edificio = ?',
             [$edificio]);
-        
+
         header('Content-type: text/json');
         echo json_encode($res, TRUE);
     }
-    
+
     function getSubalterniEdificio($edificio, $db){
         $res = $db->ql(
             'SELECT Subalterno, Mappale
              FROM subalterni_edifici
              WHERE Edificio = ?',
             [$edificio]);
-        
+
         header('Content-type: text/json');
         echo json_encode($res, TRUE);
+    }
+
+    function getPraticaNumberForAnno($anno, $db){
+      $res = $db->ql(
+          'SELECT MAX(Numero)+1 n
+           FROM pe_pratiche
+           WHERE Anno = ?',
+          [$anno]);
+
+      header('Content-type: text/plain');
+      echo ($res?$res[0]['n']:'');
     }

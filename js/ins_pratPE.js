@@ -1,3 +1,20 @@
+/****************HANDLERS*****************/
+$('input[name=anno]').keyup(function(){
+  let val = $(this).val()+'';
+  if(val.length == 4 && $('input[name=numero]').val().length == 0){
+    $.ajax({
+      url: "../runtime/handler.php",
+      type: "POST",
+      data: {'action' : 'getPraticaNumberForAnno', 'anno' : val},
+      success: function(msg) { $('input[name=numero]').val(msg); }
+    });
+  }else if(val.length > 4)
+    $(this).val(val.substr(0,4))
+});
+
+
+/****************FUNCTIONS*****************/
+
 (function ($) {
     $.fn.serializeFormJSON = function () {
 
@@ -27,13 +44,12 @@ function ricercaEdificio(form){
     url: "../runtime/handler.php",
     type: "POST",
     data: data,
-    dataType: "text",
     error: function(jqXHR, textStatus) {
             alert('Errore: '+textStatus);
            },
    success: function(msg) {
-   					msg = JSON.parse(msg)
-   					//console.log(msg);
+            //console.log(msg);
+   					//msg = JSON.parse(msg);
    					$('#risultati-ricerca-edificio').empty();
    					for (let ed of msg) {
    						let div = $('<div></div>');
@@ -41,7 +57,7 @@ function ricercaEdificio(form){
    						div.click(function(){
    							$('#ricerca-edificio-field').val(ed.ID);
    						});
-   						
+
    						for(let attr in ed){
    							let row = $('<div></div>');
    							let p = $('<p></p>');
@@ -52,10 +68,10 @@ function ricercaEdificio(form){
    							row.append(p);
    							div.append(row);
    						}
-   						
+
    						$('#risultati-ricerca-edificio').append(div);
 					}
-   					
+
 	            }
   });
 }
@@ -72,13 +88,13 @@ function freezeEdificio() {
 		alert('Selezionare un edificio');
 }
 
-var mappaliEditingEdCount = 1;
+var mappaliCount = 1;
 function addFieldMappale() {
 	if(edID){
 		let mappali = getMappaliEdificio(edID);
-		if(mappali){
+		if(mappali.length > 0){
 			let select = $('<select></select>');
-			select.attr('name', 'mapp'+mappaliEditingEdCount);
+			select.attr('name', 'mapp'+mappaliCount);
 			select.addClass('mappale');
 
 			for (let mapp of mappali) {
@@ -89,19 +105,19 @@ function addFieldMappale() {
 			}
 
 			let div = $('<div></div>');
-			
+
 			let delBtn = $('<button></button>');
 			delBtn.click(function() {
 				div.remove();
 			});
 			delBtn.html('-');
 			delBtn.css('background-color', 'red');
-			
+
 			div.append(select);
 			div.append(delBtn);
-			
+
 			$('#mappali').append(div);
-			mappaliEditingEdCount++;
+			mappaliCount++;
 		}else
 			alert('L\'edificio non ha mappali associati');
 	}else{
@@ -111,13 +127,60 @@ function addFieldMappale() {
 	}
 }
 
-var res;
 function getMappaliEdificio(ed) {
 	return JSON.parse($.ajax({
 	    url: "../runtime/handler.php",
 	    type: "POST",
 	    data: {'action' : 'getMappaliEdificio', 'edificio' : ed},
-	    dataType: "text",
+	    async: false
+	}).responseText);
+}
+
+var subalterniCount = 1;
+function addFieldSubalterno() {
+	if(edID){
+		let subalterni = getSubalterniEdificio(edID);
+    console.log(subalterni);
+		if(subalterni.length > 0){
+			let select = $('<select></select>');
+			select.attr('name', 'sub'+subalterniCount);
+			select.addClass('subalterno');
+
+			for (let sub of subalterni) {
+				let option = $('<option></option>');
+				option.val(sub['Subalterno']);
+				option.html('Subalterno '+sub['Subalterno']+' del mappale '+sub['Mappale']);
+				select.append(option);
+			}
+
+			let div = $('<div></div>');
+
+			let delBtn = $('<button></button>');
+			delBtn.click(function() {
+				div.remove();
+			});
+			delBtn.html('-');
+			delBtn.css('background-color', 'red');
+
+			div.append(select);
+			div.append(delBtn);
+
+			$('#subalterni').append(div);
+			subalterniCount++;
+		}else
+			alert('L\'edificio non ha subalterni associati');
+	}else{
+		$('#dati-pratica').hide();
+		$('#dati-edificio').show();
+		alert('Selezionare un edificio');
+	}
+}
+
+function getSubalterniEdificio(ed) {
+	return JSON.parse($.ajax({
+	    url: "../runtime/handler.php",
+	    type: "POST",
+	    data: {'action' : 'getSubalterniEdificio', 'edificio' : ed},
 	    async: false
 	}).responseText);
 }

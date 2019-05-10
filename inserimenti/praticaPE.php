@@ -117,7 +117,7 @@
     #dati-pratica{
         display: none;
     }
-    #mappali > div{
+    #mappali > div,#subalterni > div{
         display: flex;
     }
   </style>
@@ -135,37 +135,60 @@
             <input name="mappale" type="number" placeholder="Mappale...">
           </form>
           <div id="risultati-ricerca-edificio"></div>
-          
+
           <label>N° Edificio</label>
           <input type="number" id="ricerca-edificio-field" required="required" disabled="disabled">
           <button type="button" onclick="freezeEdificio();">Blocca edificio</button>
       </div>
 
-      <div id="dati-pratica" class="inner-wrap">
-
-		<h4 id="info-edificio"></h4>
-		<input type="hidden" name="edificio" id="edificio">
-
-        <div class="field">
-          	<label>Mappale/i</label>
-    		<div id="mappali"></div>
-    		<button type="button" onclick="addFieldMappale();">+</button>
+      <div id="dati-pratica">
+        <div class="inner-wrap">
+      		<h2 id="info-edificio"></h2>
+      		<input type="hidden" name="edificio" id="edificio" required="required">
         </div>
 
-        <div class="field">
-          <label>Tipo</label>
-          <select name="tipo_pratica">
-            <?php
-            $types = getEnumValues('pe_pratiche', 'Tipo', $c->db);
-            foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
-            ?>
-          </select>
+        <div class="inner-wrap">
+          <div class="field">
+          	 <label>Mappale/i</label>
+    		     <div id="mappali"></div>
+  		       <button type="button" onclick="addFieldMappale();">+</button>
+          </div>
+          <div class="field">
+            	<label>Subalterno/i</label>
+    		      <div id="subalterni"></div>
+    		      <button type="button" onclick="addFieldSubalterno();">+</button>
+          </div>
         </div>
 
-        <label>Subalterno/i<input type="text" name="subalterno" pattern="^(\d{1,4}-)*\d{1,4}$" value="<?= $_POST['subalterno']??'' ?>"></label>
-        <label>Anno<input type="number" name="anno" required="required" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
-        <label>Numero<input type="number" name="numero" required="required" value="<?= $_POST['numero']??'' ?>"></label>
-        <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
+        <div class="inner-wrap">
+          <div class="field">
+            <label>Tipo</label>
+            <select name="tipo_pratica">
+              <?php
+              $types = getEnumValues('pe_pratiche', 'Tipo', $c->db);
+              foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
+              ?>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Anno</label>
+            <input type="number" name="anno" required="required" pattern="\d{4}" value="111">
+          </div>
+
+          <div class="field">
+            <label>Numero</label>
+            <input type="number" name="numero" required="required" pattern="\d{4}">
+          </div>
+
+          <div class="field">
+            <label>Barrato</label>
+            <input type="text" name="barrato">
+          </div>
+
+        </div>
+
+
         <label>Data<input type="date" name="data" value="<?= $_POST['data']??date('Y-m-d') ?>"></label>
         <label>Protocollo<input type="number" name="protocollo" value="<?= $_POST['protocollo']??'' ?>"></label>
         <div class="extensible">
