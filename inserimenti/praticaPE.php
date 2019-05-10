@@ -117,6 +117,9 @@
     #dati-pratica{
         display: none;
     }
+    #mappali > div{
+        display: flex;
+    }
   </style>
 </head>
 <body>
@@ -137,18 +140,16 @@
           <input type="number" id="ricerca-edificio-field" required="required" disabled="disabled">
           <button type="button" onclick="freezeEdificio();">Blocca edificio</button>
       </div>
-		<?php 
-		//TODO
-		?>
+
       <div id="dati-pratica" class="inner-wrap">
 
 		<h4 id="info-edificio"></h4>
 		<input type="hidden" name="edificio" id="edificio">
 
         <div class="field">
-          <label>Mappale/i</label>
-
-          <input>
+          	<label>Mappale/i</label>
+    		<div id="mappali"></div>
+    		<button type="button" onclick="addFieldMappale();">+</button>
         </div>
 
         <div class="field">

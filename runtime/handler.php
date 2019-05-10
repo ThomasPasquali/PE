@@ -51,6 +51,10 @@
             case 'searchEdificio':
                 searchEdificio($_POST['foglio'], $_POST['mappale'], $c->db);
                 exit();
+                
+            case 'getMappaliEdificio':
+                getMappaliEdificio($_POST['edificio'], $c->db);
+                exit();
 
             default:
                 break;
@@ -128,7 +132,6 @@
     }
     
     function searchEdificio($foglio, $mappale, $db) {
-        header('Content-type: text/json');
         $params = [];
         if(!empty($foglio)) $params[] = $foglio;
         if(!empty($mappale)) $params[] = $mappale;
@@ -149,7 +152,28 @@
                LIMIT 10',
             $params);
         
+        header('Content-type: text/json');
         echo json_encode($res, TRUE);
     }
     
+    function getMappaliEdificio($edificio, $db){
+        $res = $db->ql(
+            'SELECT Mappale, EX
+             FROM fogli_mappali_edifici
+             WHERE Edificio = ?',
+            [$edificio]);
+        
+        header('Content-type: text/json');
+        echo json_encode($res, TRUE);
+    }
     
+    function getSubalterniEdificio($edificio, $db){
+        $res = $db->ql(
+            'SELECT Subalterno, Mappale
+             FROM subalterni_edifici
+             WHERE Edificio = ?',
+            [$edificio]);
+        
+        header('Content-type: text/json');
+        echo json_encode($res, TRUE);
+    }

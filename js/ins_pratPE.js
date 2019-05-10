@@ -33,7 +33,7 @@ function ricercaEdificio(form){
            },
    success: function(msg) {
    					msg = JSON.parse(msg)
-   					console.log(msg);
+   					//console.log(msg);
    					$('#risultati-ricerca-edificio').empty();
    					for (let ed of msg) {
    						let div = $('<div></div>');
@@ -60,8 +60,9 @@ function ricercaEdificio(form){
   });
 }
 
+var edID;
 function freezeEdificio() {
-	let edID = $('#ricerca-edificio-field').val();
+	edID = $('#ricerca-edificio-field').val();
 	if(edID){
 		$('#dati-pratica').show();
 		$('#dati-edificio').hide();
@@ -69,4 +70,54 @@ function freezeEdificio() {
 		$('#edificio').val(edID);
 	}else
 		alert('Selezionare un edificio');
+}
+
+var mappaliEditingEdCount = 1;
+function addFieldMappale() {
+	if(edID){
+		let mappali = getMappaliEdificio(edID);
+		if(mappali){
+			let select = $('<select></select>');
+			select.attr('name', 'mapp'+mappaliEditingEdCount);
+			select.addClass('mappale');
+
+			for (let mapp of mappali) {
+				let option = $('<option></option>');
+				option.val(mapp['Mappale']);
+				option.html(mapp['Mappale']+(mapp['EX']?'(EX)':''));
+				select.append(option);
+			}
+
+			let div = $('<div></div>');
+			
+			let delBtn = $('<button></button>');
+			delBtn.click(function() {
+				div.remove();
+			});
+			delBtn.html('-');
+			delBtn.css('background-color', 'red');
+			
+			div.append(select);
+			div.append(delBtn);
+			
+			$('#mappali').append(div);
+			mappaliEditingEdCount++;
+		}else
+			alert('L\'edificio non ha mappali associati');
+	}else{
+		$('#dati-pratica').hide();
+		$('#dati-edificio').show();
+		alert('Selezionare un edificio');
+	}
+}
+
+var res;
+function getMappaliEdificio(ed) {
+	return JSON.parse($.ajax({
+	    url: "../runtime/handler.php",
+	    type: "POST",
+	    data: {'action' : 'getMappaliEdificio', 'edificio' : ed},
+	    dataType: "text",
+	    async: false
+	}).responseText);
 }
