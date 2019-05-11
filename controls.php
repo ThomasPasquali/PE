@@ -8,10 +8,14 @@
         private const USER_TYPE_KEY = 'user_type';
 
         public $db;
+        public $doc_el_root_path;
 
         public function __construct() {
             if(session_status() != PHP_SESSION_ACTIVE) session_start();
 
+            $peINI = parse_ini_file(INI_DIR.'PE.ini');
+            $this->doc_el_root_path = $peINI['DOC_EL_ROOT'];
+            
             require_once 'lib/db.php';
 
             $this->db = new DB();

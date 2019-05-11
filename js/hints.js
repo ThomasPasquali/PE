@@ -1,7 +1,7 @@
 function updateHints(type, field, hintBoxID, targetFieldID) {
 	if(field instanceof jQuery)
-		field = field.get();
-
+		field = field.get(0);
+	
 	var request = $.ajax({
         url: "/runtime/handler.php",
         type: "POST",
@@ -22,9 +22,9 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
       });
 
       request.done(function(hints) {
-				console.log(hints);
-				if(hints){
-					hints = JSON.parse(hints);
+			console.log(hints);
+			if(hints){
+				hints = JSON.parse(hints);
 	      	$(hintBoxID).empty();
 	      	$(hintBoxID).css("display", "block");
 	      	for (let el of hints) {

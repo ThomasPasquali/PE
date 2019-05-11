@@ -111,6 +111,7 @@
         $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
                                 FROM intestatari_persone
                                 WHERE Cognome LIKE ?
+                                ORDER BY Cognome, Nome
                                 LIMIT 20',
             ["$search%"]);
         header('Content-type: application/json');
@@ -118,9 +119,10 @@
     }
 
     function sendIntestatarioSocietaHints($search, $db) {
-        $res = $db->ql('SELECT ID, Intestazione Description
+        $res = $db->ql('SELECT ID, CONCAT(Intestazione, \' (\', Partita_iva, \')\') Description
                                 FROM intestatari_societa
-                                WHERE Denominazione LIKE ?
+                                WHERE Intestazione LIKE ?
+                                ORDER BY Intestazione
                                 LIMIT 20',
             ["%$search%"]);
         header('Content-type: application/json');

@@ -1,3 +1,8 @@
+/****************SETUP*****************/
+$('input').each(function() {
+	$(this).attr('autocomplete', 'off');
+})
+
 /****************HANDLERS*****************/
 $('input[name=anno]').keyup(function(){
   let val = $(this).val()+'';
@@ -6,7 +11,7 @@ $('input[name=anno]').keyup(function(){
       url: "../runtime/handler.php",
       type: "POST",
       data: {'action' : 'getPraticaNumberForAnno', 'anno' : val},
-      success: function(msg) { $('input[name=numero]').val(msg); }
+      success: function(msg) { console.log(msg);$('input[name=numero]').val((msg.length == 0?'1':msg)); }
     });
   }else if(val.length > 4)
     $(this).val(val.substr(0,4))
@@ -148,7 +153,7 @@ function addFieldSubalterno() {
 
 			for (let sub of subalterni) {
 				let option = $('<option></option>');
-				option.val(sub['Subalterno']);
+				option.val(sub['Subalterno']+'mapp'+sub['Mappale']);
 				option.html('Subalterno '+sub['Subalterno']+' del mappale '+sub['Mappale']);
 				select.append(option);
 			}
@@ -189,11 +194,13 @@ var intestatariPersonaCount = 1;
 function addFieldIntestatarioPersona() {
   let searchField = $('<input>');
   searchField.attr('id', 'intestatarioPersona'+intestatariPersonaCount);
+  searchField.attr('type', 'text');
   searchField.click(function () {
     $(this).select();
   });
+  let tmp = intestatariPersonaCount;
   searchField.keyup(function () {
-    updateHints('intestatarioPersona', $(this), '#hintsIntestatarioPersona'+intestatariPersonaCount, '#intestatarioPersona'+intestatariPersonaCount+'ID');
+    updateHints('intestatarioPersona', $(this), '#hintsIntestatarioPersona'+tmp, '#intestatarioPersona'+tmp+'ID');
   });
 
   let idField = $('<input>');
@@ -220,4 +227,43 @@ function addFieldIntestatarioPersona() {
 
   $('#fieldsIntPers').append(div);
   intestatariPersonaCount++;
+}
+
+var intestatariSocietaCount = 1;
+function addFieldIntestatarioSocieta() {
+  let searchField = $('<input>');
+  searchField.attr('id', 'intestatarioSocieta'+intestatariSocietaCount);
+  searchField.attr('type', 'text');
+  searchField.click(function () {
+    $(this).select();
+  });
+  let tmp = intestatariSocietaCount;
+  searchField.keyup(function () {
+    updateHints('intestatarioSocieta', $(this), '#hintsIntestatarioSocieta'+tmp, '#intestatarioSocieta'+tmp+'ID');
+  });
+
+  let idField = $('<input>');
+  idField.attr('id', 'intestatarioSocieta'+intestatariSocietaCount+'ID');
+  idField.attr('name', 'intestatarioSocieta'+intestatariSocietaCount);
+  idField.attr('type', 'hidden');
+
+  let hintsDiv = $('<div></div>')
+  hintsDiv.addClass('hintBox');
+  hintsDiv.attr('id', 'hintsIntestatarioSocieta'+intestatariSocietaCount);
+
+  let div = $('<div></div>');
+
+  let delBtn = $('<button></button>');
+  delBtn.click(function () {
+    div.remove();
+  });
+  delBtn.html('-');
+
+  div.append(searchField);
+  div.append(idField);
+  div.append(hintsDiv);
+  div.append(delBtn);
+
+  $('#fieldsIntSoc').append(div);
+  intestatariSocietaCount++;
 }

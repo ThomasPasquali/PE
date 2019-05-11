@@ -9,16 +9,21 @@
 
   print_r($_POST);
 
-  function inserisciPraticaPE() {
-    //TODO "rifare"
-    if($c->check(['tipo', 'anno', 'numero', 'barrato', 'edificio'], $_POST)){
-
-      exit();
-
+    if($c->check(['tipo', 'anno', 'numero', 'edificio'], $_POST)){
+        
+        if(isset($_POST['documento_elettronico'])){
+            $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
+            $path = $c->doc_el_root_path."\\$relPath";
+            if(!file_exists($path))
+                mkdir($path, 0777, TRUE);
+            $_POST['documento_elettronico'] = $relPath;
+        }else 
+        $_POST['documento_elettronico'] = '';
+        
         $res = $c->db->dml(
             'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Edificio, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
               VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :edificio, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
-            [':tipo' => $_POST['tipo_pratica'],
+            [':tipo' => $_POST['tipo'],
             ':anno' => $_POST['anno'],
             ':numero' => $_POST['numero'],
             ':barr' => $_POST['barrato'],
@@ -38,44 +43,43 @@
             ':note' => ifEmptyGet($_POST['note'])]);
 
         if($res->errorCode() == 0){
-            $GLOBALS['succ'] = 'Pratica inserita correttamente';
+            echo 'Pratica inserita correttamente';
 
-            $idPratica =  $GLOBALS['c']->db->ql(
-                'SELECT ID FROM pe_pratiche WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
-                [$_POST['tipo_pratica'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0]['ID'];
+            $ed =  $c->db->ql(
+                'SELECT p.ID pid, e.ID eid, e.Foglio foglio
+                FROM pe_pratiche p
+                JOIN edifici e ON e.ID = p.Edificio
+                WHERE p.TIPO = ? AND p.Anno = ? AND p.Numero = ? AND p.Barrato = ?',
+                [$_POST['tipo'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0];
 
-             //inserimento intestatari persone
-            $i = 0;
-            $tryNext = true;
-            while ($tryNext) {
-                if(isset($_POST['intestatario_persona_'.$i])){
-                    $persona = $_POST['intestatario_persona_'.$i];
-                    $res = $GLOBALS['c']->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
-                                                                VALUES(?, ?)', [$idPratica, $persona]);
-                    if($res->errorInfo()[0] != 0) print_r($res->errorInfo());
-                }else
-            $tryNext = false;
-                $i++;
+             //inserimento intestatari, mappali e subalterni
+            foreach ($_POST as $key => $value)
+                if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
+                
+                    $res = $c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
+                                                        VALUES(?, ?)', [$ed['pid'], $value]);
+                    
+            }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'){
+                
+                    $res = $c->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
+                                                        VALUES(?, ?)', [$ed['pid'], $value]);
+                    
+            }else if(substr($key, 0, strlen('mapp')) == 'mapp'){
+                
+                $res = $c->db->dml('INSERT INTO pe_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
+                                                        VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $ed['foglio'], $value]);
+                
+            }else if(substr($key, 0, strlen('sub')) == 'sub'){
+                
+                $sub_mapp = explode('mapp', $value);
+                $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Mappale, Subalterno)
+                                                        VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $sub_mapp[1], $sub_mapp[0]]);
             }
 
-            //inserimento intestatari societa
-            $i = 0;
-            $tryNext = true;
-            while ($tryNext) {
-                if(isset($_POST['intestatario_societa_'.$i])){
-                    $societa = $_POST['intestatario_societa_'.$i];
-                    $res = $GLOBALS['c']->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
-                                                                VALUES(?, ?)', [$idPratica, $societa]);
-                    if($res->errorInfo()[0] != 0) print_r($res->errorInfo());
-                }else
-                    $tryNext = false;
-                    $i++;
-            }
         }else
-        $GLOBALS['err'] = 'Impossibile inserire la pratica: '.$stmt->errorInfo()[2];
-    }else
-        $GLOBALS['err'] = 'Dati inseriti non corretti: valori mancanti';
-  }
+        echo 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
+    }
+  
 
   //Misc functions
   function getEnumValues($table, $field, $db){
@@ -205,19 +209,16 @@
 
           <div class="section">Persone correlate</div>
           <div class="inner-wrap">
-            <div class="extensible field">
+            <div class="field">
               <label>Intestatari persone</label>
               <div id="fieldsIntPers"></div>
               <button type="button" onclick="addFieldIntestatarioPersona();">+</button>
             </div>
 
-            <div class="extensible field">
-              <label>Intestatari societ&aacute</label>
-              <div id="fieldsIntSoc"></div>
-              <div style="display:inline-flex;">
-                <button type="button" style="background-color:red;" onclick="genSoc.removeField();">-</button>
-                <button type="button" onclick="genSoc.addField();">+</button>
-              </div>
+            <div class="field">
+              	<label>Intestatari societ&aacute</label>
+              	<div id="fieldsIntSoc"></div>
+				<button type="button" onclick="addFieldIntestatarioSocieta();">+</button>
             </div>
 
             <div class="field">
@@ -268,8 +269,8 @@
             </div>
 
             <div class="field">
-              <label>Documento elettronico</label>
-              <input type="text" name="documento_elettronico">
+              <label>Genera cartella documenti elettronici</label>
+              <input type="checkbox" name="documento_elettronico" checked="checked">
             </div>
 
             <div class="field">
@@ -284,7 +285,7 @@
 
           </div>
 
-          <button type="submit" name="btn" value="inserimentoPratica">Inserisci pratica</button>
+          <button type="submit">Inserisci pratica</button>
         </div>
       </form>
   </div>
