@@ -184,3 +184,40 @@ function getSubalterniEdificio(ed) {
 	    async: false
 	}).responseText);
 }
+
+var intestatariPersonaCount = 1;
+function addFieldIntestatarioPersona() {
+  let searchField = $('<input>');
+  searchField.attr('id', 'intestatarioPersona'+intestatariPersonaCount);
+  searchField.click(function () {
+    $(this).select();
+  });
+  searchField.keyup(function () {
+    updateHints('intestatarioPersona', $(this), '#hintsIntestatarioPersona'+intestatariPersonaCount, '#intestatarioPersona'+intestatariPersonaCount+'ID');
+  });
+
+  let idField = $('<input>');
+  idField.attr('id', 'intestatarioPersona'+intestatariPersonaCount+'ID');
+  idField.attr('name', 'intestatarioPersona'+intestatariPersonaCount);
+  idField.attr('type', 'hidden');
+
+  let hintsDiv = $('<div></div>')
+  hintsDiv.addClass('hintBox');
+  hintsDiv.attr('id', 'hintsIntestatarioPersona'+intestatariPersonaCount);
+
+  let div = $('<div></div>');
+
+  let delBtn = $('<button></button>');
+  delBtn.click(function () {
+    div.remove();
+  });
+  delBtn.html('-');
+
+  div.append(searchField);
+  div.append(idField);
+  div.append(hintsDiv);
+  div.append(delBtn);
+
+  $('#fieldsIntPers').append(div);
+  intestatariPersonaCount++;
+}

@@ -23,6 +23,14 @@
                         sendStradarioHints($_POST['search'], $c->db);
                         exit();
 
+                    case 'intestatarioPersona':
+                        sendIntestatarioPersonaHints($_POST['search'], $c->db);
+                        exit();
+
+                    case 'intestatarioSocieta':
+                        sendIntestatarioSocietaHints($_POST['search'], $c->db);
+                        exit();
+
                     default:
                         break;
                 }
@@ -72,9 +80,9 @@
     function sendTecnicoHints($search, $db) {
         $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
                                 FROM tecnici
-                                WHERE Cognome LIKE ? OR Nome LIKE ?
+                                WHERE Cognome LIKE ?
                                 LIMIT 20',
-                                ["%$search%", "%$search%"]);
+                                ["$search%"]);
         header('Content-type: application/json');
         echo  json_encode($res);
     }
@@ -92,6 +100,26 @@
     function sendStradarioHints($search, $db) {
         $res = $db->ql('SELECT Identificativo_nazionale ID, Denominazione Description
                                 FROM stradario
+                                WHERE Denominazione LIKE ?
+                                LIMIT 20',
+            ["%$search%"]);
+        header('Content-type: application/json');
+        echo json_encode($res);
+    }
+
+    function sendIntestatarioPersonaHints($search, $db) {
+        $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
+                                FROM intestatari_persone
+                                WHERE Cognome LIKE ?
+                                LIMIT 20',
+            ["$search%"]);
+        header('Content-type: application/json');
+        echo json_encode($res);
+    }
+
+    function sendIntestatarioSocietaHints($search, $db) {
+        $res = $db->ql('SELECT ID, Intestazione Description
+                                FROM intestatari_societa
                                 WHERE Denominazione LIKE ?
                                 LIMIT 20',
             ["%$search%"]);
