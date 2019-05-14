@@ -18,6 +18,8 @@
                 $stmt->execute($params);
                 $this->lastErrorInfo = $stmt->errorInfo();
 
+                //if($stmt->errorCode() != 0) echo $stmt->errorInfo()[2];
+
                 $righe_estratte = [];
                 while ($riga = $stmt->fetch($fetchType))
                     $righe_estratte[] = $this->changeEncoding($riga);

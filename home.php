@@ -18,10 +18,6 @@
                 inserimentoAnagrafiche();
                 break;
 
-            case 'inserimentoPratica':
-                inserimentoPratiche();
-                break;
-
             case 'mappaliEX':
                 $esitoGestMapp = gestioneMappaliEX();
                 $GLOBALS[$esitoGestMapp[1]?'err':'succ'] = $esitoGestMapp[0];
@@ -57,24 +53,6 @@
         }
     }
 
-    function inserimentoPratiche() {
-        switch ($_POST['tipo']) {
-            case 'pe':
-            inserisciPraticaPE();
-            break;
-
-            case 'tec':
-            inserisciPraticaTEC();
-            break;
-
-            default:
-            ;
-            break;
-        }
-    }
-
-
-
     function inserisciPraticaTEC() {
         ;//TODO
     }
@@ -82,15 +60,14 @@
     function inserisciPersona() {
         if($GLOBALS['c']->check(['nome', 'cognome', 'cf'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
-                'INSERT INTO intestatari_persone (Nome, Cognome, Codice_fiscale, Indirizzo, Citta, Provincia, Note)
-                VALUES (:n, :c, :cf, :ind, :citta, :prov, :note)',
+                'INSERT INTO intestatari_persone (Nome, Cognome, Codice_fiscale, Indirizzo, Citta, Provincia)
+                VALUES (:n, :c, :cf, :ind, :citta, :prov)',
                 [':n' => $_POST['nome'],
                 ':c' => $_POST['cognome'],
                 ':cf' => $_POST['cf'],
                 ':ind' => getValueORNULL($_POST['indirizzo']),
                 ':citta' => getValueORNULL($_POST['citta']),
-                ':prov' => getValueORNULL($_POST['provincia']),
-                ':note' => getValueORNULL($_POST['note'])]);
+                ':prov' => getValueORNULL($_POST['provincia'])]);
 
             if($stmt->errorInfo()[0] == 0)
                 $GLOBALS['succ'] = 'Anagrafica inserita correttamente';
@@ -128,14 +105,13 @@
     function inserisciSocieta() {
         if($GLOBALS['c']->check(['intestazione', 'piva'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
-                'INSERT INTO intestatari_societa (Intestazione, Partita_iva, Indirizzo, Citta, Provincia, Note)
-                VALUES (:int, :piva, :ind, :citta, :prov, :note)',
+                'INSERT INTO intestatari_societa (Intestazione, Partita_iva, Indirizzo, Citta, Provincia)
+                VALUES (:int, :piva, :ind, :citta, :prov)',
                 [':int' => $_POST['intestazione'],
                 ':piva' => $_POST['piva'],
                 ':ind' => getValueORNULL($_POST['indirizzo']),
                 ':citta' => getValueORNULL($_POST['citta']),
-                ':prov' => getValueORNULL($_POST['provincia']),
-                ':note' => getValueORNULL($_POST['note'])]);
+                ':prov' => getValueORNULL($_POST['provincia'])]);
 
             if($stmt->errorInfo()[0] == 0)
                 $GLOBALS['succ'] = 'Societa inserita correttamente';
@@ -148,12 +124,11 @@
     function inserisciImpresa() {
         if($GLOBALS['c']->check(['intestazione'], $_POST)){
             $stmt = $GLOBALS['c']->db->dml(
-                'INSERT INTO imprese (Intestazione, Codice_fiscale, Partita_iva, Note)
-                 VALUES (:int, :cf, :piva, :note)',
+                'INSERT INTO imprese (Intestazione, Codice_fiscale, Partita_iva)
+                 VALUES (:int, :cf, :piva)',
                 [':int' => $_POST['intestazione'],
                 ':piva' => getValueORNULL($_POST['piva']),
-                ':cf' => getValueORNULL($_POST['cf']),
-                ':note' => getValueORNULL($_POST['note'])]);
+                ':cf' => getValueORNULL($_POST['cf'])]);
 
                 if($stmt->errorInfo()[0] == 0)
                     $GLOBALS['succ'] = 'Impresa inserita correttamente';
@@ -400,7 +375,7 @@
         	            echo '<h1 style="color: red;">Report non supportato!<h1>';
         	           break;
         	    }
-        	    echo "<script>directChg('$_POST[tipo]')</script>";
+        	    echo "<script>directChg('$_POST[tipo]'); changeContent('intAnag');</script>";
         	}
 
     	    ?>
@@ -446,7 +421,6 @@
             			<label>Indirizzo<input type="text" name="indirizzo" value="<?= $_POST['indirizzo']??'' ?>"></label>
             			<label>Città<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
             			<label>Provincia (sigla)<input type="text" name="provincia" pattern="|[A-Z]{2}" value="<?= $_POST['provincia']??'' ?>"></label>
-            			<label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
             		</div>
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
 				</form>
@@ -491,7 +465,6 @@
             			<label>Indirizzo<input type="text" name="indirizzo" value="<?= $_POST['indirizzo']??'' ?>"></label>
             			<label>Città<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
             			<label>Provincia (sigla)<input type="text" name="provincia" pattern="|[A-Z]{2}" value="<?= $_POST['provincia']??'' ?>"></label>
-            			<label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
             		</div>
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
 				</form>
@@ -509,7 +482,6 @@
             			<label>Intestazione<input type="text" name="intestazione" required="required" value="<?= $_POST['intestazione']??'' ?>"></label>
             			<label>Codice fiscale<input type="text" name="cf" pattern="[A-Za-z]{6}[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{3}[A-Za-z]" value="<?= $_POST['cf']??'' ?>"></label>
             		    <label>Partita iva<input type="text" name="piva" pattern="\d{11}" value="<?= $_POST['piva']??'' ?>"></label>
-            			<label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
             		</div>
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
 				</form>
@@ -551,11 +523,6 @@
 			</div>
         </div>
         <?= isset($_POST['btn'])&&$_POST['btn']=='mappaliEX'?'<script type="text/javascript">changeContent(\'gestMappEX\');</script>':'' ?>
-
-        <script type="text/javascript">
-    		var genPers = new FieldsGenIntPers(document.getElementById('fieldsIntPers'), '<?php generaListIntestatariPersone(); ?>');
-    		var genSoc = new FieldsGenIntSoc(document.getElementById('fieldsIntSoc'), '<?php generaListIntestatariSocieta(); ?>');
-		</script>
 
         <?php
             if(isset($GLOBALS['err'])&&isset($_POST['btn'])&&$_POST['btn'] == 'inserimentoAnagrafica')
