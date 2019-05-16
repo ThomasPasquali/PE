@@ -1,5 +1,5 @@
-var mappaliNewEdCount = 1;
-var mappaliEditingEdCount = 1;
+var fieldsFMNewEdCount = 1;
+var fieldsFMEditingEdCount = 1;
 var subalterniEditingEdCount = 1;
 var b;
 
@@ -10,64 +10,55 @@ function changeContent(divID) {
 	document.getElementById(divID).classList.add('active');
 }
 
-function addFieldMappaleNewEd() {
-	let field = document.createElement('input');
-	field.name = 'mappNewEd'+mappaliNewEdCount;
-	field.className = 'mappaleNewEd';
-	field.placeholder = mappaliNewEdCount+'° mappale';
-	field.type = 'text';
-	field.pattern = '\\d{1,4}';
-	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this, "foglio-new-ed", "mappaleNewEd");');
-	field.setAttribute('autocomplete', 'off');
-	let div = document.createElement('div');
-	div.appendChild(field);
-	let span = document.createElement('span');
+function addFieldFoglioMappale(newORediting = 'editing', isEX = false) {
+	let count = newORediting == 'new' ? fieldsFMNewEdCount++ : fieldsFMEditingEdCount++;
+	let fieldFoglio = $('<input>');
+	let fieldMappale = $('<input>');
+	let fieldEX = $('<input>');
+	let delBtn = $('<input>');
+	let span = $('<span></span>');
 	span.className = 'esitiCheckMappaliNewEd';
-	div.appendChild(span);
-	$('#mappali-new-ed').append(div);
-	checkIfMappaleIsFree(field, "foglio-new-ed", "mappaleNewEd");
-	mappaliNewEdCount++;
-}
-
-function addFieldMappaleEditingEd(mappale, isEX, edificio) {
-	let field = document.createElement('input');
-	field.name = 'mappEditingEd'+mappaliEditingEdCount;
-	field.className = 'mappaleEditingEd';
-	field.placeholder = mappaliEditingEdCount+'° mappale';
-	field.type = 'text';
-	field.pattern = '\\d{1,4}';
-	field.value = mappale;
-	field.setAttribute('onkeyup', 'checkIfMappaleIsFree(this, "foglio-editing-ed", "mappaleEditingEd", '+edificio+');');
-	field.setAttribute('autocomplete', 'off');
-
-	let p = document.createElement('p');
-	p.innerHTML = 'EX';
-
-	let fieldEX = document.createElement('input');
-	fieldEX.name = 'isExMappEditingEd'+mappaliEditingEdCount;
-	fieldEX.type = 'checkbox';
-	fieldEX.value = 'EX'
-	if(isEX) fieldEX.checked = 'checked';
-
-	let span = document.createElement('span');
-	span.className = 'esitiCheckMappaliEditingEd';
-
-	let div = document.createElement('div');
-
-	let delBtn = document.createElement('input');
-	delBtn.type = 'button';
-	delBtn.value = 'Elimina mappale';
-	delBtn.addEventListener('click', function(){ div.remove(); });
-
-	div.appendChild(field);
-	div.appendChild(p);
-	div.appendChild(fieldEX);
-	div.appendChild(delBtn);
-	div.appendChild(span);
-
-	$('#mappali-editing-ed').append(div);
-	checkIfMappaleIsFree(field, "foglio-editing-ed", "mappaleEditingEd", edificio)
-	mappaliEditingEdCount++;
+	
+	fieldFoglio.attr('name', 'foglio'+newORediting+count);
+	fieldFoglio.addClass('foglio'+newORediting);
+	fieldFoglio.attr('placeholder', 'Foglio '+count);
+	fieldFoglio.attr('id', 'foglio-'+newORediting+'-ed'+count);
+	fieldFoglio.attr('type', 'text');
+	fieldFoglio.attr('pattern', '\\d{1,4}');
+	fieldFoglio.attr('autocomplete', 'off');
+	fieldFoglio.keyup(function() {
+		checkIfFoglioMappaleIsFree(fieldFoglio.val(), fieldMappale.val(), span);
+	});
+	
+	fieldMappale.attr('name', 'mappale'+newORediting+count);
+	fieldMappale.addClass('mappale'+newORediting);
+	fieldMappale.attr('placeholder', 'Mappale '+count);
+	fieldMappale.attr('id', 'mappale-'+newORediting+'-ed'+count);
+	fieldMappale.attr('type', 'text');
+	fieldMappale.attr('pattern', '\\d{1,4}');
+	fieldMappale.attr('autocomplete', 'off');
+	fieldMappale.keyup(function() {
+		checkIfFoglioMappaleIsFree(fieldFoglio.val(), fieldMappale.val(), span);
+	});
+	
+	fieldEX.attr('name', 'ex'+newORediting+count);
+	fieldEX.attr('type', 'checkbox');
+	fieldEX.attr('value', 'EX');
+	if(isEX) fieldEX.attr('checked', 'checked');
+	
+	delBtn.attr('type', 'button');
+	delBtn.attr('value', 'Elimina');
+	delBtn.click(function(){ div.remove(); });
+	
+	let div = $('<div></div>');
+	div.append(fieldFoglio);
+	div.append(fieldMappale);
+	div.append($('<span></span>').text('EX'));
+	div.append(fieldEX);
+	div.append(span);
+	div.append(delBtn);
+	$('#fogli-mappali-'+newORediting+'-ed').append(div);
+	checkIfFoglioMappaleIsFree(fieldFoglio.val(), fieldMappale.val(), span);
 }
 
 function addFieldSubalternoEditingEd(subalterno, mappale) {
@@ -110,48 +101,36 @@ function addFieldSubalternoEditingEd(subalterno, mappale) {
 	subalterniEditingEdCount++;
 }
 
+function checkIfFoglioMappaleIsFree(foglio, mappale, span, edificioToExcludeID='') {
+	if(!foglio)
+		span.text('Specificare il foglio');
+	else if(!mappale)
+		span.text('Specificare il mappale');
+	else{
+		//TODO local check
+		//db check
+		var request = $.ajax({
+	      url: "/runtime/handler.php",
+	      type: "POST",
+	      data: {"action":"checkMappale", 
+	    	  		"foglio" : foglio, 
+	    	  		"mappale" : mappale, 
+	    	  		"edificioToExclude" : edificioToExcludeID},
+	      dataType: "text"
+	    });
+	    request.done(function(msg) {
+	    	//console.log(msg);
+			span.text(msg=='OK'?'✔':'✖');
+	    });
+	}
+}
+
 function checkIfMappaleIsOnPage(field){
 	let mappOnPage = [];
 	$('.mappaleEditingEd').each(function(){
 		mappOnPage.push($(this).val());
 	});
 	field.parentNode.lastChild.innerHTML = (mappOnPage.indexOf(field.value) >= 0)?'✔':'✖';
-}
-
-function checkIfMappaleIsFree(el, foglioFieldID, mappaliClass, edificioToExcludeID = '') {
-	let foglio = $('#'+foglioFieldID).val();
-	if(foglio){
-		//local check TODO NON VAAAAAAA
-		b = true;
-		$('.'+mappaliClass).each(function(){
-			//console.log('TAsssss:'+$(this).val());
-			if($(this).val() == foglio)
-				return false;
-		});
-		if(!b) return false;
-		//console.log('db check');
-
-
-	//db check
-	var request = $.ajax({
-      url: "/runtime/handler.php",
-      type: "POST",
-      data: {"action":"checkMappale", "foglio" : foglio, "mappale" : el.value, "edificioToExclude" : edificioToExcludeID},
-      dataType: "text"
-    });
-    request.fail(function(jqXHR, textStatus) {
-    	alert('Errore: '+textStatus);
-    });
-    request.done(function(msg) {
-    	//console.log(msg);
-		let span = el.parentNode.lastChild;
-		span.innerHTML = (msg=='OK'?'✔':'✖');
-		return msg=='OK';
-    });
-	}else{
-		el.parentNode.lastChild.innerHTML = 'Specificare il foglio';
-		return false;
-	}
 }
 
 function checkAllMappaliNewEd() {

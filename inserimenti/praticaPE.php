@@ -46,7 +46,7 @@
             echo 'Pratica inserita correttamente';
 
             $ed =  $c->db->ql(
-                'SELECT p.ID pid, e.ID eid, e.Foglio foglio
+                'SELECT p.ID pid, e.ID eid
                 FROM pe_pratiche p
                 JOIN edifici e ON e.ID = p.Edificio
                 WHERE p.TIPO = ? AND p.Anno = ? AND p.Numero = ? AND p.Barrato = ?',

@@ -176,11 +176,11 @@
         if(!empty($mappale)) $params[] = $mappale;
 
         $where = [];
-        if(!empty($foglio)) $where[] = 'e.Foglio = ?';
+        if(!empty($foglio)) $where[] = 'fm.Foglio = ?';
         if(!empty($mappale)) $where[] = ' fm.Mappale = ?';
 
         $res = $db->ql(
-            'SELECT  e.ID ID, e.Foglio Foglio,
+            'SELECT  e.ID ID, fm.Foglio Foglio,
             	           GROUP_CONCAT(CONCAT(fm.Mappale, IF(fm.EX IS NULL, \'\', \'(EX)\')) ORDER BY fm.Mappale SEPARATOR \', \') Mappali,
                            s.Denominazione Stradario, e.Note Note
             FROM edifici e

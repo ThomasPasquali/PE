@@ -7,32 +7,35 @@
         exit();
     }
 
-    //$c->echoCode($_REQUEST);
+    $c->echoCode($_REQUEST);
     
     //INSERT EDIFICIO
     $edInserted = FALSE;
-    if($c->check(['foglioNewEd','stradarioNewEd'], $_REQUEST)&&isset($_REQUEST['noteNewEd'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
+    if($c->check(['stradarioNewEd'], $_REQUEST)&&isset($_REQUEST['noteNewEd'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
         //NEW ID EXTRACTION
         $edID = $c->db->ql('SELECT MAX(ID)+1 id FROM edifici')[0]['id'];
         if($edID === NULL) $edID = 1;
         $res = $c->db->dml(
-            'INSERT INTO edifici (ID, Foglio, Stradario, Note) VALUES(?,?,?,?)',
-            [$edID,$_REQUEST['foglioNewEd'],$_REQUEST['stradarioNewEd'],empty($_REQUEST['noteNewEd'])?NULL:$_REQUEST['noteNewEd']]
+            'INSERT INTO edifici (ID, Stradario, Note) VALUES(?,?,?)',
+            [$edID, $_REQUEST['stradarioNewEd'],empty($_REQUEST['noteNewEd'])?NULL:$_REQUEST['noteNewEd']]
         );
         $edInserted = $res->errorCode() == '0';
 
         //INSERT MAPPALI
         if($edInserted)
-            foreach ($_REQUEST as $key => $value)
-                if(substr($key, 0, strlen('mappNewEd')) === 'mappNewEd'&&!empty($value))
-                  $c->db->dml(
-                      'INSERT INTO fogli_mappali_edifici (Edificio,Foglio,Mappale) VALUES(?,?,?)',
-                      [$edID, $_REQUEST['foglioNewEd'],$value]
-                  );
+            foreach ($_REQUEST as $key => $mappale)
+                if(substr($key, 0, strlen('mappNewEd')) === 'mappNewEd'&&!empty($mappale)){
+                    $foglio = substr($key, strlen('mappNewEd'), strlen($key));
+                    echo "Foglio $foglio";
+                    $c->db->dml(
+                          'INSERT INTO fogli_mappali_edifici (Edificio,Foglio,Mappale) VALUES(?,?,?)',
+                        [$edID, $foglio ,$mappale]);
+                }
+                  
     }
 
     
-    //UPDATDE EDIFICIO
+    //UPDATDE EDIFICIO TODO cambiare foglio mappale
     $edUpdated = FALSE;
     $edUpdateErrors = [];
     $edUpdateInfos = [];
@@ -157,9 +160,6 @@
             display: block;
             margin-top: 10px;
         }
-        #form-editing-ed{
-
-        }
         #search-editing-ed h2,input{
             display: inline-flex;
         }
@@ -172,9 +172,10 @@
             margin:0px;
             margin-right: 10px;
         }
-        #mappali-editing-ed div span{
+        #fogli-mappali-new-ed  > div > *,#fogli-mappali-editing-ed > div > *{
+            display: inline-flex;
             margin-left:10px;
-            font-size: 1.7em;
+            margin-bottom:10px;
         }
         #search-results{
             display: grid;
@@ -222,32 +223,27 @@
                                 $where = [];
                                 $params = [];
                                 if(!empty($_REQUEST['searchFoglio'])){
-                                  $where[] = 'e.Foglio = ?';
+                                  $where[] = 'Foglio = ?';
                                   $params[] = $_REQUEST['searchFoglio'];
                                 }
                                 if(!empty($_REQUEST['searchMappale'])){
-                                  $where[] = 'fm.Mappale = ?';
+                                  $where[] = 'Mappale = ?';
                                   $params[] = $_REQUEST['searchMappale'];
                                 }
                                 $where = implode(' AND ', $where);
-                               $res = $c->db->ql('SELECT DISTINCT e.ID id, e.Foglio foglio, s.Denominazione strad, e.Note note
-                                                          FROM edifici e
-                                                          LEFT JOIN fogli_mappali_edifici fm ON e.ID = fm.Edificio
-                                                          JOIN stradario s ON s.Identificativo_nazionale = e.Stradario'.
-                                                          (empty($where)?'':" WHERE $where").
-                                                          ' LIMIT 50',
+                               $res = $c->db->ql(' SELECT ID, Mappali, Stradario, Note
+                                                            FROM edifici_view
+                                                            WHERE ID IN (  SELECT Edificio
+                                                                                      FROM fogli_mappali_edifici'.
+                                                                                      (empty($where)?'':" WHERE $where").')'.
+                                                           'LIMIT 50',
                                                            $params);
                                foreach ($res as $ed) {
-                                   echo "<div class=\"search-result\" onclick=\"editEdificio($ed[id]);\">";
-                                   echo "<p><strong>ID edificio </strong>$ed[id]</p>";
-                                   echo "<p><strong>Foglio </strong>$ed[foglio]</p>";
-                                   $mappali = getMappaliEdificio($ed['id'], $c->db);
-                                   $strMappali = '';
-                                   foreach ($mappali as $mappale)
-                                      $strMappali = $strMappali.", $mappale[Mappale]".($mappale['EX']==='EX'?'(EX)':'');
-                                   echo "<p><strong>Mappale/i </strong>".substr($strMappali, 2).'</p>';
-                                   echo "<p><strong>Stradario </strong>$ed[strad]<br>";
-                                   echo empty($ed['note'])?'':"<p style=\"white-space: pre-line;\"><strong>Note </strong><br>$ed[note]</p>";
+                                   echo "<div class=\"search-result\" onclick=\"editEdificio($ed[ID]);\">";
+                                   echo "<p><strong>ID edificio </strong>$ed[ID]</p>";
+                                   echo '<p><strong>Fogli/Mappali </strong><br>'.str_replace(', ', '<br>', $ed['Mappali']).'</p>';
+                                   echo "<p><strong>Stradario </strong>$ed[Stradario]<br>";
+                                   echo empty($ed['Note'])?'':"<p style=\"white-space: pre-line;\"><strong>Note </strong><br>$ed[Note]</p>";
                                    echo "</div>";
                                  }
                                }
@@ -260,10 +256,14 @@
                 		<div id="editing-edificio">
                     		<?php
                     		if($c->check(['editingEdificio'], $_REQUEST)){
-                    		    $ed = $c->db->ql('SELECT e.ID id, e.Foglio foglio, s.Denominazione strad, s.Identificativo_nazionale stradID, e.Note note
-                                                            FROM edifici e
-                                                            JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
-                                                            WHERE e.ID = ?',
+                    		    $ed = $c->db->ql('SELECT e.ID id, s.Denominazione strad, s.Identificativo_nazionale stradID, e.Note note,
+                                                        		(SELECT GROUP_CONCAT(DISTINCT fm.Foglio ORDER BY fm.Foglio)
+                                                        		FROM fogli_mappali_edifici fm
+                                                        		GROUP BY fm.Edificio
+                                                        		HAVING fm.Edificio = e.ID) foglio
+                                                        FROM edifici e
+                                                        JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
+                                                        WHERE e.ID = ?',
                     		                              [$_REQUEST['editingEdificio']]);
                                 if(count($ed) > 0){
                     		            $ed = $ed[0];
@@ -307,12 +307,9 @@
         	<div class="w3-container w3-teal"><h1>Nuovo edificio</h1></div>
             <div id="container-new-ed" class="w3-container">
             	<form id="form-new-ed" method="post">
-            		<h2>Foglio</h2>
-            		<input id="foglio-new-ed" autocomplete="off" required="required" onkeyup="checkAllMappaliNewEd();" type="number" name="foglioNewEd" max="9999" placeholder="Foglio...">
-
-            		<h2>Mappale/i</h2>
-            		<div id="mappali-new-ed"></div>
-            		<button type="button" onclick="addFieldMappaleNewEd();">+</button>
+            		<h2>Fogli/Mappali</h2>
+            		<div id="fogli-mappali-new-ed"></div>
+            		<button type="button" onclick="addFieldFoglioMappale('new');">+</button>
 
             		<h2>Stradario</h2>
  	   				<input id="stradario-new-ed" type="text" required="required" autocomplete="off" onkeyup="updateHints('stradario', this, '#hintsStradari-new-ed', '#stradarioID-new-ed');" onclick="this.select();" placeholder="Stradario...">
@@ -330,8 +327,9 @@
     </div>
 
     <script type="text/javascript" src="/js/misc.js"></script>
+    <script type="text/javascript" src="/js/hints.js"></script>
 	<script type="text/javascript" src="/js/gestione_edifici.js"></script>
-    <script type="text/javascript">addFieldMappaleNewEd();</script>
+    <script type="text/javascript">addFieldFoglioMappale('new');</script>
     <?php
     if(isset($_REQUEST['editingEdificio'])){
         $mappaliFromDB = getMappaliEdificio($_REQUEST['editingEdificio'], $c->db);
