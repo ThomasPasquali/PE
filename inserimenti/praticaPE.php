@@ -109,7 +109,7 @@
         display: grid;
         grid-template-columns: auto auto auto auto;
     }
-    .risultato-ricerca-edificio{
+    .risultato-ricerca-edificio,.edificio-selezionato{
         border: solid 1px black;
         margin: 5px;
         padding-left: 10px;
@@ -120,13 +120,18 @@
     }
     .risultato-ricerca-edificio:hover{
         text-decoration: underline;
+        color: green;
     }
-    .risultato-ricerca-edificio > div p,strong{
+    .edificio-selezionato:hover{
+        text-decoration: underline;
+        color: red;
+    }
+    .risultato-ricerca-edificio > div p,strong,.edificio-selezionato > div p,strong {
         display: inline-flex;
         margin-top: 2px;
         margin-bottom: 2px;
     }
-    .risultato-ricerca-edificio > div strong{
+    .risultato-ricerca-edificio > div strong,.edificio-selezionato > div strong{
         margin-right: 3px;
     }
     #dati-pratica{
@@ -144,26 +149,25 @@
 
       <div id="dati-edificio">
 
-        <div class="section">Selezione edificio</div>
+        <div class="section">Selezione edificio/i</div>
         <div class="inner-wrap">
             <form id="ricerca-edificio">
             <input type="hidden" name="action" value="searchEdificio">
             <input name="foglio" type="number" placeholder="Foglio...">
             <input name="mappale" type="number" placeholder="Mappale...">
           </form>
+          <h2>Risultati ricerca</h2>
           <div id="risultati-ricerca-edificio"></div>
 
-          <label>N° Edificio</label>
-          <input type="number" id="ricerca-edificio-field" required="required" disabled="disabled">
-          <button type="button" onclick="freezeEdificio();">Blocca edificio</button>
+          <h2>Edifici selezionati</h2>
+		  <div id="edifici-selezionati"></div>
+          <button type="button" onclick="freezeEdifici();">Conferma edificio/i</button>
 
         </div>
       </div>
 
       <form method="post">
         <div id="dati-pratica">
-      		<input type="hidden" name="edificio" id="edificio" required="required">
-
           <div class="section">Non so che scrivere</div>
           <div class="inner-wrap">
             <div class="field">

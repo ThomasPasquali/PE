@@ -53,50 +53,62 @@ function ricercaEdificio(form){
             alert('Errore: '+textStatus);
            },
    success: function(msg) {
-            //console.log(msg);
-   					//msg = JSON.parse(msg);
-   					$('#risultati-ricerca-edificio').empty();
-   					for (let ed of msg) {
-   						let div = $('<div></div>');
-   						div.addClass('risultato-ricerca-edificio');
-   						div.click(function(){
-   							$('#ricerca-edificio-field').val(ed.ID);
-   						});
-
-   						for(let attr in ed){
-   							let row = $('<div></div>');
-   							let p = $('<p></p>');
-   							p.text(ed[attr]);
-   							let strong = $('<strong></strong>');
-   							strong.text(attr + ':');
-   							row.append(strong);
-   							row.append(p);
-   							div.append(row);
-   						}
-
-   						$('#risultati-ricerca-edificio').append(div);
+			$('#risultati-ricerca-edificio').empty();
+			for (let ed of msg) {
+				let div = $('<div></div>');
+				div.addClass('risultato-ricerca-edificio');
+				for(let attr in ed){
+					let row = $('<div></div>');
+					let p = $('<p></p>');
+					p.text(ed[attr]);
+					let strong = $('<strong></strong>');
+					strong.text(attr + ':');
+					row.append(strong);
+					row.append(p);
+					div.append(row);
+				}
+				
+				let idDiv = $('<div></div>');
+				idDiv.css('display', 'none');
+				idDiv.html(ed['ID'])
+				idDiv.addClass('id-edificio-selezionato');
+				div.append(idDiv);
+				
+				div.click(function(){
+					if($(this).attr('class') == 'risultato-ricerca-edificio'){
+						$('#edifici-selezionati').append(div);
+						$(this).attr('class', 'edificio-selezionato')
+					}else{
+						$('#risultati-ricerca-edificio').append(div);
+						$(this).attr('class', 'risultato-ricerca-edificio')
 					}
+				});
 
-	            }
+				$('#risultati-ricerca-edificio').append(div);
+			}
+    }
   });
 }
 
-var edID;
-function freezeEdificio() {
-	edID = $('#ricerca-edificio-field').val();
-	if(edID){
+var edifici = [];
+function freezeEdifici() {
+	$('.edificio-selezionato').each(function() {
+		edifici.push($(this).children('.id-edificio-selezionato').html());
+	});
+	if(edifici.length > 0){
 		$('#dati-pratica').show();
 		$('#dati-edificio').hide();
-		$('#info-edificio').html('Edificio N° '+edID);
-		$('#edificio').val(edID);
+		if(edifici.length > 1) $('#info-edificio').html('Edifici N° '+edifici.join(', '));
+		else 						 $('#info-edificio').html('Edificio N° '+edifici[0]);
 	}else
-		alert('Selezionare un edificio');
+		alert('Selezionare almeno un edificio');
 }
 
 var mappaliCount = 1;
-function addFieldMappale() {
-	if(edID){
-		let mappali = getMappaliEdificio(edID);
+function addFieldFoglioMappale() {
+	if(edifici.length > 0){
+		/*TODO let mappali = getFogliMappaliEdifici(edifici);
+		console.log(mappali);
 		if(mappali.length > 0){
 			let select = $('<select></select>');
 			select.attr('name', 'mapp'+mappaliCount);
@@ -124,7 +136,7 @@ function addFieldMappale() {
 			$('#mappali').append(div);
 			mappaliCount++;
 		}else
-			alert('L\'edificio non ha mappali associati');
+			alert('L\'edificio non ha mappali associati');*/
 	}else{
 		$('#dati-pratica').hide();
 		$('#dati-edificio').show();
@@ -132,13 +144,36 @@ function addFieldMappale() {
 	}
 }
 
-function getMappaliEdificio(ed) {
-	return JSON.parse($.ajax({
+function getFogliMappaliEdifici(edifici) {
+	//TODO
+	let request = $.ajax({
 	    url: "../runtime/handler.php",
 	    type: "POST",
-	    data: {'action' : 'getMappaliEdificio', 'edificio' : ed},
-	    async: false
-	}).responseText);
+	    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
+	    success: function (response) {
+	    	console.log(response);
+	    },
+	    error: function (jqXHR, exception) {
+	        var msg = '';
+	        if (jqXHR.status === 0) {
+	            msg = 'Not connect.\n Verify Network.';
+	        } else if (jqXHR.status == 404) {
+	            msg = 'Requested page not found. [404]';
+	        } else if (jqXHR.status == 500) {
+	            msg = 'Internal Server Error [500].';
+	        } else if (exception === 'parsererror') {
+	            msg = 'Requested JSON parse failed.';
+	        } else if (exception === 'timeout') {
+	            msg = 'Time out error.';
+	        } else if (exception === 'abort') {
+	            msg = 'Ajax request aborted.';
+	        } else {
+	            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+	        }
+	        console.log(msg);
+	    }
+	});
+	console.log(request);
 }
 
 var subalterniCount = 1;

@@ -7,7 +7,7 @@
         exit();
     }
 
-    $c->echoCode($_REQUEST);
+    //$c->echoCode($_REQUEST);
     
     $errors = [];
     $infos = [];
@@ -43,105 +43,124 @@
         }
     }
 
-    
     //UPDATDE EDIFICIO TODO cambiare foglio mappale
     if($c->check(['stradarioEditingEd', 'noteEditingEd', 'edificioEditingEd'], $_REQUEST)&&$_SERVER['REQUEST_METHOD'] === 'POST'){
       //UPDATE TABLE EDIFICI
+      $edID = $_REQUEST['edificioEditingEd'];
       $res =$c->db->dml(
           'UPDATE edifici SET Stradario = ?, Note = ? WHERE ID = ?',
-          [$_REQUEST['stradarioEditingEd'], empty($_REQUEST['noteEditingEd'])?NULL:$_REQUEST['noteEditingEd'], $_REQUEST['edificioEditingEd']]);
+          [$_REQUEST['stradarioEditingEd'], empty($_REQUEST['noteEditingEd'])?NULL:$_REQUEST['noteEditingEd'], $edID]);
 
       if($res->errorCode() != 0)
           $errors[] = $res->errorInfo()[2];
       else {
-        $infos[] = "Edificio $_REQUEST[edificioEditingEd] modificato con successo";
+        $infos[] = "Edificio $edID modificato con successo";
         //UPDATE TABLE MAPPALI
-         $mappali = [];
-         foreach ($_REQUEST as $key => $value)
+         $fogliMappaliFromUser = [];
+         foreach ($_REQUEST as $keyMappale => $mappale)
              //IF PARAM IS FOR MAPPALE
-            if(substr($key, 0, strlen('mappEditingEd')) == 'mappEditingEd'){
-                $mappali[] = $value;
-                //CHECK IF EXISTS
-                $res = $c->db->ql(
-                    'SELECT EX FROM fogli_mappali_edifici
-                    WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                    [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $value]);
-
-                $mappaleNum = substr($key, strlen('mappEditingEd'), strlen($key));
-                $exFromUser = isset($_REQUEST["isExMappEditingEd$mappaleNum"]);
-
-                if(count($res) > 0){
-                  //IF EXISTS AND EX HAS CHANGED
-                  $exFromDB = $res[0]['EX'] == 'EX';
-                  if($exFromDB != $exFromUser){
-                    //CHANGE DB VALUE OF EX
-                    $c->db->dml(
-                        'UPDATE fogli_mappali_edifici SET EX = ? WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                        [($exFromUser?'EX':NULL), $_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $value]);
-                        $infos[] = "Valore di EX del mappale $value modificato a: ".($exFromUser?'EX':'NULL');
-                  }
-                }else{
-                  //IF DOESN'T EXIST
-                  $res = $c->db->dml(
-                      'INSERT INTO fogli_mappali_edifici (Edificio, Foglio, Mappale, EX) VALUES (?,?,?,?)',
-                      [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $value, ($exFromUser?'EX':NULL)]);
-                  if($res->errorCode() == '0')
-                      $infos[] = "Mappale $value".($exFromUser?'(EX)':'')." aggiunto correttamente";
-                  else
-                $errors[] = $res->errorInfo()[2];
+            if(substr($keyMappale, 0, strlen('mappaleediting')) == 'mappaleediting'){
+                $n = substr($keyMappale, strlen('mappaleediting'), strlen($keyMappale));
+                $keyFoglio = "foglioediting$n";
+                $foglio = $_REQUEST[$keyFoglio]??'';
+                $exFromUser = isset($_REQUEST["exediting$n"]);
+                
+                if(!empty($foglio)&&!empty($mappale)){
+                    $fogliMappaliFromUser[] = ['Foglio' => $foglio, 'Mappale' => $mappale];
+                    //CHECK IF EXISTS
+                    $res = $c->db->ql(
+                        'SELECT EX FROM fogli_mappali_edifici
+                        WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                        [$edID, $foglio, $mappale]);
+    
+                    if(count($res) > 0){
+                      //IF EXISTS AND EX HAS CHANGED
+                      $exFromDB = $res[0]['EX'] == 'EX';
+                      if($exFromDB != $exFromUser){
+                        //CHANGE DB VALUE OF EX
+                        $c->db->dml(
+                            'UPDATE fogli_mappali_edifici SET EX = ? WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                            [($exFromUser?'EX':NULL), $edID, $foglio, $mappale]);
+                        $infos[] = "Valore di EX del F.$foglio m.$mappale modificato a: ".($exFromUser?'EX':'ATTUALE');
+                      }
+                    }else{
+                      //IF DOESN'T EXIST
+                      $res = $c->db->dml(
+                          'INSERT INTO fogli_mappali_edifici (Edificio, Foglio, Mappale, EX) VALUES (?,?,?,?)',
+                          [$edID, $foglio, $mappale, ($exFromUser?'EX':NULL)]);
+                      if($res->errorCode() == '0')
+                          $infos[] = "F.$foglio m.$mappale".($exFromUser?' (EX)':'')." aggiunto correttamente";
+                      else
+                    $errors[] = $res->errorInfo()[2];
+                    }
                 }
             }
 
         //UPDATE TABLE SUBALTERNI
-         $subalterni = [];
-          foreach ($_REQUEST as $key => $value)
-            if(substr($key, 0, strlen('subEditingEd')) == 'subEditingEd'){
-                //INSERT SUBALTERNI
-                $mappale = $_REQUEST['mappSubEditingEd'.substr($key, strlen('subEditingEd'), strlen($key))]??'';
-                $subalterni[] = ['Mappale' => $mappale, 'Subalterno' => $value];
+         $fogliMappaliSubalterniFromUser = [];
+          foreach ($_REQUEST as $keySubalterno => $subalterno)
+              if(substr($keySubalterno, 0, strlen('subalterno')) == 'subalterno'){
+              
+                $n = substr($keySubalterno, strlen('subalterno'), strlen($keySubalterno));
+                $keyFoglio = "foglioSubalterno$n";
+                $foglio = $_REQUEST[$keyFoglio]??'';
+                $keyMappale = "mappaleSubalterno$n";
+                $mappale = $_REQUEST[$keyMappale]??'';
+                $fogliMappaliSubalterniFromUser[] = ['Foglio' => $foglio, 'Mappale' => $mappale, 'Subalterno' => $subalterno];
                 
-                if(!empty($value)&&!empty($mappale)){
-                    $res = $c->db->dml(
-                        'INSERT INTO subalterni_edifici (Edificio, Foglio, Mappale, Subalterno) VALUES (?,?,?,?)',
-                        //TODO add foglio
-                        [$_REQUEST['edificioEditingEd'], $mappale,$value]);
-                    if($res->errorCode() == '0')
-                        $infos[] = "Subalterno $value del mappale $mappale aggiunto correttamente";
+                //INSERT SUBALTERNI
+                if(!empty($foglio)&&!empty($mappale)&&!empty($subalterno)){
+                    //CHECK IF EXISTS
+                    $res = $c->db->ql(
+                        'SELECT 1 FROM subalterni_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ? AND Subalterno = ?',
+                        [$edID, $foglio, $mappale, $subalterno]);
+                    
+                    if(count($res) == 0){
+                        $res = $c->db->dml(
+                            'INSERT INTO subalterni_edifici (Edificio, Foglio, Mappale, Subalterno) VALUES (?,?,?,?)',
+                            [$edID, $foglio, $mappale, $subalterno]);
+                        if($res->errorCode() == '0')
+                            $infos[] = "Subalterno $subalterno del F.$foglio m.$mappale aggiunto correttamente";
+                        else 
+                      $errors[] = $res->errorInfo()[2];
+                    }
                 }
+                
             }
 
        //DELETE OMITTED MAPPALI
-        $mappaliFromDB = getMappaliEdificio($_REQUEST['edificioEditingEd'], $c->db);
-       foreach ($mappaliFromDB as $mappaleFromDB)
-           if(!in_array($mappaleFromDB['Mappale'], $mappali)){
+        $fogliMappaliFromDB = getFogliMappaliEdificio($edID, $c->db, FALSE);
+        foreach ($fogliMappaliFromDB as $foglioMappaleFromDB)
+            if(!in_array($foglioMappaleFromDB, $fogliMappaliFromUser)){
                $res = $c->db->dml(
-                                   'DELETE FROM fogli_mappali_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
-                                   [$_REQUEST['edificioEditingEd'], $_REQUEST['foglioEditingEd'], $mappaleFromDB['Mappale']]);
+                       'DELETE FROM fogli_mappali_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
+                        [$edID, $foglioMappaleFromDB['Foglio'], $foglioMappaleFromDB['Mappale']]);
                if($res->errorCode() == '0')
-                   $infos[] = "Mappale $mappaleFromDB[Mappale] eliminato con successo";
+                   $infos[] = "F.$foglioMappaleFromDB[Foglio] m.$foglioMappaleFromDB[Mappale] eliminato con successo";
                else
-            $errors[] = $res->errorInfo()[2];
+               $errors[] = $res->errorInfo()[2];
             }
 
        //DELETE OMITTED SUBALIERNI FINIRE
-       $subalterniFromDB = getSubalterniEdificio($_REQUEST['edificioEditingEd'], $c->db);
-       foreach ($subalterniFromDB as $subalternoFromDB)
-           if(!in_array($subalternoFromDB, $subalterni)){
+       $fogliMappaliSubalterniFromDB = getSubalterniEdificio($edID, $c->db);
+       foreach ($fogliMappaliSubalterniFromDB as $foglioMappaleSubalternoFromDB)
+           if(!in_array($foglioMappaleSubalternoFromDB, $fogliMappaliSubalterniFromUser)){
                $res = $c->db->dml(
-                                   'DELETE FROM subalterni_edifici WHERE Edificio = ? AND Mappale = ?  AND Subalterno = ?',
-                   [$_REQUEST['edificioEditingEd'], $subalternoFromDB['Mappale'], $subalternoFromDB['Subalterno']]);
+                                   'DELETE FROM subalterni_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ?  AND Subalterno = ?',
+                   [$edID, $foglioMappaleSubalternoFromDB['Foglio'], $foglioMappaleSubalternoFromDB['Mappale'], $foglioMappaleSubalternoFromDB['Subalterno']]);
                if($res->errorCode() == '0')
-                   $infos[] = "Subalterno $subalternoFromDB[Subalterno] del mappale $subalternoFromDB[Mappale] eliminato con successo";
+                   $infos[] = "Subalterno $foglioMappaleSubalternoFromDB[Subalterno] del F.$foglioMappaleSubalternoFromDB[Foglio] m.$foglioMappaleSubalternoFromDB[Mappale] eliminato con successo";
                else
             $errors[] = $res->errorInfo()[2];
             }
+       
          }
     }
 
     //MISC FUNCTIONS
-    function getFogliMappaliEdificio($edID, $db){
-      return $db->ql('SELECT Foglio, Mappale, EX
-                                FROM fogli_mappali_edifici
+    function getFogliMappaliEdificio($edID, $db, $withEX = TRUE){
+      return $db->ql('SELECT Foglio, Mappale'.($withEX?', EX':'').
+                              ' FROM fogli_mappali_edifici
                                 WHERE Edificio = ?',
                                 [$edID]);
     }
@@ -265,8 +284,8 @@
                     		    $ed = $c->db->ql('SELECT e.ID id, s.Denominazione strad, s.Identificativo_nazionale stradID, e.Note note,
                                                         		(SELECT GROUP_CONCAT(DISTINCT fm.Foglio ORDER BY fm.Foglio)
                                                         		FROM fogli_mappali_edifici fm
-                                                        		GROUP BY fm.Edificio
-                                                        		HAVING fm.Edificio = e.ID) foglio
+                                                                GROUP BY fm.Edificio
+                                                                HAVING fm.Edificio = e.ID) foglio
                                                         FROM edifici e
                                                         JOIN stradario s ON s.Identificativo_nazionale = e.Stradario
                                                         WHERE e.ID = ?',
@@ -334,14 +353,15 @@
 	<script type="text/javascript" src="/js/gestione_edifici.js"></script>
     <script type="text/javascript">addFieldFoglioMappale('new');</script>
     <?php
-    if(isset($_REQUEST['editingEdificio'])){
-        $foglimappaliFromDB = getFogliMappaliEdificio($_REQUEST['editingEdificio'], $c->db);
-        $subalterniFromDB = getSubalterniEdificio($_REQUEST['editingEdificio'], $c->db);
+    $edID = $_REQUEST['editingEdificio']??'';
+    if(!empty($edID)){
+        $foglimappaliFromDB = getFogliMappaliEdificio($edID, $c->db);
+        $subalterniFromDB = getSubalterniEdificio($edID, $c->db);
         echo '<script>';
         foreach ($foglimappaliFromDB as $tmp)
             echo "addFieldFoglioMappale('editing', $tmp[Foglio], $tmp[Mappale],".($tmp['EX']=='EX'?'true':'false').", $_REQUEST[editingEdificio]);";
-        foreach ($subalterniFromDB as $subalterno)
-            echo "addFieldSubalternoEditingEd('$subalterno[Subalterno]', '$subalterno[Mappale]');";
+        foreach ($subalterniFromDB as $tmp)
+            echo "addFieldSubalterno($tmp[Foglio], $tmp[Mappale], $tmp[Subalterno]);";
         echo '</script>';
     }
     

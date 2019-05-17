@@ -6,7 +6,7 @@
         header('Location: /index.php?err=Utente non loggato');
         exit();
     }
-
+    
     if($c->check(['action'], $_POST))
         switch ($_POST['action']) {
             case 'hint':
@@ -59,9 +59,9 @@
             case 'searchEdificio':
                 searchEdificio($_POST['foglio'], $_POST['mappale'], $c->db);
                 exit();
-
-            case 'getMappaliEdificio':
-                getMappaliEdificio($_POST['edificio'], $c->db);
+                
+            case 'getFogliMappaliEdifici':
+                getFogliMappaliEdifici($_POST['edifici'], $c->db);
                 exit();
 
             case 'getSubalterniEdificio':
@@ -74,7 +74,9 @@
 
 
             default:
-                break;
+                header('Content-type: text/plain');
+                echo $_POST['action'].' non implementato';
+                exit();
         }
 
     function sendTecnicoHints($search, $db) {
@@ -176,34 +178,39 @@
         if(!empty($mappale)) $params[] = $mappale;
 
         $where = [];
-        if(!empty($foglio)) $where[] = 'fm.Foglio = ?';
-        if(!empty($mappale)) $where[] = ' fm.Mappale = ?';
+        if(!empty($foglio)) $where[] = 'Foglio = ?';
+        if(!empty($mappale)) $where[] = 'Mappale = ?';
 
         $res = $db->ql(
-            'SELECT  e.ID ID, fm.Foglio Foglio,
-            	           GROUP_CONCAT(CONCAT(fm.Mappale, IF(fm.EX IS NULL, \'\', \'(EX)\')) ORDER BY fm.Mappale SEPARATOR \', \') Mappali,
-                           s.Denominazione Stradario, e.Note Note
-            FROM edifici e
-            LEFT JOIN fogli_mappali_edifici fm ON fm.Edificio = e.ID
-            JOIN stradario s ON s.Identificativo_nazionale = e.Stradario '.
-            (count($params) > 0?' WHERE '.implode(' AND ', $where):'').
-             ' GROUP BY e.ID
-               LIMIT 10',
+            'SELECT ID, Mappali, Stradario, Note
+            FROM edifici_view
+            WHERE ID IN(
+                SELECT  Edificio
+                FROM fogli_mappali_edifici '.
+                (count($params) > 0?' WHERE '.implode(' AND ', $where):'').
+             ') LIMIT 10',
             $params);
 
         header('Content-type: text/json');
         echo json_encode($res, TRUE);
     }
 
-    function getMappaliEdificio($edificio, $db){
-        $res = $db->ql(
-            'SELECT Mappale, EX
-             FROM fogli_mappali_edifici
-             WHERE Edificio = ?',
-            [$edificio]);
-
-        header('Content-type: text/json');
-        echo json_encode($res, TRUE);
+    function getFogliMappaliEdifici($edifici, $db){
+        //TODO
+        header('Content-type: text/plain');
+        if(count($edifici) > 0){
+            $res = $db->ql(
+                'SELECT Mappale, EX
+                 FROM fogli_mappali_edifici
+                 WHERE Edificio IN (?'.str_repeat(',?', count($edifici)-1).')',
+                    [$edifici]);
+            
+            //header('Content-type: application/json');
+            echo json_encode($res, TRUE);
+        }else{
+            header('Content-type: text/plain');
+            echo 'FORNIRE ALMENO UN EDIFICIO';
+        }
     }
 
     function getSubalterniEdificio($edificio, $db){

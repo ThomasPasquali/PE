@@ -11,14 +11,13 @@
 
         public function ql($sql, $params=NULL, $fetchType = PDO::FETCH_ASSOC) {
             try {
-                //echo $sql;
                 $this->beginTransaction();
 
                 $stmt = $this->prepare($sql);
                 $stmt->execute($params);
                 $this->lastErrorInfo = $stmt->errorInfo();
 
-                if($stmt->errorCode() != 0) echo $stmt->errorInfo()[2];
+                if($stmt->errorCode() != 0) echo $sql.'   '.$stmt->errorInfo()[2];
 
                 $righe_estratte = [];
                 while ($riga = $stmt->fetch($fetchType))

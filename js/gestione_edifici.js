@@ -19,7 +19,7 @@ $('#submit-new-edificio').click(function() {
 	});
 	
 	if(!ok)
-		displayMessage('Qualche foglio/mappale è incorretto', document.getElementById('container-new-ed'));
+		displayMessage('Qualche foglio/mappale è incorretto (✖)', document.getElementById('container-new-ed'));
 	else if(!$('#stradarioID-new-ed').val())
 		displayMessage('Selezionare uno stradario', document.getElementById('container-new-ed'));
 	else
@@ -28,7 +28,25 @@ $('#submit-new-edificio').click(function() {
 });
 
 $('#submit-modifiche-edificio').click(function() {
-	//TODO
+
+	$(".mappaleediting").each(function(){
+		$(this).keyup();
+	});
+
+	let ok = true;
+	$('.esitoCheckediting').each(function(){
+		 if($(this).text() !== '✔') {
+			 ok = false;
+			 return;
+		 }
+	});
+	console.log(ok);
+	if(!ok)
+		displayMessage('Qualche foglio/mappale o subalterno è incorretto (✖)', document.getElementById('container-editing-ed'));
+	else if(!$('#stradarioID-editing-ed').val())
+		displayMessage('Selezionare uno stradario', document.getElementById('container-editing-ed'));
+	else
+		$('#form-edit-ed').submit();
 });
 
 /***************FUNCTIONS***************/
