@@ -10,16 +10,16 @@
   print_r($_POST);
 
     if($c->check(['tipo', 'anno', 'numero', 'edificio'], $_POST)){
-        
+
         if(isset($_POST['documento_elettronico'])){
             $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
             $path = $c->doc_el_root_path."\\$relPath";
             if(!file_exists($path))
                 mkdir($path, 0777, TRUE);
             $_POST['documento_elettronico'] = $relPath;
-        }else 
+        }else
         $_POST['documento_elettronico'] = '';
-        
+
         $res = $c->db->dml(
             'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Edificio, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
               VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :edificio, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
@@ -55,22 +55,22 @@
              //inserimento intestatari, mappali e subalterni
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
-                
+
                     $res = $c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
                                                         VALUES(?, ?)', [$ed['pid'], $value]);
-                    
+
             }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'){
-                
+
                     $res = $c->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
                                                         VALUES(?, ?)', [$ed['pid'], $value]);
-                    
+
             }else if(substr($key, 0, strlen('mapp')) == 'mapp'){
-                
+
                 $res = $c->db->dml('INSERT INTO pe_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
                                                         VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $ed['foglio'], $value]);
-                
+
             }else if(substr($key, 0, strlen('sub')) == 'sub'){
-                
+
                 $sub_mapp = explode('mapp', $value);
                 $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Mappale, Subalterno)
                                                         VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $sub_mapp[1], $sub_mapp[0]]);
@@ -79,7 +79,7 @@
         }else
         echo 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
     }
-  
+
 
   //Misc functions
   function getEnumValues($table, $field, $db){
@@ -173,7 +173,7 @@
             <div class="field">
             	 <label>Mappale/i</label>
       		     <div id="mappali"></div>
-    		       <button type="button" onclick="addFieldMappale();">+</button>
+    		       <button type="button" onclick="addFieldFoglioMappale();">+</button>
             </div>
             <div class="field">
               	<label>Subalterno/i</label>

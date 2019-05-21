@@ -6,7 +6,7 @@
         header('Location: /index.php?err=Utente non loggato');
         exit();
     }
-    
+
     if($c->check(['action'], $_POST))
         switch ($_POST['action']) {
             case 'hint':
@@ -59,7 +59,7 @@
             case 'searchEdificio':
                 searchEdificio($_POST['foglio'], $_POST['mappale'], $c->db);
                 exit();
-                
+
             case 'getFogliMappaliEdifici':
                 getFogliMappaliEdifici($_POST['edifici'], $c->db);
                 exit();
@@ -197,6 +197,7 @@
 
     function getFogliMappaliEdifici($edifici, $db){
         //TODO
+        var_dump($edifici);
         header('Content-type: text/plain');
         if(count($edifici) > 0){
             $res = $db->ql(
@@ -204,7 +205,7 @@
                  FROM fogli_mappali_edifici
                  WHERE Edificio IN (?'.str_repeat(',?', count($edifici)-1).')',
                     [$edifici]);
-            
+
             //header('Content-type: application/json');
             echo json_encode($res, TRUE);
         }else{

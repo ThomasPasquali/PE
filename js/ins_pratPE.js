@@ -51,6 +51,7 @@ function ricercaEdificio(form){
     data: data,
     error: function(jqXHR, textStatus) {
             alert('Errore: '+textStatus);
+						console.log(jqXHR);
            },
    success: function(msg) {
 			$('#risultati-ricerca-edificio').empty();
@@ -67,13 +68,13 @@ function ricercaEdificio(form){
 					row.append(p);
 					div.append(row);
 				}
-				
+
 				let idDiv = $('<div></div>');
 				idDiv.css('display', 'none');
 				idDiv.html(ed['ID'])
 				idDiv.addClass('id-edificio-selezionato');
 				div.append(idDiv);
-				
+
 				div.click(function(){
 					if($(this).attr('class') == 'risultato-ricerca-edificio'){
 						$('#edifici-selezionati').append(div);
@@ -107,7 +108,37 @@ function freezeEdifici() {
 var mappaliCount = 1;
 function addFieldFoglioMappale() {
 	if(edifici.length > 0){
-		/*TODO let mappali = getFogliMappaliEdifici(edifici);
+		// TODO:
+		let mappali;
+		let request = $.ajax({
+		    url: "../runtime/handler.php",
+		    type: "POST",
+		    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
+		    success: function (response) {
+		    	console.log('siiii '+response);
+
+		    },
+		    error: function (jqXHR, exception) {
+		        var msg = '';
+		        if (jqXHR.status === 0) {
+		            msg = 'Not connect.\n Verify Network.';
+		        } else if (jqXHR.status == 404) {
+		            msg = 'Requested page not found. [404]';
+		        } else if (jqXHR.status == 500) {
+		            msg = 'Internal Server Error [500].';
+		        } else if (exception === 'parsererror') {
+		            msg = 'Requested JSON parse failed.';
+		        } else if (exception === 'timeout') {
+		            msg = 'Time out error.';
+		        } else if (exception === 'abort') {
+		            msg = 'Ajax request aborted.';
+		        } else {
+		            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+		        }
+		        console.log(msg);
+		    }
+		});
+		console.log(request);
 		console.log(mappali);
 		if(mappali.length > 0){
 			let select = $('<select></select>');
@@ -136,44 +167,12 @@ function addFieldFoglioMappale() {
 			$('#mappali').append(div);
 			mappaliCount++;
 		}else
-			alert('L\'edificio non ha mappali associati');*/
+			alert('L\'edificio non ha mappali associati');
 	}else{
 		$('#dati-pratica').hide();
 		$('#dati-edificio').show();
 		alert('Selezionare un edificio');
 	}
-}
-
-function getFogliMappaliEdifici(edifici) {
-	//TODO
-	let request = $.ajax({
-	    url: "../runtime/handler.php",
-	    type: "POST",
-	    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
-	    success: function (response) {
-	    	console.log(response);
-	    },
-	    error: function (jqXHR, exception) {
-	        var msg = '';
-	        if (jqXHR.status === 0) {
-	            msg = 'Not connect.\n Verify Network.';
-	        } else if (jqXHR.status == 404) {
-	            msg = 'Requested page not found. [404]';
-	        } else if (jqXHR.status == 500) {
-	            msg = 'Internal Server Error [500].';
-	        } else if (exception === 'parsererror') {
-	            msg = 'Requested JSON parse failed.';
-	        } else if (exception === 'timeout') {
-	            msg = 'Time out error.';
-	        } else if (exception === 'abort') {
-	            msg = 'Ajax request aborted.';
-	        } else {
-	            msg = 'Uncaught Error.\n' + jqXHR.responseText;
-	        }
-	        console.log(msg);
-	    }
-	});
-	console.log(request);
 }
 
 var subalterniCount = 1;

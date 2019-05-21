@@ -10,7 +10,7 @@
         }
 
         public function ql($sql, $params=NULL, $fetchType = PDO::FETCH_ASSOC) {
-            try {
+            try {//print_r($params);
                 $this->beginTransaction();
 
                 $stmt = $this->prepare($sql);
