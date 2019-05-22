@@ -55,7 +55,7 @@
 
             //inserimento edifici
             foreach ($_POST as $key => $value)
-                if(substr($key, 0, strlen('edificio')) == 'edificio'){
+                if(substr($key, 0, strlen('edificio')) == 'edificio'&&$value){
                     $res = $c->db->dml('INSERT INTO pe_edifici_pratiche (Pratica, Edificio)
                                                     VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata all'edificio N° $value";
@@ -64,11 +64,11 @@
             
             //inserimento fogli-mappali
             foreach ($_POST as $key => $value)
-                if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'){
+                if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'&&$value){
                     $tmp = explode('-', $value);
                     $foglio = $tmp[0];
                     $mappale = $tmp[1];
-                    $edificio = getEdificioID($foglio, $mappale, $c->db);
+                    $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
                     
                     if($edificio){
                         $res = $c->db->dml('INSERT INTO pe_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
@@ -82,12 +82,12 @@
             
             //inserimento subalterni
             foreach ($_POST as $key => $value)
-                if(substr($key, 0, strlen('foglio-mappale-subalterno')) == 'foglio-mappale-subalterno'){
+                if(substr($key, 0, strlen('foglio-mappale-subalterno')) == 'foglio-mappale-subalterno'&&$value){
                     $tmp = explode('-', $value);
                     $foglio = $tmp[0];
                     $mappale = $tmp[1];
                     $subalterno = $tmp[2];
-                    $edificio = getEdificioID($foglio, $mappale, $c->db);
+                    $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
                     
                     if($edificio){
                         $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Foglio, Mappale, Subalterno)
@@ -101,13 +101,13 @@
             
             //inserimento intestatari
             foreach ($_POST as $key => $value)
-                if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
+                if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'&&$value){
 
                     $res = $c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
                                                         VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario persona ($value)";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario persona $value: ".$res->errorInfo()[2];
-            }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'){
+            }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'&&$value){
 
                     $res = $c->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
                                                         VALUES(?, ?)', [$idPratica, $value]);
@@ -121,31 +121,10 @@
 
 
   //Misc functions
-  function getEnumValues($table, $field, $db){
-    $query = $db->query("SHOW COLUMNS FROM $table WHERE Field = '$field'");
-    $type = $query->fetch(PDO::FETCH_ASSOC)['Type'];
-    $matches = [];
-    preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
-    $enum = explode("','", $matches[1]);
-    return $enum;
-  }
-
   function ifEmptyGet($val, $valIfEmpty = NULL){
     return empty($val)?$valIfEmpty:$val;
   }
   
-  //TODO portare in controls
-  function getEdificioID($foglio, $mappale, $db) {
-      $res = $db->ql('SELECT Edificio
-                                    FROM fogli_mappali_edifici
-                                    WHERE Foglio = ? AND Mappale = ?',
-                                    [$foglio, $mappale]);
-      if(count($res) === 1)
-          return $res[0]['Edificio'];
-      else
-      return NULL;
-  }
-
 ?>
 <html>
 <head>
@@ -248,7 +227,7 @@
               <label>Tipo</label>
               <select name="tipo">
                 <?php
-                $types = getEnumValues('pe_pratiche', 'Tipo', $c->db);
+                $types = $c->getEnumValues('pe_pratiche', 'Tipo', $c->db);
                 foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
                 ?>
               </select>

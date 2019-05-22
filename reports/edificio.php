@@ -1,339 +1,174 @@
 ﻿<?php 
     include_once '../controls.php';
-    $controls = new Controls();
+    $c = new Controls();
     
-    if(!$controls->logged()){
+    if(!$c->logged()){
         header('Location: index.php?err=Utente non loggato');
         exit();
     }
     
-    if($controls->check(['foglio', 'mappale'], $_REQUEST)||$controls->check(['id'], $_REQUEST)){
+    if($c->check(['edificio'], $_REQUEST)||$c->check(['foglio', 'mappale'], $_REQUEST)){
         
-        if(isset($_REQUEST['id'])){
-            $id = $_REQUEST['id'];
+        $edificioID = $_REQUEST['edificio']??'';
+        if(!$edificioID) 
+            $edificioID = $c->getEdificioID($_REQUEST['foglio']??'', $_REQUEST['mappale']??'');
+        
+        $datiGenericiEdificio = NULL;
+        if($edificioID)
+            $datiGenericiEdificio = $c->db->ql('SELECT * FROM edifici_view WHERE ID = ?',[$edificioID])[0];
+        
+        if($datiGenericiEdificio !== NULL){
             
-            $res = $controls->db->ql(
-                'SELECT e.Foglio foglio, s.Denominazione strad, e.Note
-                FROM pe_edifici e
-                	JOIN stradario s ON e.Stradario = s.Identificativo_nazionale
-                WHERE e.ID = ?',
-                [$id]);
+            $intest_persone = [];
+            $intest_societa = [];
             
-            if(count($res) == 0){
-                echo '<h1 style="color:red; text-align:center;">Nessun risultato</h1>';
-                exit();
-            }
+            $rubriche = [];
+            $condoni = [];
             
-            $foglio = $res[0]['foglio'];
-            $stradario = $res[0]['strad'];
-            $note = $res[0]['Note'];
+            $scia = [];
+            $dia = [];
+            $cila = [];
+            $cil = [];
+            $varie = [];
             
-        }else{
-            $foglio = $_REQUEST['foglio'];
+            /*----------------------------------------------*/
             
-            $res = $controls->db->ql(
-                'SELECT e.ID id, s.Denominazione strad, e.Note
-            FROM pe_edifici e
-            	JOIN pe_mappali_edifici m ON e.ID = m.Edificio
-            	JOIN stradario s ON e.Stradario = s.Identificativo_nazionale
-            WHERE e.Foglio = ? AND m.Mappale = ?',
-                [$foglio, $_REQUEST['mappale']]);
-            
-            if(count($res) == 0){
-                echo '<h1 style="color:red; text-align:center;">Nessun risultato</h1>';
-                exit();
-            }
-            
-            $id = $res[0]['id'];
-            $stradario = $res[0]['strad'];
-            $note = $res[0]['Note'];
-        }
-        
-        /*----------------------------------------------*/
-        
-        $res = $controls->db->ql("SELECT GROUP_CONCAT(Mappale SEPARATOR ', ') map
-                                                    FROM pe_mappali_edifici
-                                                    WHERE Edificio = $id AND EX IS NULL
-                                                    GROUP BY Edificio");
-
-        if(count($res) > 1){
-            echo 'wait...what? mappali';
-            exit();
-        }
-        
-        if(count($res) > 0)
-            $mappali = $res[0]['map'];
-        else
-        $mappali = '';
-        
-        $res = $controls->db->ql("SELECT GROUP_CONCAT(Mappale SEPARATOR ', ') map
-                                                    FROM pe_mappali_edifici
-                                                    WHERE Edificio = $id AND EX IS NOT NULL
-                                                    GROUP BY Edificio");
-        
-        if(count($res) > 1){
-            echo 'wait...what? mappali ex';
-            exit();
-        }
-        
-        if(count($res) > 0)
-            $mappaliEx = $res[0]['map'];
-        else
-        $mappaliEx = '';
-        
-        /*----------------------------------------------*/
-        
-        $intest_persone = [];
-        $intest_societa = [];
-        
-        $rubriche = [];
-        $condoni = [];
-        
-        $scia = [];
-        $dia = [];
-        $cila = [];
-        $cil = [];
-        $varie = [];
-        
-        /*----------------------------------------------*/
-        
-        $intest_persone = $controls->db->ql(
-            "SELECT DISTINCT pers.ID, pers.Nome, pers.Cognome
-                FROM pe_pratiche p
-                JOIN pe_intestatari_persone_pratiche i ON i.Pratica = p.ID
-                JOIN intestatari_persone pers ON i.Persona = pers.ID
-                WHERE p.Edificio = $id
-                UNION
-                SELECT DISTINCT pers.ID, pers.Nome, pers.Cognome
-                FROM tec_pratiche p
-                JOIN tec_intestatari_persone_pratiche i ON i.Pratica = p.ID
-                JOIN intestatari_persone pers ON i.Persona = pers.ID
-                WHERE p.Edificio = $id");
-        
-        /*----------------------------------------------*/
-        
-        $intest_societa = $controls->db->ql(
-            "SELECT DISTINCT soc.ID, soc.Intestazione
+            //TODO tec con UNION
+            $intest_persone = $c->db->ql(
+                "SELECT DISTINCT ip.*
+                FROM pe_edifici_pratiche ep
+                JOIN pe_intestatari_persone_pratiche ipp ON ipp.Pratica = ep.Pratica
+                JOIN intestatari_persone ip ON ip.ID = ipp.Persona
+                WHERE ep.Edificio = ?",
+                [$edificioID]);
+                            
+            /*----------------------------------------------*/
+                            
+            $intest_societa = $c->db->ql(
+                "SELECT DISTINCT soc.ID, soc.Intestazione
                 FROM pe_pratiche p
                 JOIN pe_intestatari_societa_pratiche i ON i.Pratica = p.ID
                 JOIN intestatari_societa soc ON i.Societa = soc.ID
-                WHERE p.Edificio = $id
+                WHERE p.Edificio = ?
                 UNION
                 SELECT DISTINCT soc.ID, soc.Intestazione
                 FROM tec_pratiche p
                 JOIN tec_intestatari_societa_pratiche i ON i.Pratica = p.ID
                 JOIN intestatari_societa soc ON i.Societa = soc.ID
-                WHERE p.Edificio = $id");
-        
-        /*----------------------------------------------*/
-        
-        $res = $controls->db->ql("SELECT *
-                                                    FROM pe_pratiche
-                                                    WHERE Edificio = $id");
-        
-        foreach ($res as $pratica){
-           switch ($pratica['TIPO']) {
-               case 'DIA':
-                   $dia[] = $pratica;
-                   break;
-               
-               case 'CIL':
-                   $cil[] = $pratica;
-                   break;
-               
-               case 'CILA':
-                   $cila[] = $pratica;
-                   break;
-               
-               case 'SCIA':
-                   $scia[] = $pratica;
-                   break;
-               
-               case 'VARIE':
-                   $varie[] = $pratica;
-                   break;
-               
-               default:
-                   ;
-               break;
-           }
-        }
-        
-        /*----------------------------------------------*/
-        
-        $rubriche = $controls->db->ql("SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
-                                                            FROM pe_rubrica r
-                                                            JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
-                                                            WHERE Edificio = $id");
-        
-        /*----------------------------------------------*/
-        
-        $condoni = $controls->db->ql("SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
-                                                            FROM pe_condoni
-                                                            WHERE Edificio = $id");
-        
-        /*----------------------------------------------*/
-        
-        //TODO pratiche ed intestatari TEC
-        $aut = [];
-        $perm = [];
-        $conc = [];
-        $san = [];
-        $opere = [];
-        
-        /*----------------------------------------------*/
-        
-        $res = $controls->db->ql("SELECT *
-                                FROM tec_pratiche
-                                WHERE Edificio = $id");
-        
-        foreach ($res as $pratica){
-            $tipo = substr($pratica['ID'], 0, 1);
-            switch ($tipo) {
-                case 'A':
-                    $aut[] = $pratica;
-                    break;
-                    
-                case 'S':
-                    $san[] = $pratica;
-                    break;
-                    
-                case 'P':
-                    $perm[] = $pratica;
-                    break;
-                    
-                case 'C':
-                    $conc[] = $pratica;
-                    break;
-                    
-                case 'I':
-                    $opere[] = $pratica;
-                    break;
-                    
-                default:
-                    ;
-                    break;
+                WHERE p.Edificio = ?",
+                [$edificioID, $edificioID]);
+                            
+            /*----------------------------------------------*/
+            
+            $res = $c->db->ql(
+                "SELECT *
+                FROM pe_pratiche
+                WHERE Edificio = ?",
+                [$edificioID]);
+                            
+            foreach ($res as $pratica)
+                switch ($pratica['TIPO']) {
+                    case 'DIA':
+                        $dia[] = $pratica;
+                        break;
+                        
+                    case 'CIL':
+                        $cil[] = $pratica;
+                        break;
+                        
+                    case 'CILA':
+                        $cila[] = $pratica;
+                        break;
+                        
+                    case 'SCIA':
+                        $scia[] = $pratica;
+                        break;
+                        
+                    case 'VARIE':
+                        $varie[] = $pratica;
+                        break;
+                        
+                    default:
+                        ;
+                        break;
+                }
+            
+            /*----------------------------------------------*/
+            
+            $rubriche = $c->db->ql("SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
+                                                    FROM pe_rubrica r
+                                                    JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
+                                                    WHERE Edificio = ?",
+                                                    [$edificioID]);
+                            
+            /*----------------------------------------------*/
+            
+            $condoni = $c->db->ql("SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
+                                                FROM pe_condoni
+                                                WHERE Edificio = ?",
+                                                [$edificioID]);
+                            
+            /*----------------------------------------------*/
+            
+            //TODO pratiche ed intestatari TEC
+            $aut = [];
+            $perm = [];
+            $conc = [];
+            $san = [];
+            $opere = [];
+            
+            /*----------------------------------------------*/
+                            
+            $res = $c->db->ql("SELECT *
+                FROM tec_pratiche
+                WHERE Edificio = ?",
+                [$edificioID]);
+            
+            foreach ($res as $pratica){
+                $tipo = substr($pratica['ID'], 0, 1);
+                switch ($tipo) {
+                    case 'A':
+                        $aut[] = $pratica;
+                        break;
+                        
+                    case 'S':
+                        $san[] = $pratica;
+                        break;
+                        
+                    case 'P':
+                        $perm[] = $pratica;
+                        break;
+                        
+                    case 'C':
+                        $conc[] = $pratica;
+                        break;
+                        
+                    case 'I':
+                        $opere[] = $pratica;
+                        break;
+                        
+                    default:
+                        ;
+                        break;
+                }
             }
+            
+        } else {
+            echo '<span class="errorTitle">Nessun risultato con parametri:
+                                                                N° edificio: '.($_REQUEST['edificio']??'').'
+                                                                Foglio: '.($_REQUEST['foglio']??'').'
+                                                                Mappale: '.($_REQUEST['mappale']??'').'</span>';
+            exit();
         }
-        
-        
-        
+            
     }else {
-        echo '<h1 style="color: red;">Richiesta invalida!</h1>';
+        echo '<span class="errorTitle">Richiesta non valida</span>';
         exit();
     }
 ?>
-<!DOCTYPE html>
-<html lang="it">
   <head>
-    <meta charset="utf-8"></meta>
     <title>Storico edificio</title>
-    <style>
-        body {
-            width: 1000px;
-        }
-        
-        #titoli{
-            background-color: brown;
-            height: 200px;
-            text-align: center;
-            padding-top: 30px;
-        }
-        
-        #logo{
-            float: right;
-        }
-        
-        #generalita{
-            display: inline-grid;
-            width: 1000px;
-            grid-template-columns: auto auto auto auto;
-            background-color: #2196F3;
-            border-style: solid;
-            border-width: thin;
-        }
-        
-        #generalita > p{
-            background-color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-            padding: 10px;
-            font-size: 15px;
-        }
-        
-        #localita{
-            grid-column-start: 3;
-            grid-column-end: 5;
-        }
-        
-        #mappaliCompleti{
-            grid-column-start: 1;
-            grid-column-end: 3;
-        }
-        
-         #exMappali{
-            grid-column-start: 3;
-            grid-column-end: 5;
-        }
-        
-        #intestatari{
-            display: grid;
-            grid-template-columns: auto auto;
-            width: 1000px;
-            background-color: #2196F3;
-            background-color: #2196F3;
-            border-style: solid;
-            border-width: thin;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-        
-        #nomiIntestatariPersone{
-            margin-left: 20px;
-            border-style: solid;
-            border-width: thin;
-            width: 850px;
-        }
-        
-        #nomiIntestatariSocieta{
-            margin-left: 20px;
-            border-style: solid;
-            border-width: thin;
-            width: 850px;
-        }
-        
-        #pe{
-            display: grid;
-            grid-template-columns: auto auto;
-            background-color: #2196F3;
-            border-style: solid;
-            border-width: thin;
-            width: 1000px;
-        }
-        
-        .listaPE{
-            margin-left: 20px;
-            border-style: solid;
-            border-width: thin;
-            width: 850px;
-        }
-        
-        #finePagina{
-            display: inline-flex;
-            width: 1000px;
-        }
-        
-        #note{
-            margin-left: 20px;
-            border-style: solid;
-            border-width: thin;
-            width: 1000px;
-        }
-        
-        p {
-            word-wrap: break-word;
-        }
-        
-    </style>
+    <link rel="stylesheet" type="text/css" href="../css/report_edificio.css">
   </head>
   <body>
     <div id="intestazione">
@@ -345,11 +180,9 @@
        </div>
     </div>
     <div id="generalita">
-            <p>Edificio n: <?= $id ?> </p>
-            <p>Foglio: <?= $foglio ?></p>
-            <p id="localita">Localit&aacute;: <?= $stradario ?></p>
-            <p id="mappaliCompleti">Mappali: <?= $mappali ?></p>
-            <p id="exMappali">Ex mappali: <?= $mappaliEx ?></p>
+            <p>Edificio n: <?= $datiGenericiEdificio['ID'] ?> </p>
+            <p id="localita">Localit&aacute;: <?= $datiGenericiEdificio['Stradario'] ?></p>
+            <p id="mappaliCompleti">Fogli-mappali: <?= $datiGenericiEdificio['Mappali'] ?></p>
     </div>
     <div id="intestatari">
         <p>Intestatari persone: </p>
@@ -455,7 +288,7 @@
     </div>
     <div id="finePagina">
         <p>Note: </p>
-        <p id="note"><?= $note ?></p>
+        <p id="note"><?= $datiGenericiEdificio['Note'] ?></p>
     </div>
   </body>
 </html>

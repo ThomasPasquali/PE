@@ -104,6 +104,36 @@
             }else
             echo "<pre>$code</pre>";
         }
+        
+        /***********DB QUERIES*************/
+        /**
+         * 
+         * @param string|int $foglio
+         * @param string|int $mappale
+         * @return int|NULL se esiste l'ID dell'edificio altrimenti NULL
+         */
+        public function getEdificioID($foglio, $mappale) {
+            $res = $this->db->ql('SELECT Edificio
+                                                FROM fogli_mappali_edifici
+                                                WHERE Foglio = ? AND Mappale = ?',
+                                                [$foglio, $mappale]);
+            return (count($res) === 1)?$res[0]['Edificio']:NULL;
+        }
+        
+        /**
+         * 
+         * @param string $table
+         * @param string $field
+         * @return array La lista di valori dell'enum
+         */
+        public function getEnumValues($table, $field){
+            $query = $this->db->query("SHOW COLUMNS FROM $table WHERE Field = '$field'");
+            $type = $query->fetch(PDO::FETCH_ASSOC)['Type'];
+            $matches = [];
+            preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
+            $enum = explode("','", $matches[1]);
+            return $enum;
+        }
 
     }
 ?>

@@ -1,0 +1,103 @@
+body {
+    width: 1000px;
+}
+
+#titoli{
+    background-color: brown;
+    height: 200px;
+    text-align: center;
+    padding-top: 30px;
+}
+
+#logo{
+    float: right;
+}
+
+#generalita{
+    display: inline-grid;
+    width: 1000px;
+    grid-template-columns: auto auto auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+}
+
+#generalita > p{
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#localita{
+    grid-column-start: 3;
+    grid-column-end: 5;
+}
+
+#mappaliCompleti{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+ #exMappali{
+    grid-column-start: 3;
+    grid-column-end: 5;
+}
+
+#intestatari{
+    display: grid;
+    grid-template-columns: auto auto;
+    width: 1000px;
+    background-color: #2196F3;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#nomiIntestatariPersone{
+    margin-left: 20px;
+    border-style: solid;
+    border-width: thin;
+    width: 850px;
+}
+
+#nomiIntestatariSocieta{
+    margin-left: 20px;
+    border-style: solid;
+    border-width: thin;
+    width: 850px;
+}
+
+#pe{
+    display: grid;
+    grid-template-columns: auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+    width: 1000px;
+}
+
+.listaPE{
+    margin-left: 20px;
+    border-style: solid;
+    border-width: thin;
+    width: 850px;
+}
+
+#finePagina{
+    display: inline-flex;
+    width: 1000px;
+}
+
+#note{
+    margin-left: 20px;
+    border-style: solid;
+    border-width: thin;
+    width: 1000px;
+}
+
+p {
+    word-wrap: break-word;
+}
