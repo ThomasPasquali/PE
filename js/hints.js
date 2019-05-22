@@ -22,7 +22,7 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
       });
 
       request.done(function(hints) {
-			console.log(hints);
+			//console.log(hints);
 			if(hints){
 				hints = JSON.parse(hints);
 	      	$(hintBoxID).empty();

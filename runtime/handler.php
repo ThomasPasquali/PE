@@ -64,8 +64,8 @@
                 getFogliMappaliEdifici($_POST['edifici'], $c->db);
                 exit();
 
-            case 'getSubalterniEdificio':
-                getSubalterniEdificio($_POST['edificio'], $c->db);
+            case 'getSubalterniEdifici':
+                getSubalterniEdifici($_POST['edifici'], $c->db);
                 exit();
 
             case 'getPraticaNumberForAnno':
@@ -196,17 +196,14 @@
     }
 
     function getFogliMappaliEdifici($edifici, $db){
-        //TODO
-        var_dump($edifici);
-        header('Content-type: text/plain');
         if(count($edifici) > 0){
             $res = $db->ql(
-                'SELECT Mappale, EX
+                'SELECT Foglio, Mappale, EX
                  FROM fogli_mappali_edifici
                  WHERE Edificio IN (?'.str_repeat(',?', count($edifici)-1).')',
-                    [$edifici]);
+                $edifici);
 
-            //header('Content-type: application/json');
+            header('Content-type: application/json');
             echo json_encode($res, TRUE);
         }else{
             header('Content-type: text/plain');
@@ -214,15 +211,20 @@
         }
     }
 
-    function getSubalterniEdificio($edificio, $db){
-        $res = $db->ql(
-            'SELECT Subalterno, Mappale
-             FROM subalterni_edifici
-             WHERE Edificio = ?',
-            [$edificio]);
-
-        header('Content-type: text/json');
-        echo json_encode($res, TRUE);
+    function getSubalterniEdifici($edifici, $db){
+        if(count($edifici) > 0){
+            $res = $db->ql(
+                'SELECT Foglio, Mappale, Subalterno
+                 FROM subalterni_edifici
+                 WHERE Edificio IN (?'.str_repeat(',?', count($edifici)-1).')',
+                $edifici);
+            
+            header('Content-type: application/json');
+            echo json_encode($res, TRUE);
+        }else{
+            header('Content-type: text/plain');
+            echo 'FORNIRE ALMENO UN EDIFICIO';
+        }
     }
 
     function getPraticaNumberForAnno($anno, $db){

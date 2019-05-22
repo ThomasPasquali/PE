@@ -8,27 +8,32 @@
   }
 
   print_r($_POST);
-
+  /**
+   * Array ( [foglio-mappale1] => 1-1 [foglio-mappale-subalterno1] => 1-34-2 [tipo] => SCIA [anno] => 2019 [numero] => 1 [barrato] => A [intestatarioPersona1] => 1 [tecnico] => [impresa] => [direzione_lavori] => [data] => 2019-05-22 [protocollo] => [stradario] => [intervento] => Intervento [documento_elettronico] => on [data_inizio_lavori] => [note] => )
+   */
+    $infos = [];
+    $errors = [];
     if($c->check(['tipo', 'anno', 'numero', 'edificio'], $_POST)){
-
+        
         if(isset($_POST['documento_elettronico'])){
             $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
             $path = $c->doc_el_root_path."\\$relPath";
             if(!file_exists($path))
                 mkdir($path, 0777, TRUE);
             $_POST['documento_elettronico'] = $relPath;
+            if(file_exists($path)) $infos[] = 'Cartella documenti elettronici creata';
+            else                    $errors[] = 'Errore nella creazione della cartella documenti elettronici';
         }else
         $_POST['documento_elettronico'] = '';
 
         $res = $c->db->dml(
-            'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Edificio, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
-              VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :edificio, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
+            'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
+              VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
             [':tipo' => $_POST['tipo'],
             ':anno' => $_POST['anno'],
             ':numero' => $_POST['numero'],
             ':barr' => $_POST['barrato'],
 
-            ':edificio' => $_POST['edificio'],
             ':strad' => ifEmptyGet($_POST['stradario']),
 
             ':tecnico' => ifEmptyGet($_POST['tecnico']),
@@ -43,16 +48,18 @@
             ':note' => ifEmptyGet($_POST['note'])]);
 
         if($res->errorCode() == 0){
-            echo 'Pratica inserita correttamente';
+            $infos[] = 'Pratica inserita correttamente';
 
-            $ed =  $c->db->ql(
-                'SELECT p.ID pid, e.ID eid
-                FROM pe_pratiche p
-                JOIN edifici e ON e.ID = p.Edificio
+            $idPratica =  $c->db->ql(
+                'SELECT ID
+                FROM pe_pratiche
                 WHERE p.TIPO = ? AND p.Anno = ? AND p.Numero = ? AND p.Barrato = ?',
-                [$_POST['tipo'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0];
+                [$_POST['tipo'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0]['ID'];
 
-             //inserimento intestatari, mappali e subalterni
+            //inserimento edifici
+            //TODO
+                
+            //inserimento intestatari, mappali e subalterni
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
 
@@ -289,7 +296,7 @@
 
           </div>
 
-          <button type="submit">Inserisci pratica</button>
+          <button id="inserisci-pratica" type="button">Inserisci pratica</button>
         </div>
       </form>
   </div>

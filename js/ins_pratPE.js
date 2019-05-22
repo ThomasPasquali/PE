@@ -18,6 +18,10 @@ $('input[name=anno]').keyup(function(){
 });
 
 
+$('#inserisci-pratica').submit(function(e) {
+	console.log('sub');
+});
+
 /****************FUNCTIONS*****************/
 
 (function ($) {
@@ -91,12 +95,34 @@ function ricercaEdificio(form){
   });
 }
 
-var edifici = [];
+var edifici = [], mappali, subalterni;
 function freezeEdifici() {
 	$('.edificio-selezionato').each(function() {
 		edifici.push($(this).children('.id-edificio-selezionato').html());
 	});
 	if(edifici.length > 0){
+		$.ajax({
+		    url: "../runtime/handler.php",
+		    type: "POST",
+		    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
+		    success: function (response) {
+		    	mappali = response;
+		    },
+		    error: function (jqXHR, exception) {
+		        console.log('Errore nella richiesta dei fogli mappali');
+		    }
+		});
+		$.ajax({
+		    url: "../runtime/handler.php",
+		    type: "POST",
+		    data: {'action' : 'getSubalterniEdifici', 'edifici' : edifici},
+		    success: function (response) {
+		    	subalterni = response;
+		    },
+		    error: function (jqXHR, exception) {
+		        console.log('Errore nella richiesta dei subalterni');
+		    }
+		});
 		$('#dati-pratica').show();
 		$('#dati-edificio').hide();
 		if(edifici.length > 1) $('#info-edificio').html('Edifici N° '+edifici.join(', '));
@@ -108,47 +134,15 @@ function freezeEdifici() {
 var mappaliCount = 1;
 function addFieldFoglioMappale() {
 	if(edifici.length > 0){
-		// TODO:
-		let mappali;
-		let request = $.ajax({
-		    url: "../runtime/handler.php",
-		    type: "POST",
-		    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
-		    success: function (response) {
-		    	console.log('siiii '+response);
-
-		    },
-		    error: function (jqXHR, exception) {
-		        var msg = '';
-		        if (jqXHR.status === 0) {
-		            msg = 'Not connect.\n Verify Network.';
-		        } else if (jqXHR.status == 404) {
-		            msg = 'Requested page not found. [404]';
-		        } else if (jqXHR.status == 500) {
-		            msg = 'Internal Server Error [500].';
-		        } else if (exception === 'parsererror') {
-		            msg = 'Requested JSON parse failed.';
-		        } else if (exception === 'timeout') {
-		            msg = 'Time out error.';
-		        } else if (exception === 'abort') {
-		            msg = 'Ajax request aborted.';
-		        } else {
-		            msg = 'Uncaught Error.\n' + jqXHR.responseText;
-		        }
-		        console.log(msg);
-		    }
-		});
-		console.log(request);
-		console.log(mappali);
 		if(mappali.length > 0){
 			let select = $('<select></select>');
-			select.attr('name', 'mapp'+mappaliCount);
+			select.attr('name', 'foglio-mappale'+mappaliCount);
 			select.addClass('mappale');
 
 			for (let mapp of mappali) {
 				let option = $('<option></option>');
-				option.val(mapp['Mappale']);
-				option.html(mapp['Mappale']+(mapp['EX']?'(EX)':''));
+				option.val(mapp['Foglio']+'-'+mapp['Mappale']);
+				option.html('F.'+mapp['Foglio']+' m.'+mapp['Mappale']+(mapp['EX']?' (EX)':''));
 				select.append(option);
 			}
 
@@ -177,18 +171,16 @@ function addFieldFoglioMappale() {
 
 var subalterniCount = 1;
 function addFieldSubalterno() {
-	if(edID){
-		let subalterni = getSubalterniEdificio(edID);
-    console.log(subalterni);
+	if(edifici.length > 0){
 		if(subalterni.length > 0){
 			let select = $('<select></select>');
-			select.attr('name', 'sub'+subalterniCount);
+			select.attr('name', 'foglio-mappale-subalterno'+subalterniCount);
 			select.addClass('subalterno');
 
 			for (let sub of subalterni) {
 				let option = $('<option></option>');
-				option.val(sub['Subalterno']+'mapp'+sub['Mappale']);
-				option.html('Subalterno '+sub['Subalterno']+' del mappale '+sub['Mappale']);
+				option.val(sub['Foglio']+'-'+sub['Mappale']+'-'+sub['Subalterno']);
+				option.html('Subalterno '+sub['Subalterno']+' del F.'+sub['Foglio']+' m.'+sub['Mappale']);
 				select.append(option);
 			}
 
