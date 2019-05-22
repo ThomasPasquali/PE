@@ -18,8 +18,16 @@ $('input[name=anno]').keyup(function(){
 });
 
 
-$('#inserisci-pratica').submit(function(e) {
-	console.log('sub');
+$('#form-pratica').submit(function(e) {
+	console.log(edifici);
+	let i = 1;
+	for (let edificio of edifici){
+		let field = $('<input>');
+		field.attr('type', 'hidden');
+		field.attr('name', 'edificio'+(i++));
+		field.attr('value', edificio);
+		$(this).append(field);
+	}
 });
 
 /****************FUNCTIONS*****************/

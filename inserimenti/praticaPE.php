@@ -13,8 +13,7 @@
    */
     $infos = [];
     $errors = [];
-    if($c->check(['tipo', 'anno', 'numero', 'edificio'], $_POST)){
-        
+    if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         if(isset($_POST['documento_elettronico'])){
             $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
             $path = $c->doc_el_root_path."\\$relPath";
@@ -58,7 +57,7 @@
 
             //inserimento edifici
             //TODO
-                
+
             //inserimento intestatari, mappali e subalterni
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
@@ -84,7 +83,7 @@
             }
 
         }else
-        echo 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
+          $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
     }
 
 
@@ -107,7 +106,9 @@
 <head>
   <script src="../lib/jquery-3.3.1.min.js"></script>
   <script src="../js/hints.js"></script>
+  <script src="../js/misc.js"></script>
   <link rel="stylesheet" type="text/css" href="../css/form.css">
+  <link rel="stylesheet" type="text/css" href="../css/alerts.css">
   <style>
     .form{
       width: 90%;
@@ -150,6 +151,13 @@
   </style>
 </head>
 <body>
+  <?php
+  if(count($errors) > 0)
+      echo "<script>displayMessage('Errori: ".str_replace('\'', '\\\'', implode('<br>', $errors)).'\', document.body)</script>';
+  if(count($infos) > 0)
+      echo "<script>displayMessage('Info: ".str_replace('\'', '\\\'', implode('<br>', $infos))."', document.body, 'info');</script>";
+  ?>
+
   <div class="form">
     <h1>Inserimento pratiche <span id="info-edificio"></span></h1>
       <input type="hidden" name="tipo" value="pe">
@@ -173,7 +181,7 @@
         </div>
       </div>
 
-      <form method="post">
+      <form id="form-pratica" method="post">
         <div id="dati-pratica">
           <div class="section">Non so che scrivere</div>
           <div class="inner-wrap">
@@ -296,7 +304,7 @@
 
           </div>
 
-          <button id="inserisci-pratica" type="button">Inserisci pratica</button>
+          <button type="submit">Inserisci pratica</button>
         </div>
       </form>
   </div>
