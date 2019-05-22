@@ -8,9 +8,7 @@
   }
 
   print_r($_POST);
-  /**
-   * Array ( [foglio-mappale1] => 1-1 [foglio-mappale-subalterno1] => 1-34-2 [tipo] => SCIA [anno] => 2019 [numero] => 1 [barrato] => A [intestatarioPersona1] => 1 [tecnico] => [impresa] => [direzione_lavori] => [data] => 2019-05-22 [protocollo] => [stradario] => [intervento] => Intervento [documento_elettronico] => on [data_inizio_lavori] => [note] => )
-   */
+  
     $infos = [];
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
@@ -52,34 +50,69 @@
             $idPratica =  $c->db->ql(
                 'SELECT ID
                 FROM pe_pratiche
-                WHERE p.TIPO = ? AND p.Anno = ? AND p.Numero = ? AND p.Barrato = ?',
+                WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
                 [$_POST['tipo'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0]['ID'];
 
             //inserimento edifici
-            //TODO
-
-            //inserimento intestatari, mappali e subalterni
+            foreach ($_POST as $key => $value)
+                if(substr($key, 0, strlen('edificio')) == 'edificio'){
+                    $res = $c->db->dml('INSERT INTO pe_edifici_pratiche (Pratica, Edificio)
+                                                    VALUES(?, ?)', [$idPratica, $value]);
+                    if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata all'edificio N° $value";
+                    else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'edificio N° $value: ".$res->errorInfo()[2];
+                }
+            
+            //inserimento fogli-mappali
+            foreach ($_POST as $key => $value)
+                if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'){
+                    $tmp = explode('-', $value);
+                    $foglio = $tmp[0];
+                    $mappale = $tmp[1];
+                    $edificio = getEdificioID($foglio, $mappale, $c->db);
+                    
+                    if($edificio){
+                        $res = $c->db->dml('INSERT INTO pe_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
+                                                            VALUES(?, ?, ?, ?)', [$idPratica, $edificio, $foglio, $mappale]);
+                        
+                        if($res->errorCode() == 0) $infos[] = "F.$foglio m.$mappale associato alla pratica";
+                        else                         $errors[] = "Impossibile associare F.$foglio m.$mappale alla pratica: ".$res->errorInfo()[2];
+                    }else
+                        $errors[] = "Impossibile trovare F.$foglio m.$mappale: ".$res->errorInfo()[2];
+                }
+            
+            //inserimento subalterni
+            foreach ($_POST as $key => $value)
+                if(substr($key, 0, strlen('foglio-mappale-subalterno')) == 'foglio-mappale-subalterno'){
+                    $tmp = explode('-', $value);
+                    $foglio = $tmp[0];
+                    $mappale = $tmp[1];
+                    $subalterno = $tmp[2];
+                    $edificio = getEdificioID($foglio, $mappale, $c->db);
+                    
+                    if($edificio){
+                        $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Foglio, Mappale, Subalterno)
+                                                    VALUES(?, ?, ?, ?, ?)',
+                            [$idPratica, $edificio, $foglio, $mappale, $subalterno]);
+                        if($res->errorCode() == 0) $infos[] = "Subalterno $subalterno del F.$foglio m.$mappale associato alla pratica";
+                        else                         $errors[] = "Impossibile associare subalterno $subalterno del F.$foglio m.$mappale alla pratica: ".$res->errorInfo()[2];
+                    }else
+                        $errors[] = "Impossibile trovare F.$foglio m.$mappale: ".$res->errorInfo()[2];
+                }
+            
+            //inserimento intestatari
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'){
 
                     $res = $c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
-                                                        VALUES(?, ?)', [$ed['pid'], $value]);
-
+                                                        VALUES(?, ?)', [$idPratica, $value]);
+                    if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario persona ($value)";
+                    else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario persona $value: ".$res->errorInfo()[2];
             }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'){
 
                     $res = $c->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
-                                                        VALUES(?, ?)', [$ed['pid'], $value]);
-
-            }else if(substr($key, 0, strlen('mapp')) == 'mapp'){
-
-                $res = $c->db->dml('INSERT INTO pe_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
-                                                        VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $ed['foglio'], $value]);
-
-            }else if(substr($key, 0, strlen('sub')) == 'sub'){
-
-                $sub_mapp = explode('mapp', $value);
-                $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Mappale, Subalterno)
-                                                        VALUES(?, ?, ?, ?)', [$ed['pid'], $ed['eid'], $sub_mapp[1], $sub_mapp[0]]);
+                                                        VALUES(?, ?)', [$idPratica, $value]);
+                    if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario societ&agrave; ($value)";
+                    else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario societ&agrave; $value: ".$res->errorInfo()[2];
             }
 
         }else
@@ -99,6 +132,18 @@
 
   function ifEmptyGet($val, $valIfEmpty = NULL){
     return empty($val)?$valIfEmpty:$val;
+  }
+  
+  //TODO portare in controls
+  function getEdificioID($foglio, $mappale, $db) {
+      $res = $db->ql('SELECT Edificio
+                                    FROM fogli_mappali_edifici
+                                    WHERE Foglio = ? AND Mappale = ?',
+                                    [$foglio, $mappale]);
+      if(count($res) === 1)
+          return $res[0]['Edificio'];
+      else
+      return NULL;
   }
 
 ?>
