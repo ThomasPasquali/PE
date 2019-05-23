@@ -64,7 +64,7 @@
             
             //inserimento fogli-mappali
             foreach ($_POST as $key => $value)
-                if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'&&$value){
+                if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'&&is_numeric(substr($key, strlen('foglio-mappale'), strlen($key)))&&$value){
                     $tmp = explode('-', $value);
                     $foglio = $tmp[0];
                     $mappale = $tmp[1];
