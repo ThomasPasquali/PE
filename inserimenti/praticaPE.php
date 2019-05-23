@@ -128,6 +128,7 @@
 ?>
 <html>
 <head>
+  <title>Inerimento pratica PE</title>
   <script src="../lib/jquery-3.3.1.min.js"></script>
   <script src="../js/hints.js"></script>
   <script src="../js/misc.js"></script>
@@ -206,6 +207,7 @@
       </div>
 
       <form id="form-pratica" method="post">
+      	<button type="button" onclick="refreshMappaliESubalterni();">Ricarica mapp e sub</button>
         <div id="dati-pratica">
           <div class="section">Non so che scrivere</div>
           <div class="inner-wrap">

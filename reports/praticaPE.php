@@ -118,6 +118,7 @@
     <p class="sottotitolo">Ulteriori informazioni:</p>
     <div id="ultInfo">
     	<p id="docElettronico">Documento elettronico: <?= $datiGenericiPratica['Doc'] ?></p>
+    	<p id="note">Intervento: <?= $datiGenericiPratica['Intervento'] ?></p>
         <p id="note">Note: <?= $datiGenericiPratica['Note'] ?></p>
     </div>
   </body>

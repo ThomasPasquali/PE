@@ -1,9 +1,15 @@
 /****************SETUP*****************/
+
 $('input').each(function() {
 	$(this).attr('autocomplete', 'off');
 })
 
 /****************HANDLERS*****************/
+
+$( "#ricerca-edificio > input" ).keyup(function() {
+  ricercaEdificio($('#ricerca-edificio'));
+});
+
 $('input[name=anno]').keyup(function(){
   let val = $(this).val()+'';
   if(val.length == 4 && $('input[name=numero]').val().length == 0){
@@ -50,10 +56,6 @@ $('#form-pratica').submit(function(e) {
         return o;
     };
 })(jQuery);
-
-$( "#ricerca-edificio > input" ).keyup(function() {
-  ricercaEdificio($('#ricerca-edificio'));
-});
 
 function ricercaEdificio(form){
   var data = form.serializeFormJSON();
@@ -109,28 +111,7 @@ function freezeEdifici() {
 		edifici.push($(this).children('.id-edificio-selezionato').html());
 	});
 	if(edifici.length > 0){
-		$.ajax({
-		    url: "../runtime/handler.php",
-		    type: "POST",
-		    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
-		    success: function (response) {
-		    	mappali = response;
-		    },
-		    error: function (jqXHR, exception) {
-		        console.log('Errore nella richiesta dei fogli mappali');
-		    }
-		});
-		$.ajax({
-		    url: "../runtime/handler.php",
-		    type: "POST",
-		    data: {'action' : 'getSubalterniEdifici', 'edifici' : edifici},
-		    success: function (response) {
-		    	subalterni = response;
-		    },
-		    error: function (jqXHR, exception) {
-		        console.log('Errore nella richiesta dei subalterni');
-		    }
-		});
+		refreshMappaliESubalterni();
 		$('#dati-pratica').show();
 		$('#dati-edificio').hide();
 		if(edifici.length > 1) $('#info-edificio').html('Edifici N° '+edifici.join(', '));
@@ -300,4 +281,29 @@ function addFieldIntestatarioSocieta() {
 
   $('#fieldsIntSoc').append(div);
   intestatariSocietaCount++;
+}
+
+function refreshMappaliESubalterni() {
+	$.ajax({
+	    url: "../runtime/handler.php",
+	    type: "POST",
+	    data: {'action' : 'getFogliMappaliEdifici', 'edifici' : edifici},
+	    success: function (response) {
+	    	mappali = response;
+	    },
+	    error: function (jqXHR, exception) {
+	        console.log('Errore nella richiesta dei fogli mappali');
+	    }
+	});
+	$.ajax({
+	    url: "../runtime/handler.php",
+	    type: "POST",
+	    data: {'action' : 'getSubalterniEdifici', 'edifici' : edifici},
+	    success: function (response) {
+	    	subalterni = response;
+	    },
+	    error: function (jqXHR, exception) {
+	        console.log('Errore nella richiesta dei subalterni');
+	    }
+	});
 }

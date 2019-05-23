@@ -4,6 +4,7 @@ var subalterniCount = 1;
 var b;
 
 /***********HANDLERS*************/
+
 $('#submit-new-edificio').click(function() {
 	
 	$(".mappalenew").each(function(){
@@ -197,7 +198,7 @@ function checkIfFoglioMappaleIsOnPage(foglio, mappale, subalterno, span){
 		span.text('Specificare il subalterno');
 	else{
 		let exists = false;
-		for (var i = 1; i <= subalterniCount; i++) 
+		for (var i = 1; i <= fieldsFMEditingEdCount; i++) 
 			if($('input[name=foglioediting'+i+']').val() == foglio &&
 				$('input[name=mappaleediting'+i+']').val() == mappale)
 				exists = true;

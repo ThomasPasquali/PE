@@ -176,8 +176,9 @@
     </div>
     <div id="generalita">
             <p>Edificio n: <?= $datiGenericiEdificio['ID'] ?> </p>
-            <p id="localita">Localit&aacute;: <?= $datiGenericiEdificio['Stradario'] ?></p>
+            <p id="localita">Localit&agrave;: <?= $datiGenericiEdificio['Stradario'] ?></p>
             <p id="mappaliCompleti">Fogli-mappali: <?= $datiGenericiEdificio['Mappali'] ?></p>
+            <p>Subalterni: <?= $datiGenericiEdificio['Subalterni'] ?></p>
     </div>
     <div id="intestatari">
         <p>Intestatari persone: </p>

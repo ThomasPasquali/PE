@@ -13,8 +13,8 @@
 
 
 -- Dump della struttura del database pe
-CREATE DATABASE IF NOT EXISTS `pe_prod` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `pe_prod`;
+CREATE DATABASE IF NOT EXISTS `pe` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `pe`;
 
 -- Dump della struttura di tabella pe.belfiore
 CREATE TABLE IF NOT EXISTS `belfiore` (
@@ -49,7 +49,8 @@ CREATE TABLE `edifici_view` (
 	`Stradario` CHAR(60) NOT NULL COLLATE 'utf8_general_ci',
 	`Note` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
 	`Fogli` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
-	`Mappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
+	`Mappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
 ) ENGINE=MyISAM;
 
 -- Dump della struttura di tabella pe.fogli_mappali_edifici
@@ -152,10 +153,11 @@ CREATE TABLE IF NOT EXISTS `pe_fogli_mappali_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
-  `Mappale` char(6) DEFAULT NULL,
+  `Mappale` char(6) NOT NULL,
   UNIQUE KEY `Pratica` (`Pratica`,`Foglio`,`Mappale`),
   KEY `FK_pe_mappali_pratiche_fogli_mappali_edifici` (`Edificio`,`Foglio`,`Mappale`),
   KEY `FK_pe_mappali_pratiche_pe_pratiche` (`Pratica`,`Edificio`),
+  KEY `Pratica1` (`Pratica`,`Edificio`,`Foglio`,`Mappale`),
   CONSTRAINT `FK_pe_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`),
   CONSTRAINT `FK_pe_mappali_pratiche_pe_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `pe_edifici_pratiche` (`Pratica`, `Edificio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -211,6 +213,7 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche` (
   `Tecnico` int(10) unsigned DEFAULT NULL,
   `Impresa` int(10) unsigned DEFAULT NULL,
   `Direzione_lavori` int(10) unsigned DEFAULT NULL,
+  `Zona` VARCHAR(255) NULL DEFAULT NULL,
   `Intervento` varchar(255) DEFAULT NULL,
   `Data_inizio_lavori` date DEFAULT NULL,
   `Documento_elettronico` char(255) DEFAULT NULL,
@@ -274,12 +277,29 @@ CREATE TABLE IF NOT EXISTS `pe_subalterni_pratiche` (
   `Subalterno` int(3) unsigned NOT NULL,
   PRIMARY KEY (`Pratica`,`Foglio`,`Mappale`,`Subalterno`),
   KEY `Edificio` (`Edificio`,`Foglio`,`Mappale`,`Subalterno`),
-  KEY `FK_pe_subalterni_pratiche_pe_edifici_pratiche` (`Pratica`,`Edificio`),
+  KEY `FK_pe_subalterni_pratiche_pe_fogli_mappali_pratiche` (`Pratica`,`Edificio`,`Foglio`,`Mappale`),
   CONSTRAINT `FK_pe_subalterni_pratiche_pe_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `pe_edifici_pratiche` (`Pratica`, `Edificio`),
+  CONSTRAINT `FK_pe_subalterni_pratiche_pe_fogli_mappali_pratiche` FOREIGN KEY (`Pratica`, `Edificio`, `Foglio`, `Mappale`) REFERENCES `pe_fogli_mappali_pratiche` (`Pratica`, `Edificio`, `Foglio`, `Mappale`),
   CONSTRAINT `FK_pe_subalterni_pratiche_subalterni_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`, `Subalterno`) REFERENCES `subalterni_edifici` (`Edificio`, `Foglio`, `Mappale`, `Subalterno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di vista pe.pratiche_view
+-- Creazione di una tabella temporanea per risolvere gli errori di dipendenza della vista
+CREATE TABLE `pratiche_view` (
+	`ID` INT(10) UNSIGNED NOT NULL,
+	`Tipo` ENUM('SCIA','DIA','CIL','CILA','VARIE','PERMESSI') NOT NULL COLLATE 'utf8_general_ci',
+	`Anno` INT(4) NOT NULL,
+	`Numero` INT(4) NOT NULL,
+	`Barrato` CHAR(12) NOT NULL COLLATE 'utf8_general_ci',
+	`Intervento` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Sigla` VARCHAR(43) NOT NULL COLLATE 'utf8_general_ci',
+	`Protocollo` INT(8) NULL,
+	`Stradario` VARCHAR(60) NULL COLLATE 'utf8_general_ci',
+	`FogliMappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
+) ENGINE=MyISAM;
 
 -- Dump della struttura di tabella pe.stradario
 CREATE TABLE IF NOT EXISTS `stradario` (
@@ -466,7 +486,7 @@ CREATE TABLE IF NOT EXISTS `utenti` (
 -- Dump della struttura di vista pe.edifici_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
 DROP TABLE IF EXISTS `edifici_view`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note Note,
+CREATE ALGORITHM=UNDEFINED DEFINER=`admin`@`%` SQL SECURITY DEFINER VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note Note,
 		(SELECT GROUP_CONCAT(DISTINCT fm.Foglio ORDER BY fm.Foglio)
 		FROM fogli_mappali_edifici fm
 		GROUP BY fm.Edificio
@@ -478,9 +498,62 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 							SEPARATOR ', ')
 		FROM fogli_mappali_edifici fm
 		GROUP BY fm.Edificio
-		HAVING fm.Edificio = e.ID) Mappali
+		HAVING fm.Edificio = e.ID) Mappali,
+		(SELECT GROUP_CONCAT(CONCAT('Sub.', se.Subalterno,
+									' F.', se.Foglio, 
+									' m.', se.Mappale, 
+									IF(fm.EX IS NOT NULL, ' (ex)', ''))
+							ORDER BY fm.Foglio, fm.Mappale
+							SEPARATOR ', ')
+		FROM subalterni_edifici se
+		JOIN fogli_mappali_edifici fm 
+			ON fm.Edificio = se.Edificio
+			AND fm.Foglio = se.Foglio
+			AND fm.Mappale = se.Mappale
+		GROUP BY se.Edificio
+		HAVING se.Edificio = e.ID) Subalterni
 FROM edifici e
 JOIN stradario s ON s.Identificativo_nazionale = e.Stradario ;
+
+-- Dump della struttura di vista pe.pratiche_view
+-- Rimozione temporanea di tabella e creazione della struttura finale della vista
+DROP TABLE IF EXISTS `pratiche_view`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`admin`@`%` SQL SECURITY DEFINER VIEW `pratiche_view` AS SELECT  p.ID,
+		p.TIPO Tipo,
+		p.Anno,
+		p.Numero, 
+		p.Barrato,
+		p.Intervento,
+		CONCAT(p.TIPO, p.Anno, '/', p.Numero, p.Barrato) Sigla,
+		p.Protocollo,
+		IF(s.Denominazione IS NULL, '', s.Denominazione) Stradario,
+		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio, 
+									' m.', fm.Mappale, 
+									IF(fm.EX IS NOT NULL, ' (ex)', ''))
+							ORDER BY fm.Foglio, fm.Mappale
+							SEPARATOR ', ')
+		FROM pe_fogli_mappali_pratiche fmp
+		JOIN fogli_mappali_edifici fm 
+			ON fm.Edificio = fmp.Edificio
+			AND fm.Foglio = fmp.Foglio
+			AND fm.Mappale = fmp.Mappale
+		GROUP BY fmp.Pratica
+		HAVING fmp.Pratica = p.ID) FogliMappali,
+		(SELECT GROUP_CONCAT(CONCAT('Sub.', sp.Subalterno,
+									' F.', sp.Foglio, 
+									' m.', sp.Mappale, 
+									IF(fm.EX IS NOT NULL, ' (ex)', ''))
+							ORDER BY fm.Foglio, fm.Mappale
+							SEPARATOR ', ')
+		FROM pe_subalterni_pratiche sp
+		JOIN fogli_mappali_edifici fm 
+			ON fm.Edificio = sp.Edificio
+			AND fm.Foglio = sp.Foglio
+			AND fm.Mappale = sp.Mappale
+		GROUP BY sp.Pratica
+		HAVING sp.Pratica = p.ID) Subalterni
+FROM pe_pratiche p
+LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
