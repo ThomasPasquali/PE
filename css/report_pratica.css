@@ -1,0 +1,119 @@
+body {
+    width: 1000px;
+}
+
+#titoli{
+    background-color: skyblue;
+    height: 220px;
+    text-align: center;
+    padding-top: 1px;
+}
+
+#logo{
+    float: right;
+}
+
+.sottotitolo{
+    font-weight: bold;
+    margin-bottom: 0px;
+    margin-top: 20px;
+}
+
+#generalita{
+    display: inline-grid;
+    width: 1000px;
+    grid-template-columns: auto auto auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+}
+
+#generalita > p{
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#localita{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+ #subalterno{
+    grid-column-start: 3;
+    grid-column-end: 5;
+}
+
+#intervento{
+    grid-column-start: 1;
+    grid-column-end: 5;
+}
+
+#persone{
+    display: inline-grid;
+    width: 1000px;
+    grid-template-columns: auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+}
+
+#persone > p{
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#impresa{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+#date{
+    display: inline-grid;
+    width: 1000px;
+    grid-template-columns: auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+}
+
+#date > p{
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#dataScadenza{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+#ultInfo{
+    display: inline-grid;
+    width: 1000px;
+    grid-template-columns: auto auto;
+    background-color: #2196F3;
+    border-style: solid;
+    border-width: thin;
+}
+
+#ultInfo > p{
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#note{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+ #docElettronico{
+    grid-column-start: 1;
+    grid-column-end: 3;
+}

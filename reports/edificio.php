@@ -3,7 +3,7 @@
     $c = new Controls();
     
     if(!$c->logged()){
-        header('Location: index.php?err=Utente non loggato');
+        header('Location: ../index.php?err=Utente non loggato');
         exit();
     }
     
@@ -35,35 +35,30 @@
             
             //TODO tec con UNION
             $intest_persone = $c->db->ql(
-                "SELECT DISTINCT ip.*
+                'SELECT DISTINCT ip.*
                 FROM pe_edifici_pratiche ep
                 JOIN pe_intestatari_persone_pratiche ipp ON ipp.Pratica = ep.Pratica
                 JOIN intestatari_persone ip ON ip.ID = ipp.Persona
-                WHERE ep.Edificio = ?",
+                WHERE ep.Edificio = ?',
                 [$edificioID]);
                             
             /*----------------------------------------------*/
                             
             $intest_societa = $c->db->ql(
-                "SELECT DISTINCT soc.ID, soc.Intestazione
-                FROM pe_pratiche p
-                JOIN pe_intestatari_societa_pratiche i ON i.Pratica = p.ID
-                JOIN intestatari_societa soc ON i.Societa = soc.ID
-                WHERE p.Edificio = ?
-                UNION
-                SELECT DISTINCT soc.ID, soc.Intestazione
-                FROM tec_pratiche p
-                JOIN tec_intestatari_societa_pratiche i ON i.Pratica = p.ID
-                JOIN intestatari_societa soc ON i.Societa = soc.ID
-                WHERE p.Edificio = ?",
-                [$edificioID, $edificioID]);
+                'SELECT DISTINCT i.*
+                FROM pe_edifici_pratiche ep
+                JOIN pe_intestatari_societa_pratiche isp ON isp.Pratica = ep.Pratica
+                JOIN intestatari_societa i ON i.ID = isp.Societa
+                WHERE ep.Edificio = ?',
+                [$edificioID]);
                             
             /*----------------------------------------------*/
             
             $res = $c->db->ql(
-                "SELECT *
-                FROM pe_pratiche
-                WHERE Edificio = ?",
+                'SELECT p.*
+                FROM pe_pratiche p
+                JOIN pe_edifici_pratiche ep ON ep.Pratica = p.ID
+                WHERE Edificio = ?',
                 [$edificioID]);
                             
             foreach ($res as $pratica)
@@ -95,17 +90,17 @@
             
             /*----------------------------------------------*/
             
-            $rubriche = $c->db->ql("SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
-                                                    FROM pe_rubrica r
-                                                    JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
-                                                    WHERE Edificio = ?",
-                                                    [$edificioID]);
+            $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
+                                                FROM pe_rubrica r
+                                                JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
+                                                WHERE Edificio = ?',
+                                                [$edificioID]);
                             
             /*----------------------------------------------*/
             
-            $condoni = $c->db->ql("SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
+            $condoni = $c->db->ql('SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
                                                 FROM pe_condoni
-                                                WHERE Edificio = ?",
+                                                WHERE Edificio = ?',
                                                 [$edificioID]);
                             
             /*----------------------------------------------*/

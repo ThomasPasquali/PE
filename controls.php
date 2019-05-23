@@ -122,6 +122,22 @@
         
         /**
          * 
+         * @param string $tipo
+         * @param string $anno
+         * @param string $numero
+         * @param string $barrato
+         * @return int|NULL se esiste l'ID della pratica altrimenti NULL
+         */
+        public function getPraticaID($tipo, $anno, $numero, $barrato) {
+            $res = $this->db->ql('SELECT ID
+                                            FROM pe_pratiche
+                                            WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
+                                            [$tipo, $anno, $numero, $barrato]);
+            return (count($res) === 1)?$res[0]['ID']:NULL;
+        }
+        
+        /**
+         * 
          * @param string $table
          * @param string $field
          * @return array La lista di valori dell'enum
