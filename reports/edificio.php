@@ -1,38 +1,38 @@
-﻿<?php 
+﻿<?php
     include_once '../controls.php';
     $c = new Controls();
-    
+
     if(!$c->logged()){
         header('Location: ../index.php?err=Utente non loggato');
         exit();
     }
-    
+
     if($c->check(['edificio'], $_REQUEST)||$c->check(['foglio', 'mappale'], $_REQUEST)){
-        
+
         $edificioID = $_REQUEST['edificio']??'';
-        if(!$edificioID) 
+        if(!$edificioID)
             $edificioID = $c->getEdificioID($_REQUEST['foglio']??'', $_REQUEST['mappale']??'');
-        
+
         $datiGenericiEdificio = NULL;
         if($edificioID)
-            $datiGenericiEdificio = $c->db->ql('SELECT * FROM edifici_view WHERE ID = ?',[$edificioID])[0];
-        
+            $datiGenericiEdificio = $c->db->ql('SELECT * FROM edifici_view WHERE ID = ?',[$edificioID])[0]??NULL;
+
         if($datiGenericiEdificio !== NULL){
-            
+
             $intest_persone = [];
             $intest_societa = [];
-            
+
             $rubriche = [];
             $condoni = [];
-            
+
             $scia = [];
             $dia = [];
             $cila = [];
             $cil = [];
             $varie = [];
-            
+
             /*----------------------------------------------*/
-            
+
             //TODO tec con UNION
             $intest_persone = $c->db->ql(
                 'SELECT DISTINCT ip.*
@@ -41,9 +41,9 @@
                 JOIN intestatari_persone ip ON ip.ID = ipp.Persona
                 WHERE ep.Edificio = ?',
                 [$edificioID]);
-                            
+
             /*----------------------------------------------*/
-                            
+
             $intest_societa = $c->db->ql(
                 'SELECT DISTINCT i.*
                 FROM pe_edifici_pratiche ep
@@ -51,103 +51,103 @@
                 JOIN intestatari_societa i ON i.ID = isp.Societa
                 WHERE ep.Edificio = ?',
                 [$edificioID]);
-                            
+
             /*----------------------------------------------*/
-            
+
             $res = $c->db->ql(
                 'SELECT p.*
                 FROM pe_pratiche p
                 JOIN pe_edifici_pratiche ep ON ep.Pratica = p.ID
                 WHERE Edificio = ?',
                 [$edificioID]);
-                            
+
             foreach ($res as $pratica)
                 switch ($pratica['TIPO']) {
                     case 'DIA':
                         $dia[] = $pratica;
                         break;
-                        
+
                     case 'CIL':
                         $cil[] = $pratica;
                         break;
-                        
+
                     case 'CILA':
                         $cila[] = $pratica;
                         break;
-                        
+
                     case 'SCIA':
                         $scia[] = $pratica;
                         break;
-                        
+
                     case 'VARIE':
                         $varie[] = $pratica;
                         break;
-                        
+
                     default:
                         ;
                         break;
                 }
-            
+
             /*----------------------------------------------*/
-            
+
             $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
                                                 FROM pe_rubrica r
                                                 JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
                                                 WHERE Edificio = ?',
                                                 [$edificioID]);
-                            
+
             /*----------------------------------------------*/
-            
+
             $condoni = $c->db->ql('SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
                                                 FROM pe_condoni
                                                 WHERE Edificio = ?',
                                                 [$edificioID]);
-                            
+
             /*----------------------------------------------*/
-            
+
             //TODO pratiche ed intestatari TEC
             $aut = [];
             $perm = [];
             $conc = [];
             $san = [];
             $opere = [];
-            
+
             /*----------------------------------------------*/
-                            
+
             $res = $c->db->ql("SELECT *
                 FROM tec_pratiche
                 WHERE Edificio = ?",
                 [$edificioID]);
-            
+
             foreach ($res as $pratica){
                 $tipo = substr($pratica['ID'], 0, 1);
                 switch ($tipo) {
                     case 'A':
                         $aut[] = $pratica;
                         break;
-                        
+
                     case 'S':
                         $san[] = $pratica;
                         break;
-                        
+
                     case 'P':
                         $perm[] = $pratica;
                         break;
-                        
+
                     case 'C':
                         $conc[] = $pratica;
                         break;
-                        
+
                     case 'I':
                         $opere[] = $pratica;
                         break;
-                        
+
                     default:
                         ;
                         break;
                 }
             }
-            
+
         } else {
             echo '<span class="errorTitle">Nessun risultato con parametri:
                                                                 N° edificio: '.($_REQUEST['edificio']??'').'
@@ -155,7 +155,7 @@
                                                                 Mappale: '.($_REQUEST['mappale']??'').'</span>';
             exit();
         }
-            
+
     }else {
         echo '<span class="errorTitle">Richiesta non valida</span>';
         exit();

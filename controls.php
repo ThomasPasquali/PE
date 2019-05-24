@@ -15,7 +15,7 @@
 
             $peINI = parse_ini_file(INI_DIR.'PE.ini');
             $this->doc_el_root_path = $peINI['DOC_EL_ROOT'];
-            
+
             require_once 'lib/db.php';
 
             $this->db = new DB();
@@ -104,10 +104,14 @@
             }else
             echo "<pre>$code</pre>";
         }
-        
+
+        public function includeHTML($path) {
+          echo file_get_contents($path);
+        }
+
         /***********DB QUERIES*************/
         /**
-         * 
+         *
          * @param string|int $foglio
          * @param string|int $mappale
          * @return int|NULL se esiste l'ID dell'edificio altrimenti NULL
@@ -119,9 +123,9 @@
                                                 [$foglio, $mappale]);
             return (count($res) === 1)?$res[0]['Edificio']:NULL;
         }
-        
+
         /**
-         * 
+         *
          * @param string $tipo
          * @param string $anno
          * @param string $numero
@@ -135,9 +139,26 @@
                                             [$tipo, $anno, $numero, $barrato]);
             return (count($res) === 1)?$res[0]['ID']:NULL;
         }
-        
+
+        //TODO docs
+        public function getDatiTecnico($id) {
+            $res = $this->db->ql('SELECT *
+                                            FROM tecnici
+                                            WHERE ID = ?',
+                                            [$id]);
+            return (count($res) === 1)?$res[0]:NULL;
+        }
+
+        public function getDatiImpresa($id) {
+            $res = $this->db->ql('SELECT *
+                                            FROM imprese
+                                            WHERE ID = ?',
+                                            [$id]);
+            return (count($res) === 1)?$res[0]:NULL;
+        }
+
         /**
-         * 
+         *
          * @param string $table
          * @param string $field
          * @return array La lista di valori dell'enum

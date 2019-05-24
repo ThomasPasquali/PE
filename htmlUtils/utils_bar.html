@@ -1,0 +1,54 @@
+<header class="header">
+  <div id="nav_bar" class="navbar">
+    <ul>
+
+      <li class="active"><a href="/">Home <i class="fas fa-home"></i></a></li>
+
+      <li class="dropdown">
+        <a id="reflink" class="blockline">Report edificio</a>
+        <div class="dropborder">
+            <ul>
+              <li class="dropdown-content">
+                <form action="../reports/edificio.php" target="_blank" method="get">
+                  <label>Foglio</label>
+                  <input type="text" name="foglio" placeholder="Foglio...">
+                  <label>Mappale</label>
+                  <input type="text" name="mappale" placeholder="Mappale...">
+                </form>
+              </li>
+              <li class="dropdown-content">
+                <form action="../reports/edificio.php" target="_blank" method="get">
+                  <label>N° edificio</label>
+                  <input type="text" name="edificio" placeholder="Foglio...">
+                </form>
+              </li>
+            </ul>
+        </div>
+      </li>
+
+      <li class="dropdown">
+        <a id="reflink" class="blockline">Inserimento</a>
+        <div class="dropborder">
+          <ul>
+            <li class="dropdown-content"><a href="../inserimenti/praticaPE.php" target="_blank">Pratica PE</a></li>
+            <li class="dropdown-content"><a href="../home.php?display=insAnagIntestPers" target="_blank">Intestatario persona</a></li>
+            <li class="dropdown-content"><a href="../home.php?display=insAnagSocieta" target="_blank">Intestatario societ&agrave;</a></li>
+            <li class="dropdown-content"><a href="../home.php?display=insAnagTecnici" target="_blank">Tecnico</a></li>
+            <li class="dropdown-content"><a href="../home.php?display=insAnagImprese" target="_blank">Impresa</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="dropdown">
+        <a id="reflink" class="blockline">Gestione</a>
+        <div class="dropborder">
+          <ul>
+            <li class="dropdown-content"><a href="../gestione/edifici.php" target="_blank">Edifici</a></li>
+            <li class="dropdown-content"><a href="../gestione/utenti.php" target="_blank">Utenti</a></li>
+        </ul>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</header>

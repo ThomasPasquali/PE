@@ -3,12 +3,12 @@
     $c = new Controls();
 
     if(!$c->logged()){
-        header('Location: /index.php?err=Utente non loggato');
+        header('Location: ../index.php?err=Utente non loggato');
         exit();
     }
 
     if(!$c->isAdmin()){
-        header('Location: home.php?err=Permessi richiesti');
+        header('Location: ../home.php?err=Permessi richiesti');
         exit();
     }
 
@@ -20,7 +20,7 @@
 	<title>Gestione utenti</title>
 	<link rel="stylesheet" href="../css/gestione.css">
 	<link rel="stylesheet" href="../css/alerts.css">
-	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="../lib/jquery-3.3.1.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -63,7 +63,7 @@
         </div>
 
     </div>
-    <script type="text/javascript" src="/lib/misc.js"></script>
-    <script type="text/javascript" src="/js/gestione_utenti.js"></script>
+    <script type="text/javascript" src="../js/misc.js"></script>
+    <script type="text/javascript" src="../js/gestione_utenti.js"></script>
 </body>
 </html>

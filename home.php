@@ -18,11 +18,6 @@
                 inserimentoAnagrafiche();
                 break;
 
-            case 'mappaliEX':
-                $esitoGestMapp = gestioneMappaliEX();
-                $GLOBALS[$esitoGestMapp[1]?'err':'succ'] = $esitoGestMapp[0];
-                break;
-
             default:
                 ;
             break;
@@ -167,36 +162,6 @@
             echo "  <option value=\"$societa[ID]\"".($societa['ID'] == $selected ? 'selected="selected"':'').">".str_replace('\'', '\\\'',$societa['i'])."</option>";
     }
 
-    function gestioneMappaliEX() {
-        $foglio = $_POST['foglio'];
-        $mappale = $_POST['mappale'];
-        $ex = (($_POST['ex'] === 'yes') ? TRUE : (($_POST['ex'] === 'no') ? FALSE : NULL));
-
-        if(!is_numeric($foglio)||is_null($ex))
-            return ['Richiesta non valida!', TRUE];
-
-        $res = $GLOBALS['c']->db->ql(
-            'SELECT *
-            FROM pe_mappali_edifici m
-            JOIN pe_edifici e ON e.ID = m.Edificio
-            WHERE m.Mappale = :mapp AND e.Foglio = :fg',
-            [':mapp' => $mappale,
-            ':fg' => $foglio]);
-
-        if(count($res) == 0)
-            return ["La coppia foglio $foglio, mappale $mappale non esiste", TRUE];
-
-        $res = $GLOBALS['c']->db->dml(
-            'UPDATE pe_mappali_edifici m
-            JOIN pe_edifici e ON e.ID = m.Edificio
-            SET m.EX = :ex
-            WHERE m.Mappale = :mapp AND e.Foglio = :fg',
-            [':ex' => $ex?'EX':NULL,
-            ':mapp' => $mappale,
-            ':fg' => $foglio]);
-
-            return $res->rowCount() == 0 ? ['Non è stato necessario apportare modifiche', FALSE] : ['Modifiche apportate con successo', FALSE];
-    }
 ?>
 <html lang="it">
 	<head>
@@ -251,8 +216,8 @@
  			<div class="dropdown active">
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
-                	<a onclick="changeContent('gestMappEX');">Gestione mappali EX</a>
                 	<a href="/gestione/edifici.php">Gestione edifici</a>
+                  <a href="/gestione/utenti.php">Gestione utenti</a>
             	</div>
  			</div>
 
@@ -503,27 +468,6 @@
 			</div>
         </div>
 
-        <div id="gestMappEX" class="content">
-        	<div class="form">
-        		<h1>Gestione mappali EX</h1>
-
-            	<form method="post">
-            		<input type="hidden" name="tipo">
-            		<div class="inner-wrap">
-            			<label>Foglio<input type="text" name="foglio" pattern="\d{1,2}" required="required" value="<?= $_POST['foglio']??'' ?>"></label>
-            			<!-- pattern="\d{1,4}[A-Za-z]" -->
-            			<label>Mappale<input type="text" name="mappale" required="required" value="<?= $_POST['mappale']??'' ?>"></label>
-            			<label>
-            				Normale<input type="radio" name="ex" value="no" <?= isset($_POST['ex'])?$_POST['ex']=='no'?'checked="checked"':'':'checked="checked"' ?>>
-            				<br>
-            				Ex<input type="radio" name="ex" value="yes" <?= isset($_POST['ex'])&&$_POST['ex']=='yes'?'checked="checked"':'' ?>></label>
-            		</div>
-            		<button type="submit" name="btn" value="mappaliEX">Modifica</button>
-				</form>
-			</div>
-        </div>
-        <?= isset($_POST['btn'])&&$_POST['btn']=='mappaliEX'?'<script type="text/javascript">changeContent(\'gestMappEX\');</script>':'' ?>
-
         <?php
             if(isset($GLOBALS['err'])&&isset($_POST['btn'])&&$_POST['btn'] == 'inserimentoAnagrafica')
                 switch ($_POST['tipo']) {
@@ -540,6 +484,9 @@
                         ;
                     break;
                 }
+
+            if(isset($_REQUEST['display']))
+              echo "<script>changeContent('$_REQUEST[display]');</script>";
         ?>
 	</body>
 </html>

@@ -8,7 +8,7 @@
   }
 
   print_r($_POST);
-  
+
     $infos = [];
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
@@ -61,7 +61,7 @@
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata all'edificio N° $value";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'edificio N° $value: ".$res->errorInfo()[2];
                 }
-            
+
             //inserimento fogli-mappali
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('foglio-mappale')) == 'foglio-mappale'&&is_numeric(substr($key, strlen('foglio-mappale'), strlen($key)))&&$value){
@@ -69,17 +69,17 @@
                     $foglio = $tmp[0];
                     $mappale = $tmp[1];
                     $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
-                    
+
                     if($edificio){
                         $res = $c->db->dml('INSERT INTO pe_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
                                                             VALUES(?, ?, ?, ?)', [$idPratica, $edificio, $foglio, $mappale]);
-                        
+
                         if($res->errorCode() == 0) $infos[] = "F.$foglio m.$mappale associato alla pratica";
                         else                         $errors[] = "Impossibile associare F.$foglio m.$mappale alla pratica: ".$res->errorInfo()[2];
                     }else
                         $errors[] = "Impossibile trovare F.$foglio m.$mappale: ".$res->errorInfo()[2];
                 }
-            
+
             //inserimento subalterni
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('foglio-mappale-subalterno')) == 'foglio-mappale-subalterno'&&$value){
@@ -88,7 +88,7 @@
                     $mappale = $tmp[1];
                     $subalterno = $tmp[2];
                     $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
-                    
+
                     if($edificio){
                         $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Foglio, Mappale, Subalterno)
                                                     VALUES(?, ?, ?, ?, ?)',
@@ -98,7 +98,7 @@
                     }else
                         $errors[] = "Impossibile trovare F.$foglio m.$mappale: ".$res->errorInfo()[2];
                 }
-            
+
             //inserimento intestatari
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'&&$value){
@@ -124,7 +124,7 @@
   function ifEmptyGet($val, $valIfEmpty = NULL){
     return empty($val)?$valIfEmpty:$val;
   }
-  
+
 ?>
 <html>
 <head>
@@ -132,51 +132,17 @@
   <script src="../lib/jquery-3.3.1.min.js"></script>
   <script src="../js/hints.js"></script>
   <script src="../js/misc.js"></script>
+  <link rel="stylesheet" type="text/css" href="../lib/fontawesome/css/all.css">
   <link rel="stylesheet" type="text/css" href="../css/form.css">
   <link rel="stylesheet" type="text/css" href="../css/alerts.css">
-  <style>
-    .form{
-      width: 90%;
-    }
-    #risultati-ricerca-edificio{
-        display: grid;
-        grid-template-columns: auto auto auto auto;
-    }
-    .risultato-ricerca-edificio,.edificio-selezionato{
-        border: solid 1px black;
-        margin: 5px;
-        padding-left: 10px;
-        overflow: scroll;
-        overflow-y: auto;
-        overflow-x: auto;
-        white-space: pre-line;
-    }
-    .risultato-ricerca-edificio:hover{
-        text-decoration: underline;
-        color: green;
-    }
-    .edificio-selezionato:hover{
-        text-decoration: underline;
-        color: red;
-    }
-    .risultato-ricerca-edificio > div p,strong,.edificio-selezionato > div p,strong {
-        display: inline-flex;
-        margin-top: 2px;
-        margin-bottom: 2px;
-    }
-    .risultato-ricerca-edificio > div strong,.edificio-selezionato > div strong{
-        margin-right: 3px;
-    }
-    #dati-pratica{
-        display: none;
-    }
-    #mappali > div,#subalterni > div{
-        display: flex;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="../css/report_praticaPE.css">
+  <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
+
   <?php
+  $c->includeHTML('../htmlUtils/utils_bar.html');
+
   if(count($errors) > 0)
       echo "<script>displayMessage('Errori: ".str_replace('\'', '\\\'', implode('<br>', $errors)).'\', document.body)</script>';
   if(count($infos) > 0)
@@ -191,7 +157,7 @@
 
         <div class="section">Selezione edificio/i</div>
         <div class="inner-wrap">
-            <form id="ricerca-edificio">
+          <form id="ricerca-edificio">
             <input type="hidden" name="action" value="searchEdificio">
             <input name="foglio" type="number" placeholder="Foglio...">
             <input name="mappale" type="number" placeholder="Mappale...">

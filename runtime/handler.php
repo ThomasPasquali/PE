@@ -180,7 +180,7 @@
         $where = [];
         if(!empty($foglio)) $where[] = 'Foglio = ?';
         if(!empty($mappale)) $where[] = 'Mappale = ?';
-
+        
         $res = $db->ql(
             'SELECT ID, Mappali, Stradario, Note
             FROM edifici_view
@@ -218,7 +218,7 @@
                  FROM subalterni_edifici
                  WHERE Edificio IN (?'.str_repeat(',?', count($edifici)-1).')',
                 $edifici);
-            
+
             header('Content-type: application/json');
             echo json_encode($res, TRUE);
         }else{

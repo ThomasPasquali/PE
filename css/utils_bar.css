@@ -1,0 +1,78 @@
+.header > .navbar * {
+  user-drag: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -moz-user-drag: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header > .navbar {
+  top: 0;
+  background-color: black;
+  height: 49px;
+  width: 100%;
+  position: fixed;
+  float: left;
+  margin-bottom: 20px;
+}
+
+.header > .navbar ul > li {
+  float: left;
+  list-style-type: none;
+  width: fit-content;
+  padding: 0px 10px 0px 10px;
+  text-align: left;
+}
+
+.header > .navbar ul > li > a {
+  position: RELATIVE;
+  text-decoration: none;
+  color: white;
+  line-height: 300%;
+  display: block;
+}
+
+.header > .navbar a:hover:not(.active):not(#reflink) {
+  background-color: teal;
+  color: gold;
+}
+
+.header > .navbar .active {
+  background-color: red;
+}
+
+.header > .navbar > .dropdown {
+  position: static;
+  display: inline-block;
+}
+
+.header > .navbar .dropdown .dropborder {
+  display: none;
+}
+
+.header > .navbar .dropdown:hover .dropborder {
+  display: block;
+}
+
+.header > .navbar .dropborder li {
+  padding-right: 20px;
+  padding-bottom: 10px;
+  background-color: black;
+}
+
+.header > .navbar .dropborder .dropdown-content input {
+  display: block;
+}
+
+.header > .navbar .dropborder .dropdown-content a {
+  display: block;
+  padding: 0px;
+  margin: 0px;
+}
+
+.header > .navbar .dropborder .dropdown-content label {
+  display: block;
+  color: white;
+  text-align: left;
+}

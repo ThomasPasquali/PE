@@ -1,0 +1,38 @@
+.form{
+  width: 90%;
+}
+#risultati-ricerca-edificio{
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+}
+.risultato-ricerca-edificio,.edificio-selezionato{
+    border: solid 1px black;
+    margin: 5px;
+    padding-left: 10px;
+    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre-line;
+}
+.risultato-ricerca-edificio:hover{
+    text-decoration: underline;
+    color: green;
+}
+.edificio-selezionato:hover{
+    text-decoration: underline;
+    color: red;
+}
+.risultato-ricerca-edificio > div p,strong,.edificio-selezionato > div p,strong {
+    display: inline-flex;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.risultato-ricerca-edificio > div strong,.edificio-selezionato > div strong{
+    margin-right: 3px;
+}
+#dati-pratica{
+    display: none;
+}
+#mappali > div,#subalterni > div{
+    display: flex;
+}
