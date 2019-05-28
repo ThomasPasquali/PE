@@ -9,6 +9,7 @@
 
 .header > .navbar {
   top: 0;
+  left: 0;
   background-color: black;
   height: 49px;
   width: 100%;

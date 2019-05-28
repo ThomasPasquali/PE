@@ -3,7 +3,7 @@
   $c = new Controls();
 
   if(!$c->logged()){
-      header('Location: index.php?err=Utente non loggato');
+      header('Location: ../index.php?err=Utente non loggato');
       exit();
   }
 
