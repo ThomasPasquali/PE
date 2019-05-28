@@ -11,11 +11,13 @@
   top: 0;
   left: 0;
   background-color: black;
-  height: 49px;
+  height: 51px;
+  font-size: 17px;
   width: 100%;
   position: fixed;
   float: left;
   margin-bottom: 20px;
+  z-index: 10;
 }
 
 .header > .navbar ul > li {

@@ -21,8 +21,14 @@
 	<link rel="stylesheet" href="../css/gestione.css">
 	<link rel="stylesheet" href="../css/alerts.css">
 	<script type="text/javascript" src="../lib/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="../lib/fontawesome/css/all.css">
+  <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
+    <?php
+    $c->includeHTML('../htmlUtils/utils_bar.html');
+    ?>
+
     <!-- Sidebar -->
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
       <p onclick="reloadPageWithFlag('richieste')" class="w3-bar-item w3-button">Richieste di<br>attivazione</p>
@@ -30,7 +36,7 @@
     </div>
 
     <!-- Page Content -->
-    <div id="pageContent" style="margin-left:17%">
+    <div id="pageContent" style="margin-left:17%;margin-top:50px;">
 
         <div id="richieste" class="content">
         	<div class="w3-container w3-teal"><h1>Account inattivi</h1></div>

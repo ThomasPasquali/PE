@@ -8,16 +8,16 @@
     }
 
     //$c->echoCode($_REQUEST);
-    
+
     $errors = [];
     $infos = [];
-    
+
     //INSERT EDIFICIO
     if($c->check(['stradarioNewEd'], $_REQUEST)&&isset($_REQUEST['noteNewEd'])&&$_SERVER['REQUEST_METHOD'] === 'POST'){
         //NEW ID EXTRACTION
         $edID = $c->db->ql('SELECT MAX(ID)+1 id FROM edifici')[0]['id'];
         if($edID === NULL) $edID = 1;
-        
+
         $res = $c->db->dml(
             'INSERT INTO edifici (ID, Stradario, Note) VALUES(?,?,?)',
             [$edID, $_REQUEST['stradarioNewEd'],empty($_REQUEST['noteNewEd'])?NULL:$_REQUEST['noteNewEd']]
@@ -31,7 +31,7 @@
                 if(substr($keyMappale, 0, strlen('mappalenew')) === 'mappalenew'){
                     $n = substr($keyMappale, strlen('mappalenew'), strlen($keyMappale));
                     $keyFoglio = "foglionew$n";
-                    
+
                     if($c->check([$keyMappale, $keyFoglio], $_REQUEST)){
                         $res = $c->db->dml(
                               'INSERT INTO fogli_mappali_edifici (Edificio, Foglio, Mappale, EX) VALUES(?,?,?,?)',
@@ -64,7 +64,7 @@
                 $keyFoglio = "foglioediting$n";
                 $foglio = $_REQUEST[$keyFoglio]??'';
                 $exFromUser = isset($_REQUEST["exediting$n"]);
-                
+
                 if(!empty($foglio)&&!empty($mappale)){
                     $fogliMappaliFromUser[] = ['Foglio' => $foglio, 'Mappale' => $mappale];
                     //CHECK IF EXISTS
@@ -72,7 +72,7 @@
                         'SELECT EX FROM fogli_mappali_edifici
                         WHERE Edificio = ? AND Foglio = ? AND Mappale = ?',
                         [$edID, $foglio, $mappale]);
-    
+
                     if(count($res) > 0){
                       //IF EXISTS AND EX HAS CHANGED
                       $exFromDB = $res[0]['EX'] == 'EX';
@@ -100,32 +100,32 @@
          $fogliMappaliSubalterniFromUser = [];
           foreach ($_REQUEST as $keySubalterno => $subalterno)
               if(substr($keySubalterno, 0, strlen('subalterno')) == 'subalterno'){
-              
+
                 $n = substr($keySubalterno, strlen('subalterno'), strlen($keySubalterno));
                 $keyFoglio = "foglioSubalterno$n";
                 $foglio = $_REQUEST[$keyFoglio]??'';
                 $keyMappale = "mappaleSubalterno$n";
                 $mappale = $_REQUEST[$keyMappale]??'';
                 $fogliMappaliSubalterniFromUser[] = ['Foglio' => $foglio, 'Mappale' => $mappale, 'Subalterno' => $subalterno];
-                
+
                 //INSERT SUBALTERNI
                 if(!empty($foglio)&&!empty($mappale)&&!empty($subalterno)){
                     //CHECK IF EXISTS
                     $res = $c->db->ql(
                         'SELECT 1 FROM subalterni_edifici WHERE Edificio = ? AND Foglio = ? AND Mappale = ? AND Subalterno = ?',
                         [$edID, $foglio, $mappale, $subalterno]);
-                    
+
                     if(count($res) == 0){
                         $res = $c->db->dml(
                             'INSERT INTO subalterni_edifici (Edificio, Foglio, Mappale, Subalterno) VALUES (?,?,?,?)',
                             [$edID, $foglio, $mappale, $subalterno]);
                         if($res->errorCode() == '0')
                             $infos[] = "Subalterno $subalterno del F.$foglio m.$mappale aggiunto correttamente";
-                        else 
+                        else
                       $errors[] = $res->errorInfo()[2];
                     }
                 }
-                
+
             }
 
        //DELETE OMITTED MAPPALI
@@ -153,7 +153,7 @@
                else
             $errors[] = $res->errorInfo()[2];
             }
-       
+
          }
     }
 
@@ -176,58 +176,26 @@
 <html>
 <head>
 	<title>Gestione edifici</title>
-	<link rel="stylesheet" href="../css/gestione.css">
-	<link rel="stylesheet" href="../css/alerts.css">
 	<script type="text/javascript" src="/lib/jquery-3.3.1.min.js"></script>
-	<style type="text/css">
-        .hintBox *{
-            display: block;
-            margin-top: 10px;
-        }
-        #search-editing-ed h2,input{
-            display: inline-flex;
-        }
-        #editing-edificio *{
-            display: block;
-        }
-        #mappali-editing-ed div *, #subalterni-editing-ed div *{
-            display: inline-flex;
-            padding:0px;
-            margin:0px;
-            margin-right: 10px;
-        }
-        #fogli-mappali-new-ed  > div > *,#fogli-mappali-editing-ed > div > *{
-            display: inline-flex;
-            margin-left:10px;
-            margin-bottom:10px;
-        }
-        #search-results{
-            display: grid;
-            grid-template-columns: auto auto auto auto;
-        }
-        .search-result{
-            border: 1px solid black;
-            padding: 5px;
-            text-align: center;
-        }
-        .search-result > p{
-            display: block;
-        }
-        .search-result:hover{
-            text-decoration: underline;
-        }
-    </style>
+	<link rel="stylesheet" href="../css/gestione.css">
+  <link rel="stylesheet" href="../css/gestione_edifici.css">
+	<link rel="stylesheet" href="../css/alerts.css">
+  <link rel="stylesheet" type="text/css" href="../lib/fontawesome/css/all.css">
+  <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
+  <?php
+  $c->includeHTML('../htmlUtils/utils_bar.html');
+  ?>
 
 	<!-- Sidebar -->
-    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%">
+    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:17%;">
       <p onclick="changeContent('vis-mod')" class="w3-bar-item w3-button">Visualizza/<br>modifica</p>
       <p onclick="changeContent('new-ed')" class="w3-bar-item w3-button">Nuovo<br>edificio</p>
     </div>
 
     <!-- Page Content -->
-    <div id="pageContent" style="margin-left:17%">
+    <div id="pageContent" style="margin-left:17%;margin-top:50px;">
 
         <div id="vis-mod" class="content active">
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>
@@ -364,12 +332,12 @@
             echo "addFieldSubalterno($tmp[Foglio], $tmp[Mappale], $tmp[Subalterno]);";
         echo '</script>';
     }
-    
+
     if(count($errors) > 0)
         echo "<script>displayMessage('Errori: ".str_replace('\'', '\\\'', implode('<br>', $errors)).'\', document.getElementById(\'vis-mod\'));</script>';
     if(count($infos) > 0)
         echo "<script>displayMessage('Info: ".str_replace('\'', '\\\'', implode('<br>', $infos))."', document.getElementById('vis-mod'), 'info');</script>";
-    
+
     ?>
 </body>
 </html>

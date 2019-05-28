@@ -1,0 +1,36 @@
+.hintBox *{
+    display: block;
+    margin-top: 10px;
+}
+#search-editing-ed h2,input{
+    display: inline-flex;
+}
+#editing-edificio *{
+    display: block;
+}
+#mappali-editing-ed div *, #subalterni-editing-ed div *{
+    display: inline-flex;
+    padding:0px;
+    margin:0px;
+    margin-right: 10px;
+}
+#fogli-mappali-new-ed  > div > *,#fogli-mappali-editing-ed > div > *{
+    display: inline-flex;
+    margin-left:10px;
+    margin-bottom:10px;
+}
+#search-results{
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+}
+.search-result{
+    border: 1px solid black;
+    padding: 5px;
+    text-align: center;
+}
+.search-result > p{
+    display: block;
+}
+.search-result:hover{
+    text-decoration: underline;
+}
