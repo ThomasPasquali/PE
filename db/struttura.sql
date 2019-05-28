@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `intestatari_persone` (
   PRIMARY KEY (`Codice_fiscale`),
   UNIQUE KEY `ID` (`ID`),
   KEY `Cognome` (`Cognome`,`Nome`)
-) ENGINE=InnoDB AUTO_INCREMENT=1935 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1936 DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche` (
   `Tecnico` int(10) unsigned DEFAULT NULL,
   `Impresa` int(10) unsigned DEFAULT NULL,
   `Direzione_lavori` int(10) unsigned DEFAULT NULL,
-  `Zona` VARCHAR(255) NULL DEFAULT NULL,
+  `Zona` varchar(255) DEFAULT NULL,
   `Intervento` varchar(255) DEFAULT NULL,
   `Data_inizio_lavori` date DEFAULT NULL,
   `Documento_elettronico` char(255) DEFAULT NULL,
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche` (
   CONSTRAINT `FK_pe_pratiche_tecnici_2` FOREIGN KEY (`Tecnico`) REFERENCES `tecnici` (`ID`),
   CONSTRAINT `pe_pratiche_ibfk_2` FOREIGN KEY (`Impresa`) REFERENCES `imprese` (`ID`),
   CONSTRAINT `pe_pratiche_ibfk_4` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`identificativo_nazionale`)
-) ENGINE=InnoDB AUTO_INCREMENT=1624 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=1628 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -345,20 +345,31 @@ CREATE TABLE IF NOT EXISTS `tecnici` (
 
 -- L’esportazione dei dati non era selezionata.
 
+-- Dump della struttura di tabella pe.tec_edifici_pratiche
+CREATE TABLE IF NOT EXISTS `tec_edifici_pratiche` (
+  `Pratica` char(10) NOT NULL,
+  `Edificio` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`Edificio`,`Pratica`),
+  KEY `FK_tec_edifici_pratiche_tec_pratiche` (`Pratica`),
+  CONSTRAINT `FK_tec_edifici_pratiche_edifici` FOREIGN KEY (`Edificio`) REFERENCES `edifici` (`ID`),
+  CONSTRAINT `FK_tec_edifici_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
 -- Dump della struttura di tabella pe.tec_fogli_mappali_pratiche
 CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
-  `id` int(11) DEFAULT NULL,
   `Pratica` char(10) NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
-  `Mappale` char(6) DEFAULT NULL,
+  `Mappale` char(6) NOT NULL,
   `Superficie` int(10) unsigned DEFAULT NULL,
   `Zona_omogenea` varchar(20) DEFAULT NULL,
   UNIQUE KEY `Pratica` (`Pratica`,`Foglio`,`Mappale`),
   KEY `FK_tec_mappali_pratiche_tec_pratiche` (`Pratica`,`Edificio`),
   KEY `FK_tec_mappali_pratiche_fogli_mappali_edifici` (`Edificio`,`Foglio`,`Mappale`),
   CONSTRAINT `FK_tec_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`),
-  CONSTRAINT `FK_tec_mappali_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_pratiche` (`ID`, `Edificio`)
+  CONSTRAINT `FK_tec_mappali_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_edifici_pratiche` (`Pratica`, `Edificio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='Vari mappali sono identificati con 0 (VARI, STRADE)';
 
 -- L’esportazione dei dati non era selezionata.
@@ -367,6 +378,7 @@ CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
 CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
   `Persona` int(10) unsigned NOT NULL,
   `Pratica` char(10) NOT NULL,
+  `Note` char(10) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Persona`),
   KEY `FK_tec_intestatari_persone_pratiche_new_intestatari_persone` (`Persona`),
   CONSTRAINT `FK_tec_intestatari_persone_pratiche_intestatari_persone` FOREIGN KEY (`Persona`) REFERENCES `intestatari_persone` (`ID`),
@@ -379,6 +391,7 @@ CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
 CREATE TABLE IF NOT EXISTS `tec_intestatari_societa_pratiche` (
   `Societa` int(10) unsigned NOT NULL,
   `Pratica` char(10) NOT NULL,
+  `Note` char(10) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Societa`),
   KEY `Societa` (`Societa`),
   CONSTRAINT `FK_tec_intestatari_societa_pratiche_societa` FOREIGN KEY (`Societa`) REFERENCES `intestatari_societa` (`ID`),
@@ -415,8 +428,7 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `Oggetto` varchar(300) DEFAULT NULL,
   `Tipologia_fabbricato` int(11) DEFAULT NULL,
   `COD_INT` int(11) DEFAULT NULL,
-  `Edificio` int(10) unsigned NOT NULL,
-  `Stradario` int(6) unsigned DEFAULT NULL,
+  `Stradario` int(6) unsigned NOT NULL,
   `Civico` varchar(6) DEFAULT NULL,
   `Data_domanda` date DEFAULT NULL,
   `N_protocollo` varchar(6) DEFAULT NULL,
@@ -449,10 +461,23 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `DATA_ARC` date DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `FK_tec_pratiche_stradario` (`Stradario`),
-  KEY `FK_tec_pratiche_pe_edifici` (`Edificio`),
-  KEY `ID` (`ID`,`Edificio`),
-  CONSTRAINT `FK_tec_pratiche_pe_edifici` FOREIGN KEY (`Edificio`) REFERENCES `edifici` (`ID`),
   CONSTRAINT `FK_tec_pratiche_stradario` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`Identificativo_nazionale`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.tec_subalterni_pratiche
+CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
+  `Pratica` char(10) NOT NULL,
+  `Edificio` int(10) unsigned NOT NULL,
+  `Foglio` char(4) NOT NULL,
+  `Mappale` char(6) NOT NULL,
+  `Subalterno` int(3) unsigned NOT NULL,
+  PRIMARY KEY (`Pratica`,`Foglio`,`Mappale`,`Subalterno`),
+  KEY `Edificio` (`Edificio`,`Foglio`,`Mappale`,`Subalterno`),
+  KEY `FK_tec_subalterni_pratiche_tec_fogli_mappali_pratiche` (`Pratica`,`Edificio`,`Foglio`,`Mappale`),
+  CONSTRAINT `FK_tec_subalterni_pratiche_subalterni_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`, `Subalterno`) REFERENCES `subalterni_edifici` (`Edificio`, `Foglio`, `Mappale`, `Subalterno`),
+  CONSTRAINT `FK_tec_subalterni_pratiche_tec_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_edifici_pratiche` (`Pratica`, `Edificio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
@@ -461,7 +486,7 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
 CREATE TABLE IF NOT EXISTS `tec_tecnici_pratiche` (
   `Tecnico` int(10) unsigned NOT NULL,
   `Pratica` char(10) NOT NULL,
-  `Tipo` enum('Y','N') NOT NULL,
+  `Tipo` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Tecnico`),
   KEY `FK_tec_tecnici_pratiche_new_tecnici` (`Tecnico`),
   CONSTRAINT `FK_tec_tecnici_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`),
@@ -479,14 +504,13 @@ CREATE TABLE IF NOT EXISTS `utenti` (
   `Active` enum('1','0') NOT NULL DEFAULT '0',
   PRIMARY KEY (`Email`),
   UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
 -- Dump della struttura di vista pe.edifici_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
-DROP TABLE IF EXISTS `edifici_view`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`admin`@`%` SQL SECURITY DEFINER VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note Note,
+CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note Note,
 		(SELECT GROUP_CONCAT(DISTINCT fm.Foglio ORDER BY fm.Foglio)
 		FROM fogli_mappali_edifici fm
 		GROUP BY fm.Edificio
@@ -517,8 +541,7 @@ JOIN stradario s ON s.Identificativo_nazionale = e.Stradario ;
 
 -- Dump della struttura di vista pe.pratiche_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
-DROP TABLE IF EXISTS `pratiche_view`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`admin`@`%` SQL SECURITY DEFINER VIEW `pratiche_view` AS SELECT  p.ID,
+CREATE VIEW `pratiche_view` AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
 		p.Numero, 
