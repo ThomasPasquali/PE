@@ -70,36 +70,44 @@ function ricercaEdificio(form){
    success: function(msg) {
 			$('#risultati-ricerca-edificio').empty();
 			for (let ed of msg) {
-				let div = $('<div></div>');
-				div.addClass('risultato-ricerca-edificio');
-				for(let attr in ed){
-					let row = $('<div></div>');
-					let p = $('<p></p>');
-					p.text(ed[attr]);
-					let strong = $('<strong></strong>');
-					strong.text(attr + ':');
-					row.append(strong);
-					row.append(p);
-					div.append(row);
-				}
-
-				let idDiv = $('<div></div>');
-				idDiv.css('display', 'none');
-				idDiv.html(ed['ID'])
-				idDiv.addClass('id-edificio-selezionato');
-				div.append(idDiv);
-
-				div.click(function(){
-					if($(this).attr('class') == 'risultato-ricerca-edificio'){
-						$('#edifici-selezionati').append(div);
-						$(this).attr('class', 'edificio-selezionato')
-					}else{
-						$('#risultati-ricerca-edificio').append(div);
-						$(this).attr('class', 'risultato-ricerca-edificio')
-					}
+				//controllo presenza in edifici selezionati
+				var giaPresente = false
+				$('.edificio-selezionato .id-edificio-selezionato').each(function() {
+					if($(this).html() == ed['ID'])
+						giaPresente = true;
 				});
+				if(!giaPresente){
+					let div = $('<div></div>');
+					div.addClass('risultato-ricerca-edificio');
+					for(let attr in ed){
+						let row = $('<div></div>');
+						let p = $('<p></p>');
+						p.text(ed[attr]);
+						let strong = $('<strong></strong>');
+						strong.text(attr + ':');
+						row.append(strong);
+						row.append(p);
+						div.append(row);
+					}
 
-				$('#risultati-ricerca-edificio').append(div);
+					let idDiv = $('<div></div>');
+					idDiv.css('display', 'none');
+					idDiv.html(ed['ID'])
+					idDiv.addClass('id-edificio-selezionato');
+					div.append(idDiv);
+
+					div.click(function(){
+						if($(this).attr('class') == 'risultato-ricerca-edificio'){
+							$('#edifici-selezionati').append(div);
+							$(this).attr('class', 'edificio-selezionato')
+						}else{
+							$('#risultati-ricerca-edificio').append(div);
+							$(this).attr('class', 'risultato-ricerca-edificio')
+						}
+					});
+
+					$('#risultati-ricerca-edificio').append(div);
+				}
 			}
     }
   });
@@ -107,6 +115,7 @@ function ricercaEdificio(form){
 
 var edifici = [], mappali, subalterni;
 function freezeEdifici() {
+	edifici = [];
 	$('.edificio-selezionato').each(function() {
 		edifici.push($(this).children('.id-edificio-selezionato').html());
 	});
@@ -141,8 +150,8 @@ function addFieldFoglioMappale() {
 			delBtn.click(function() {
 				div.remove();
 			});
-			delBtn.html('-');
-			delBtn.css('background-color', 'red');
+			delBtn.html('Elimina foglio-mappale');
+			delBtn.addClass('delete-button');
 
 			div.append(select);
 			div.append(delBtn);
@@ -179,8 +188,8 @@ function addFieldSubalterno() {
 			delBtn.click(function() {
 				div.remove();
 			});
-			delBtn.html('-');
-			delBtn.css('background-color', 'red');
+			delBtn.html('Elimina subalterno');
+			delBtn.addClass('delete-button');
 
 			div.append(select);
 			div.append(delBtn);
@@ -210,6 +219,8 @@ function addFieldIntestatarioPersona() {
   let searchField = $('<input>');
   searchField.attr('id', 'intestatarioPersona'+intestatariPersonaCount);
   searchField.attr('type', 'text');
+  searchField.attr('autocomplete', 'off');
+  searchField.addClass('intestatarioPersona');
   searchField.click(function () {
     $(this).select();
   });
@@ -233,13 +244,14 @@ function addFieldIntestatarioPersona() {
   delBtn.click(function () {
     div.remove();
   });
-  delBtn.html('-');
+  delBtn.addClass('delete-button');
+  delBtn.html('Elimina intestatario persona');
 
   div.append(searchField);
+  div.append(delBtn);
   div.append(idField);
   div.append(hintsDiv);
-  div.append(delBtn);
-
+  
   $('#fieldsIntPers').append(div);
   intestatariPersonaCount++;
 }
@@ -249,6 +261,8 @@ function addFieldIntestatarioSocieta() {
   let searchField = $('<input>');
   searchField.attr('id', 'intestatarioSocieta'+intestatariSocietaCount);
   searchField.attr('type', 'text');
+  searchField.attr('autocomplete', 'off');
+  searchField.addClass('intestatarioSocieta');
   searchField.click(function () {
     $(this).select();
   });
@@ -272,13 +286,14 @@ function addFieldIntestatarioSocieta() {
   delBtn.click(function () {
     div.remove();
   });
-  delBtn.html('-');
+  delBtn.html('Elimina intestatario societ&aacute;');
+  delBtn.addClass('delete-button');
 
   div.append(searchField);
+  div.append(delBtn);
   div.append(idField);
   div.append(hintsDiv);
-  div.append(delBtn);
-
+  
   $('#fieldsIntSoc').append(div);
   intestatariSocietaCount++;
 }
@@ -306,4 +321,14 @@ function refreshMappaliESubalterni() {
 	        console.log('Errore nella richiesta dei subalterni');
 	    }
 	});
+}
+
+function backToEdificiSelection() {
+	if (confirm('Se ritorni alla selezione edifici i mappali ed i subalterni saranno resettati, proseguire?')) {
+	    $('#mappali').empty();
+	    $('#subalterni').empty();
+	    $('#dati-pratica').hide();
+		$('#dati-edificio').show();
+		$('#info-edificio').html("");
+	}
 }

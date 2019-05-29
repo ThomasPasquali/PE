@@ -128,15 +128,15 @@
 ?>
 <html>
 <head>
-  <title>Inerimento pratica PE</title>
-  <script src="../lib/jquery-3.3.1.min.js"></script>
-  <script src="../js/hints.js"></script>
-  <script src="../js/misc.js"></script>
-  <link rel="stylesheet" type="text/css" href="../lib/fontawesome/css/all.css">
-  <link rel="stylesheet" type="text/css" href="../css/form.css">
-  <link rel="stylesheet" type="text/css" href="../css/alerts.css">
-  <link rel="stylesheet" type="text/css" href="../css/report_praticaPE.css">
-  <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
+    <title>Inerimento pratica PE</title>
+    <script src="../lib/jquery-3.3.1.min.js"></script>
+    <script src="../js/hints.js"></script>
+    <script src="../js/misc.js"></script>
+    <link rel="stylesheet" type="text/css" href="../lib/fontawesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="../css/form.css">
+    <link rel="stylesheet" type="text/css" href="../css/alerts.css">
+    <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
+	<link rel="stylesheet" type="text/css" href="../css/inserimento_praticaPE.css">
 </head>
 <body>
 
@@ -159,33 +159,37 @@
         <div class="inner-wrap">
           <form id="ricerca-edificio">
             <input type="hidden" name="action" value="searchEdificio">
-            <input name="foglio" type="number" placeholder="Foglio...">
+            <input name="foglio" type="number" placeholder="Foglio..." autofocus>
             <input name="mappale" type="number" placeholder="Mappale...">
           </form>
-          <h2>Risultati ricerca</h2>
-          <div id="risultati-ricerca-edificio"></div>
+          <h3 class="centered">Risultati ricerca</h3>
+          <div id="risultati-ricerca-edificio" class="box-risultati"></div>
 
-          <h2>Edifici selezionati</h2>
-		  <div id="edifici-selezionati"></div>
+          <h3 class="centered">Edifici selezionati</h3>
+		  <div id="edifici-selezionati" class="box-risultati"></div>
           <button type="button" onclick="freezeEdifici();">Conferma edificio/i</button>
 
         </div>
       </div>
 
       <form id="form-pratica" method="post">
-      	<button type="button" onclick="refreshMappaliESubalterni();">Ricarica mapp e sub</button>
         <div id="dati-pratica">
-          <div class="section">Non so che scrivere</div>
+        <div class="section">Azioni</div>
+          <div id="bottoni-utili" class="inner-wrap">
+          	<button type="button" onclick="backToEdificiSelection();">Indietro</button>
+          	<button type="button" onclick="refreshMappaliESubalterni();">Ricarica mappali<br>e subalterni</button>
+          </div>
+          <div class="section">Mappali e subalterni</div>
           <div class="inner-wrap">
             <div class="field">
             	 <label>Mappale/i</label>
       		     <div id="mappali"></div>
-    		       <button type="button" onclick="addFieldFoglioMappale();">+</button>
+    		       <button type="button" onclick="addFieldFoglioMappale();">Aggiungi foglio-mappale</button>
             </div>
             <div class="field">
               	<label>Subalterno/i</label>
       		      <div id="subalterni"></div>
-      		      <button type="button" onclick="addFieldSubalterno();">+</button>
+      		      <button type="button" onclick="addFieldSubalterno();">Aggiungi subalterno</button>
             </div>
           </div>
 
@@ -223,13 +227,13 @@
             <div class="field">
               <label>Intestatari persone</label>
               <div id="fieldsIntPers"></div>
-              <button type="button" onclick="addFieldIntestatarioPersona();">+</button>
+              <button type="button" onclick="addFieldIntestatarioPersona();">Aggiungi intestatario persona</button>
             </div>
 
             <div class="field">
-              	<label>Intestatari societ&aacute</label>
+              	<label>Intestatari societ&aacute;</label>
               	<div id="fieldsIntSoc"></div>
-				<button type="button" onclick="addFieldIntestatarioSocieta();">+</button>
+				<button type="button" onclick="addFieldIntestatarioSocieta();">Aggiungi intestatario societ&aacute;</button>
             </div>
 
             <div class="field">
@@ -280,8 +284,8 @@
             </div>
 
             <div class="field">
-              <label>Genera cartella documenti elettronici</label>
-              <input type="checkbox" name="documento_elettronico" checked="checked">
+              <label style="display: inline-flex;">Genera cartella documenti elettronici</label>
+              <input type="checkbox" name="documento_elettronico" checked="checked" style="display: inline-flex;">
             </div>
 
             <div class="field">
@@ -301,6 +305,6 @@
       </form>
   </div>
 
-  <script src="../js/ins_pratPE.js"></script>
+  <script src="../js/inserimento_praticaPE.js"></script>
 </body>
 </html>
