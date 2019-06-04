@@ -217,7 +217,6 @@
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
                 	<a href="/gestione/edifici.php">Gestione edifici</a>
-                  <a href="/gestione/utenti.php">Gestione utenti</a>
             	</div>
  			</div>
 
@@ -309,41 +308,9 @@
             			</div>
             		</div>
 
-            		<button type="submit" name="btn" value="reportAnagrafica">Cerca</button>
+            		<button type="submit" name="btn" value="report">Cerca</button>
             	</form>
         	</div>
-        	<?php
-        	if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)&&$_POST['btn'] == 'reportAnagrafica'){
-        	    include_once 'lib/reports.php';
-        	    switch ($_POST['tipo']) {
-        	        case 'persona':
-        	            Reports::anagraficaIntestatario($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf']);
-        	           break;
-
-        	        case 'societa':
-        	            Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva']);
-        	            break;
-
-        	        case 'tecnico':
-        	            Reports::anagraficaTecnico($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf'], $_POST['piva']);
-        	            break;
-
-        	        case 'impresa':
-        	            Reports::anagraficaImprese($GLOBALS['c']->db, $_POST['intestazione'], $_POST['cf'], $_POST['piva']);
-        	            break;
-
-        	        case 'pratica':
-        	            //TODO
-        	            break;
-
-        	        default:
-        	            echo '<h1 style="color: red;">Report non supportato!<h1>';
-        	           break;
-        	    }
-        	    echo "<script>directChg('$_POST[tipo]'); changeContent('intAnag');</script>";
-        	}
-
-    	    ?>
         </div>
 
         <div id="intPra" class="content">
@@ -353,21 +320,30 @@
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="pratica">
             		<div class="inner-wrap">
-            			<label>Tipo
-                			<select name="tipo_pratica">
-                				<option value="SCIA">SCIA</option>
-                				<option value="CILA">CILA</option>
-                				<option value="DIA">DIA</option>
-                				<option value="CIL">CIL</option>
-                				<option value="PERMESSI">Permessi</option>
-                				<option value="VARIE">Varie</option>
-            				</select>
-        				</label>
-            			<label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
-     	   				<label>Numero<input type="number" name="numero" value="<?= $_POST['numero']??'' ?>"></label>
-     	   				<label>Edificio (Foglio - Mappale/i)<br><select name="edificio" class="js-example-basic-single" style="width: 100%;"><?php generaListEdifici($_POST['edificio']??NULL); ?></select></label>
+                  <label>Tipologia di pratica</label>
+                  <input type="radio" name="tipologia" value="pe" checked onclick="$('#tipo-pratica-tec-reports').hide(); $('#tipo-pratica-pe-reports').show();"> PE
+                  <input type="radio" name="tipologia" value="tec" onclick="$('#tipo-pratica-pe-reports').hide(); $('#tipo-pratica-tec-reports').show();"> TEC
+                  <?php //TODO condoni e rubriche ?>
+                  <label>Tipo</label>
+                  <select id="tipo-pratica-pe-reports" name="tipo_pratica_pe">
+                    <option value="SCIA">SCIA</option>
+                    <option value="CILA">CILA</option>
+                    <option value="DIA">DIA</option>
+                    <option value="CIL">CIL</option>
+                    <option value="PERMESSI">Permessi</option>
+                    <option value="VARIE">Varie</option>
+                  </select>
+                  <select id="tipo-pratica-tec-reports" name="tipo_pratica_tec" style="display:none;">
+                    <option value="SCIA">Asseverazione</option>
+                  </select>
+                  <input type="checkbox" name="considerTipo" checked> Considera tipo
+		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
+   	   				     <label>Numero<input type="number" name="numero" value="<?= $_POST['numero']??'' ?>"></label>
+                   <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
+                   <label>Foglio<input type="text" maxlength="4" name="foglio" value="<?= $_POST['foglio']??'' ?>"></label>
+                   <label>Mappale<input type="text" maxlength="6" name="mappale" value="<?= $_POST['mappale']??'' ?>"></label>
             		</div>
-            		<button type="submit" name="btn" value="reportPratiche">Cerca</button>
+            		<button type="submit" name="btn" value="report">Cerca</button>
             	</form>
         	</div>
         </div>
@@ -469,24 +445,67 @@
         </div>
 
         <?php
-            if(isset($GLOBALS['err'])&&isset($_POST['btn'])&&$_POST['btn'] == 'inserimentoAnagrafica')
-                switch ($_POST['tipo']) {
-                    case 'persone':
-                        echo '<script>changeContent(\'insAnagIntestPers\');</script>';
-                    break;
-                    case 'societa':
-                        echo '<script>changeContent(\'insAnagSocieta\');</script>';
-                    break;
-                    case 'tecnici':
-                        echo '<script>changeContent(\'insAnagTecnici\');</script>';
-                    break;
-                    default:
-                        ;
-                    break;
-                }
+        if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)&&$_POST['btn'] == 'report'){
+            include_once 'lib/reports.php';
+            switch ($_POST['tipo']) {
+                case 'persona':
+                    Reports::anagraficaIntestatari($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf']);
+                   break;
 
-            if(isset($_REQUEST['display']))
-              echo "<script>changeContent('$_REQUEST[display]');</script>";
+                case 'societa':
+                    Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva']);
+                    break;
+
+                case 'tecnico':
+                    Reports::anagraficaTecnici($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf'], $_POST['piva']);
+                    break;
+
+                case 'impresa':
+                    Reports::anagraficaImprese($GLOBALS['c']->db, $_POST['intestazione'], $_POST['cf'], $_POST['piva']);
+                    break;
+
+                case 'pratica':
+                    switch ($_POST['tipologia']) {
+                      case 'pe':
+                        Reports::pratichePE($GLOBALS['c']->db, isset($_POST['considerTipo'])?$_POST['tipo_pratica_pe']:'', $_POST['anno'], $_POST['numero'], $_POST['barrato'], $_POST['foglio'], $_POST['mappale']);
+                        break;
+
+                      case 'tec':
+                        // TODO code...
+                        break;
+
+                      default:
+                        break;
+                    }
+                    break;
+
+                default:
+                    echo '<h1 style="color: red;">Report non supportato!<h1>';
+                   break;
+            }
+            if($_POST['tipo'] == 'pratica')
+              echo "<script>changeContent('intPra');</script>";
+            else
+              echo "<script>directChg('$_POST[tipo]'); changeContent('intAnag');</script>";
+        }
+        if(isset($GLOBALS['err'])&&isset($_POST['btn'])&&$_POST['btn'] == 'inserimentoAnagrafica')
+            switch ($_POST['tipo']) {
+                case 'persone':
+                    echo '<script>changeContent(\'insAnagIntestPers\');</script>';
+                break;
+                case 'societa':
+                    echo '<script>changeContent(\'insAnagSocieta\');</script>';
+                break;
+                case 'tecnici':
+                    echo '<script>changeContent(\'insAnagTecnici\');</script>';
+                break;
+                default:
+                    ;
+                break;
+            }
+
+        if(isset($_REQUEST['display']))
+          echo "<script>changeContent('$_REQUEST[display]');</script>";
         ?>
 	</body>
 </html>

@@ -15,7 +15,7 @@
 
             $datiGenericiPratica = NULL;
             if($datiGenericiPraticaID)
-                $datiGenericiPratica = $c->db->ql('SELECT * FROM pratiche_view WHERE ID = ?',[$datiGenericiPraticaID])[0];
+                $datiGenericiPratica = $c->db->ql('SELECT * FROM pe_pratiche_view WHERE ID = ?',[$datiGenericiPraticaID])[0];
 
                 if($datiGenericiPratica !== NULL){
 

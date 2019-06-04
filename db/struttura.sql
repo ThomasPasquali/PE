@@ -42,17 +42,6 @@ CREATE TABLE IF NOT EXISTS `edifici` (
 
 -- L’esportazione dei dati non era selezionata.
 
--- Dump della struttura di vista pe.edifici_view
--- Creazione di una tabella temporanea per risolvere gli errori di dipendenza della vista
-CREATE TABLE `edifici_view` (
-	`ID` INT(10) UNSIGNED NOT NULL,
-	`Stradario` CHAR(60) NOT NULL COLLATE 'utf8_general_ci',
-	`Note` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
-	`Fogli` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
-	`Mappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
-	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
-) ENGINE=MyISAM;
-
 -- Dump della struttura di tabella pe.fogli_mappali_edifici
 CREATE TABLE IF NOT EXISTS `fogli_mappali_edifici` (
   `Edificio` int(10) unsigned NOT NULL,
@@ -284,23 +273,6 @@ CREATE TABLE IF NOT EXISTS `pe_subalterni_pratiche` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
-
--- Dump della struttura di vista pe.pratiche_view
--- Creazione di una tabella temporanea per risolvere gli errori di dipendenza della vista
-CREATE TABLE `pratiche_view` (
-	`ID` INT(10) UNSIGNED NOT NULL,
-	`Tipo` ENUM('SCIA','DIA','CIL','CILA','VARIE','PERMESSI') NOT NULL COLLATE 'utf8_general_ci',
-	`Anno` INT(4) NOT NULL,
-	`Numero` INT(4) NOT NULL,
-	`Barrato` CHAR(12) NOT NULL COLLATE 'utf8_general_ci',
-	`Intervento` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
-	`Sigla` VARCHAR(43) NOT NULL COLLATE 'utf8_general_ci',
-	`Protocollo` INT(8) NULL,
-	`Stradario` VARCHAR(60) NULL COLLATE 'utf8_general_ci',
-	`FogliMappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
-	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
-) ENGINE=MyISAM;
-
 -- Dump della struttura di tabella pe.stradario
 CREATE TABLE IF NOT EXISTS `stradario` (
   `Identificativo_nazionale` int(6) unsigned NOT NULL,
@@ -515,8 +487,8 @@ CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note 
 		FROM fogli_mappali_edifici fm
 		GROUP BY fm.Edificio
 		HAVING fm.Edificio = e.ID) Fogli,
-		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio, 
-									' m.', fm.Mappale, 
+		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio,
+									' m.', fm.Mappale,
 									IF(fm.EX IS NOT NULL, ' (ex)', ''))
 							ORDER BY fm.Foglio, fm.Mappale
 							SEPARATOR ', ')
@@ -524,13 +496,13 @@ CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note 
 		GROUP BY fm.Edificio
 		HAVING fm.Edificio = e.ID) Mappali,
 		(SELECT GROUP_CONCAT(CONCAT('Sub.', se.Subalterno,
-									' F.', se.Foglio, 
-									' m.', se.Mappale, 
+									' F.', se.Foglio,
+									' m.', se.Mappale,
 									IF(fm.EX IS NOT NULL, ' (ex)', ''))
 							ORDER BY fm.Foglio, fm.Mappale
 							SEPARATOR ', ')
 		FROM subalterni_edifici se
-		JOIN fogli_mappali_edifici fm 
+		JOIN fogli_mappali_edifici fm
 			ON fm.Edificio = se.Edificio
 			AND fm.Foglio = se.Foglio
 			AND fm.Mappale = se.Mappale
@@ -541,42 +513,65 @@ JOIN stradario s ON s.Identificativo_nazionale = e.Stradario ;
 
 -- Dump della struttura di vista pe.pratiche_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
-CREATE VIEW `pratiche_view` AS SELECT  p.ID,
+CREATE VIEW `pe_pratiche_view` AS
+SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
-		p.Numero, 
+		p.Numero,
 		p.Barrato,
-		p.Intervento,
+		`Data`,
+		Protocollo,
+		Tecnico,
+		Impresa,
+		Direzione_lavori,
+		Zona,
+		Intervento,
+		Data_inizio_lavori,
+		Documento_elettronico,
+		Note,
+
 		CONCAT(p.TIPO, p.Anno, '/', p.Numero, p.Barrato) Sigla,
-		p.Protocollo,
 		IF(s.Denominazione IS NULL, '', s.Denominazione) Stradario,
-		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio, 
-									' m.', fm.Mappale, 
+
+		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio,
+									' m.', fm.Mappale,
 									IF(fm.EX IS NOT NULL, ' (ex)', ''))
 							ORDER BY fm.Foglio, fm.Mappale
 							SEPARATOR ', ')
 		FROM pe_fogli_mappali_pratiche fmp
-		JOIN fogli_mappali_edifici fm 
+		JOIN fogli_mappali_edifici fm
 			ON fm.Edificio = fmp.Edificio
 			AND fm.Foglio = fmp.Foglio
 			AND fm.Mappale = fmp.Mappale
 		GROUP BY fmp.Pratica
 		HAVING fmp.Pratica = p.ID) FogliMappali,
+
 		(SELECT GROUP_CONCAT(CONCAT('Sub.', sp.Subalterno,
-									' F.', sp.Foglio, 
-									' m.', sp.Mappale, 
+									' F.', sp.Foglio,
+									' m.', sp.Mappale,
 									IF(fm.EX IS NOT NULL, ' (ex)', ''))
 							ORDER BY fm.Foglio, fm.Mappale
 							SEPARATOR ', ')
 		FROM pe_subalterni_pratiche sp
-		JOIN fogli_mappali_edifici fm 
+		JOIN fogli_mappali_edifici fm
 			ON fm.Edificio = sp.Edificio
 			AND fm.Foglio = sp.Foglio
 			AND fm.Mappale = sp.Mappale
 		GROUP BY sp.Pratica
-		HAVING sp.Pratica = p.ID) Subalterni
+		HAVING sp.Pratica = p.ID) Subalterni,
+
+		(SELECT GROUP_CONCAT(CONCAT(ip.Cognome, ' ', ip.Nome) SEPARATOR ', ')
+		FROM pe_intestatari_persone_pratiche ipp
+		JOIN intestatari_persone ip ON ip.ID = ipp.Persona
+		WHERE ipp.Pratica = p.ID) Intestatari_persone,
+
+		(SELECT GROUP_CONCAT(i.Intestazione SEPARATOR ', ')
+		FROM pe_intestatari_societa_pratiche isp
+		JOIN intestatari_societa i ON i.ID = isp.Societa
+		WHERE isp.Pratica = p.ID) Intestatari_societa
+
 FROM pe_pratiche p
-LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
+LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
