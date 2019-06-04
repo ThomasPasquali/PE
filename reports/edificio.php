@@ -115,9 +115,9 @@
             /*----------------------------------------------*/
 
             $res = $c->db->ql("SELECT *
-                FROM tec_pratiche
-                WHERE Edificio = ?",
-                [$edificioID]);
+                                            FROM tec_pratiche
+                                            WHERE Edificio = ?",
+                                            [$edificioID]);
 
             foreach ($res as $pratica){
                 $tipo = substr($pratica['ID'], 0, 1);
