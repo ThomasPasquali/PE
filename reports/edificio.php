@@ -33,24 +33,35 @@
 
             /*----------------------------------------------*/
 
-            //TODO tec con UNION
             $intest_persone = $c->db->ql(
-                'SELECT DISTINCT ip.*
+                'SELECT ip.*
                 FROM pe_edifici_pratiche ep
                 JOIN pe_intestatari_persone_pratiche ipp ON ipp.Pratica = ep.Pratica
                 JOIN intestatari_persone ip ON ip.ID = ipp.Persona
-                WHERE ep.Edificio = ?',
-                [$edificioID]);
+                WHERE ep.Edificio = :ed
+                UNION
+                SELECT ip1.*
+                FROM tec_edifici_pratiche ep1
+                JOIN tec_intestatari_persone_pratiche ipp1 ON ipp1.Pratica = ep1.Pratica
+                JOIN intestatari_persone ip1 ON ip1.ID = ipp1.Persona
+                WHERE ep1.Edificio = :ed',
+                [':ed' => $edificioID]);
 
             /*----------------------------------------------*/
 
             $intest_societa = $c->db->ql(
-                'SELECT DISTINCT i.*
+                'SELECT i.*
                 FROM pe_edifici_pratiche ep
                 JOIN pe_intestatari_societa_pratiche isp ON isp.Pratica = ep.Pratica
                 JOIN intestatari_societa i ON i.ID = isp.Societa
-                WHERE ep.Edificio = ?',
-                [$edificioID]);
+                WHERE ep.Edificio = :ed
+                UNION
+                SELECT i1.*
+                FROM tec_edifici_pratiche ep1
+                JOIN tec_intestatari_societa_pratiche isp1 ON isp1.Pratica = ep1.Pratica
+                JOIN intestatari_societa i1 ON i1.ID = isp1.Societa
+                WHERE ep1.Edificio = :ed',
+                [':ed' => $edificioID]);
 
             /*----------------------------------------------*/
 
@@ -105,7 +116,7 @@
 
             /*----------------------------------------------*/
 
-            //TODO pratiche ed intestatari TEC
+            //TODO pratiche TEC
             $aut = [];
             $perm = [];
             $conc = [];
@@ -115,9 +126,10 @@
             /*----------------------------------------------*/
 
             $res = $c->db->ql("SELECT *
-                                            FROM tec_pratiche
-                                            WHERE Edificio = ?",
-                                            [$edificioID]);
+                              FROM tec_pratiche p
+                              JOIN tec_edifici_pratiche ep ON ep.Pratica = p.ID
+                              WHERE ep.Edificio = ?",
+                              [$edificioID]);
 
             foreach ($res as $pratica){
                 $tipo = substr($pratica['ID'], 0, 1);
@@ -167,124 +179,169 @@
   </head>
   <body>
     <div id="intestazione">
-       <img src="..\imgs\logo.jpg" id="logo" alt="logo" align="right"></img>
        <div id="titoli">
             <h1>Comune di Canale d'Agordo</h1>
             <h2>Ufficio tecnico</h2>
             <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
+            <h4>Edificio n: <?= $datiGenericiEdificio['ID'] ?> </h4>
        </div>
+       <img src="..\imgs\logo.jpg" id="logo" alt="logo"></img>
     </div>
     <div id="generalita">
-            <p>Edificio n: <?= $datiGenericiEdificio['ID'] ?> </p>
-            <p id="localita">Localit&agrave;: <?= $datiGenericiEdificio['Stradario'] ?></p>
-            <p id="mappaliCompleti">Fogli-mappali: <?= $datiGenericiEdificio['Mappali'] ?></p>
-            <p>Subalterni: <?= $datiGenericiEdificio['Subalterni'] ?></p>
+        <p><span>Localit&agrave;:</span> <?= $datiGenericiEdificio['Stradario'] ?></p>
+        <p><span>Fogli-mappali:</span> <?= $datiGenericiEdificio['Mappali'] ?></p>
+        <p><span>Subalterni:</span> <?= $datiGenericiEdificio['Subalterni'] ?></p>
+        <p><span>Note:</span> <?= str_replace("\r\n", '<br>', $datiGenericiEdificio['Note']) ?></p>
     </div>
     <div id="intestatari">
-        <p>Intestatari persone: </p>
-        <p id="nomiIntestatariPersone"><?php
+      <div>
+        <p><span>Intestatari persone:</span></p>
+        <p><?php
             $temp = [];
             foreach ($intest_persone as $pers)
                 $temp[] = "<a href=\"anagrafica.php?persona=$pers[ID]\" target=\"_blank\">$pers[Cognome] $pers[Nome]</a>";
             echo implode(', ', $temp)
         ?></p>
-        <p>Intestatari societ&aacute;: </p>
-        <p id="nomiIntestatariSocieta"><?php
+      </div>
+
+      <div>
+        <p><span>Intestatari societ&aacute;:</span></p>
+        <p><?php
             $temp = [];
             foreach ($intest_societa as $soc)
                 $temp[] = "<a href=\"anagrafica.php?societa=$soc[ID]\" target=\"_blank\">$soc[Intestazione]</a>";
             echo implode(', ', $temp)
         ?></p>
+      </div>
     </div>
-    <div id="pe">
-        <p>Pratiche rubrica: </p>
-        <p class="listaPE" id="pratiche"><?php
-            $temp = [];
-            foreach ($rubriche as $pra)
-                $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Nome] $pra[Cognome])";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Autorizzazioni: </p>
-        <p class="listaPE" id="autorizzazioni"><?php
-            $temp = [];
-            foreach ($aut as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Permessi: </p>
-        <p class="listaPE" id="permessi"><?php
-            $temp = [];
-            foreach ($perm as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Concessioni: </p>
-        <p class="listaPE" id="concessioni"><?php
-            $temp = [];
-            foreach ($conc as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Sanatorie: </p>
-        <p class="listaPE" id="sanatorie"><?php
-            $temp = [];
-            foreach ($san as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Opere interne: </p>
-        <p class="listaPE" id="opereInterne"><?php
-            $temp = [];
-            foreach ($opere as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
-        ?></p>
-        <p>Condoni: </p>
+
+    <div id="condoni">
+      <div>
+        <p><span>Condoni:</span></p>
         <p class="listaPE" id="condoni"><?php
             $temp = [];
             foreach ($condoni as $pra)
                 $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Nome] $pra[Cognome] - $pra[cf])";
             echo implode(', ', $temp)
         ?></p>
-        <p>SCIA: </p>
+      </div>
+    </div>
+
+    <div id="rubriche">
+      <div>
+        <p><span>Pratiche rubrica:</span></p>
+        <p class="listaPE" id="pratiche"><?php
+            $temp = [];
+            foreach ($rubriche as $pra)
+                $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Nome] $pra[Cognome])";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
+    </div>
+
+    <div id="pe">
+      <div>
+        <p><span>SCIA:</span></p>
         <p class="listaPE" id="scia"><?php
             $temp = [];
             foreach ($scia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
-        <p>DIA: </p>
+      </div>
+
+      <div>
+        <p><span>DIA:</span></p>
         <p class="listaPE" id="dia"><?php
             $temp = [];
             foreach ($dia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
-        <p>CILA: </p>
+      </div>
+
+      <div>
+        <p><span>CILA:</span></p>
         <p class="listaPE" id="cila"><?php
             $temp = [];
             foreach ($cila as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
-        <p>CIL: </p>
+      </div>
+
+      <div>
+        <p><span>CIL:</span></p>
         <p class="listaPE" id="cil"><?php
             $temp = [];
             foreach ($cil as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
-        <p>Varie: </p>
+      </div>
+
+      <div>
+        <p><span>Varie:</span></p>
         <p class="listaPE" id="varie"><?php
             $temp = [];
             foreach ($varie as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
+      </div>
     </div>
-    <div id="finePagina">
-        <p>Note: </p>
-        <p id="note"><?= $datiGenericiEdificio['Note'] ?></p>
+
+    <div id="tec">
+      <div>
+        <p><span>Autorizzazioni:</span></p>
+        <p class="listaPE" id="autorizzazioni"><?php
+            $temp = [];
+            foreach ($aut as $pra)
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
+
+      <div>
+        <p><span>Permessi:</span></p>
+        <p class="listaPE" id="permessi"><?php
+            $temp = [];
+            foreach ($perm as $pra)
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
+
+      <div>
+        <p><span>Concessioni:</span></p>
+        <p class="listaPE" id="concessioni"><?php
+            $temp = [];
+            foreach ($conc as $pra)
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
+
+      <div>
+        <p><span>Sanatorie:</span></p>
+        <p class="listaPE" id="sanatorie"><?php
+            $temp = [];
+            foreach ($san as $pra)
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
+
+      <div>
+        <p><span>Opere interne:</span></p>
+        <p class="listaPE" id="opereInterne"><?php
+            $temp = [];
+            foreach ($opere as $pra)
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+            echo implode(', ', $temp)
+        ?></p>
+      </div>
     </div>
+
   </body>
 </html>

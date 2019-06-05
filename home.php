@@ -334,7 +334,12 @@
                     <option value="VARIE">Varie</option>
                   </select>
                   <select id="tipo-pratica-tec-reports" name="tipo_pratica_tec" style="display:none;">
-                    <option value="SCIA">Asseverazione</option>
+                    <option value="A">Asseverazioni</option>
+                    <option value="P">Permessi</option>
+                    <option value="C">Concessioni</option>
+                    <option value="S">Sanatorie</option>
+                    <option value="I">Opere iterne</option>
+                    <?php //TODO vdere se sono tutte ?>
                   </select>
                   <input type="checkbox" name="considerTipo" checked> Considera tipo
 		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>

@@ -1,103 +1,55 @@
-body {
-    width: 1000px;
+body{
+  padding: 0px 5% 0px 5%;
+}
+
+p{
+  font-size: 1.3em;
+  margin: 0px;
+  padding: 0px;
+  word-wrap: break-word;
+}
+
+p > span{
+  font-weight: bold;
+}
+
+#intestazione{
+  display: grid;
+  grid-template-columns: 4fr auto;
+  padding: 1% 10% 0px 10%;
 }
 
 #titoli{
-    background-color: brown;
-    height: 200px;
-    text-align: center;
-    padding-top: 30px;
+  text-align: center;
+}
+
+#titoli *{
+  margin: 0px;
+  padding-top: 10px;
 }
 
 #logo{
-    float: right;
+    height: 100%;
+    width: 100%;
 }
 
 #generalita{
-    display: inline-grid;
-    width: 1000px;
-    grid-template-columns: auto auto auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-}
-
-#generalita > p{
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
-}
-
-#localita{
-    grid-column-start: 3;
-    grid-column-end: 5;
-}
-
-#mappaliCompleti{
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-
- #exMappali{
-    grid-column-start: 3;
-    grid-column-end: 5;
-}
-
-#intestatari{
+    padding: 10px 5% 10px 5%;
     display: grid;
     grid-template-columns: auto auto;
-    width: 1000px;
-    background-color: #2196F3;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-    margin-top: 10px;
+    grid-column-gap: 5%;
+    grid-row-gap: 10px;
+    text-align: left;
+}
+
+#intestatari, #pe, #tec, #condoni, #rubriche, #intestatari{
+    padding: 10px 5% 0px 5%;
     margin-bottom: 10px;
 }
 
-#nomiIntestatariPersone{
-    margin-left: 20px;
-    border-style: solid;
-    border-width: thin;
-    width: 850px;
-}
-
-#nomiIntestatariSocieta{
-    margin-left: 20px;
-    border-style: solid;
-    border-width: thin;
-    width: 850px;
-}
-
-#pe{
+#pe > div, #tec > div, #condoni > div, #rubriche > div, #intestatari > div{
+    margin-bottom: dotted black 1px;
     display: grid;
-    grid-template-columns: auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-    width: 1000px;
-}
-
-.listaPE{
-    margin-left: 20px;
-    border-style: solid;
-    border-width: thin;
-    width: 850px;
-}
-
-#finePagina{
-    display: inline-flex;
-    width: 1000px;
-}
-
-#note{
-    margin-left: 20px;
-    border-style: solid;
-    border-width: thin;
-    width: 1000px;
-}
-
-p {
-    word-wrap: break-word;
+    grid-template-columns: 1fr 4fr;
+    border-bottom: dotted black 1px;
 }
