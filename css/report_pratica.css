@@ -4,127 +4,70 @@ body{
 
 p{
   font-size: 1.3em;
-  margin: 0px;
+  margin: 0px 0px 15px 0px;
   padding: 0px;
   word-wrap: break-word;
+  border-bottom: dotted black 1px;
+}
+
+a, a:visited{
+	font-style: italic;
+	text-decoration: none;
+	color: black;
+}
+
+.sottotitolo{
+	text-decoration: underline;
+    margin-bottom: 0px;
+    margin-top: 25px;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    border: 0;
 }
 
 p > span{
   font-weight: bold;
 }
 
+#intestazione{
+  display: grid;
+  grid-template-columns: 4fr auto;
+  padding: 1% 10% 0px 10%;
+}
+
 #titoli{
-    background-color: skyblue;
-    height: 220px;
-    text-align: center;
-    padding-top: 1px;
+  text-align: center;
+}
+
+#titoli *{
+  margin: 0px;
+  padding-top: 10px;
 }
 
 #logo{
-    float: right;
+    height: 100%;
+    width: 100%;
 }
 
-.sottotitolo{
-    font-weight: bold;
-    margin-bottom: 0px;
-    margin-top: 20px;
+#anno-numero-barrato{
+	display: grid;
+    grid-template-columns: 1fr 1fr	1fr;
+    grid-column-gap: 5%;
 }
 
-#generalita{
-    display: inline-grid;
-    width: 1000px;
-    grid-template-columns: auto auto auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-}
-
-#generalita > p{
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
-}
-
-#localita{
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-
- #subalterno{
-    grid-column-start: 3;
-    grid-column-end: 5;
-}
-
-#intervento{
-    grid-column-start: 1;
-    grid-column-end: 5;
-}
-
-#persone{
-    display: inline-grid;
-    width: 1000px;
-    grid-template-columns: auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-}
-
-#persone > p{
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
-}
-
-#impresa{
-    grid-column-start: 1;
-    grid-column-end: 3;
+#localita-protocollo{
+	display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 10%;
 }
 
 #date{
-    display: inline-grid;
-    width: 1000px;
+    display: grid;
     grid-template-columns: auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
+    grid-column-gap: 5%;
 }
 
-#date > p{
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
+#persone, #ultInfo{
+	display: block;
 }
 
-#dataScadenza{
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-
-#ultInfo{
-    display: inline-grid;
-    width: 1000px;
-    grid-template-columns: auto auto;
-    background-color: #2196F3;
-    border-style: solid;
-    border-width: thin;
-}
-
-#ultInfo > p{
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
-}
-
-#note{
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-
- #docElettronico{
-    grid-column-start: 1;
-    grid-column-end: 3;
-}

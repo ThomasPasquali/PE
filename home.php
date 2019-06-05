@@ -8,7 +8,7 @@
         exit();
     }
 
-   $GLOBALS['c']->echoCode($_POST);
+   //$GLOBALS['c']->echoCode($_POST);
 
    $esitoGestMapp = '';
 
@@ -228,7 +228,12 @@
                     :'';
  				?>
  				<a>Impostazioni<i class="fas fa-cogs"></i>	</a>
- 				<a target="_blank" href="/phpmyadmin/">Database<i class="fas fa-database"></i></a>
+ 				<?=
+ 			        $GLOBALS['c']->isAdmin()?
+ 			        '<a target="_blank" href="/phpmyadmin/">Database<i class="fas fa-database"></i></a>'
+                    :'';
+ 				?>
+ 				
  			</form>
         </div>
 

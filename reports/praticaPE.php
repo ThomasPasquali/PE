@@ -63,76 +63,82 @@
   </head>
   <body>
      <div id="intestazione">
-       <img src="../imgs/logo.jpg" id="logo" alt="logo" align="right">
        <div id="titoli">
             <h1>Comune di Canale d'Agordo</h1>
             <h2>Ufficio tecnico</h2>
             <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
        		<h4>ID pratica: <?= $datiGenericiPratica['ID'] ?><br>Sigla: <?= $datiGenericiPratica['Sigla'] ?></h4>
        </div>
+        <img src="../imgs/logo.jpg" id="logo" alt="logo">
     </div>
+    
     <p class="sottotitolo">Informazioni generali:</p>
     <div id="generalita">
-    		<p>Anno: <?= $datiGenericiPratica['Anno'] ?></p>
-            <p>Numero: <?= $datiGenericiPratica['Numero'] ?></p>
-            <p>Barrato: <?= $datiGenericiPratica['Barrato'] ?></p>
-            <p>Protocollo: <?= $datiGenericiPratica['Protocollo'] ?></p>
-            <?php
-            if(count($edifici) > 0){
-                echo '<p>Edifici: ';
-                $i = 0;
-                foreach ($edifici as $edificio){
-                  $sep = $i > 0 ? ', ' : '';
-                  echo "$sep<a href=\"edificio.php?edificio=$edificio[ID]\">$edificio[ID]($edificio[Mappali])</a>";
-                  $i++;
-                }
-                echo '</p>';
-            }
-            ?>
-            <p>Fogli-mappali: <?= $datiGenericiPratica['FogliMappali'] ?></p>
-            <p id="subalterno">Subalterni: <?= $datiGenericiPratica['Subalterni'] ?></p>
-            <p id="localita">Localit&aacute;: <?= $datiGenericiPratica['Stradario'] ?></p>
-            <p id="intervento">Intervento: <?= $datiGenericiPratica['Intervento'] ?></p>
+    	<div id="anno-numero-barrato">
+    		<p><span>Anno:</span> <?= $datiGenericiPratica['Anno'] ?></p>
+            <p><span>Numero:</span> <?= $datiGenericiPratica['Numero'] ?></p>
+            <p><span>Barrato:</span> <?= $datiGenericiPratica['Barrato'] ?></p>
+    	</div>
+    	
+		<div id="localita-protocollo">
+			<p><span>Localit&aacute;:</span> <?= $datiGenericiPratica['Stradario'] ?></p>
+            <p><span>Protocollo:</span> <?= $datiGenericiPratica['Protocollo'] ?></p>
+		</div>
+        
+        <p><span>Intervento:</span> <?= $datiGenericiPratica['Intervento'] ?></p>
+        
+        <p><span>Fogli-mappali: </span>
+        <?php
+        $i = 0;
+        foreach ($edifici as $edificio){
+          $sep = $i > 0 ? ', ' : '';
+          echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\">(Ed. $edificio[ID])</a>";
+          $i++;
+        }
+        ?>
+        </p>
+        
+        <p><span>Subalterni:</span> <?= $datiGenericiPratica['Subalterni'] ?></p>
     </div>
     <p class="sottotitolo">Persone:</p>
     <div id="persone">
+    	<p><span>Intestatari persone:</span>
         <?php
-        if(count($intestatariPersone) > 0){
-            echo '<p>Intestatari persone: ';
-            $i = 0;
-            foreach ($intestatariPersone as $intestatario){
-              $sep = $i > 0 ? ', ' : '';
-              echo "$sep<a href=\"anagrafica.php?persona=$intestatario[ID]\">$intestatario[Cognome] $intestatario[Nome]</a>";
-              $i++;
-            }
-            echo '</p>';
-        }
-        if(count($intestatariSocieta) > 0){
-            echo '<p>Intestatari societ&aacute: ';
-            $i = 0;
-            foreach ($intestatariSocieta as $intestatario){
-              $sep = $i > 0 ? ', ' : '';
-              echo "$sep<a href=\"anagrafica.php?societa=$intestatario[ID]\">$intestatario[Intestazione]</a>";
-              $i++;
-            }
-            echo '</p>';
+        $i = 0;
+        foreach ($intestatariPersone as $intestatario){
+          $sep = $i > 0 ? ', ' : '';
+          echo "$sep<a href=\"anagrafica.php?persona=$intestatario[ID]\">$intestatario[Cognome] $intestatario[Nome]</a>";
+          $i++;
         }
         ?>
-        <p>Tecnico:
+        </p>
+        
+        <p><span>Intestatari societ&aacute;:</span>
+        <?php
+        $i = 0;
+        foreach ($intestatariSocieta as $intestatario){
+          $sep = $i > 0 ? ', ' : '';
+          echo "$sep<a href=\"anagrafica.php?societa=$intestatario[ID]\">$intestatario[Intestazione]</a>";
+          $i++;
+        }
+        ?>
+        </p>
+        
+        <p><span>Tecnico:</span>
           <?php
             $tecnico = $c->getDatiTecnico($datiGenericiPratica['Tecnico']);
             if($tecnico)
               echo "<a href=\"anagrafica.php?tecnico=$tecnico[ID]\">$tecnico[Cognome] $tecnico[Nome] ($tecnico[Codice_fiscale] - $tecnico[Partita_iva])</a>"
           ?>
         </p>
-        <p>Direttore lavori:
+        <p><span>Direttore lavori:</span>
         <?php
           $direttoreLavori = $c->getDatiTecnico($datiGenericiPratica['Direzione_lavori']);
           if($direttoreLavori)
             echo "<a href=\"anagrafica.php?tecnico=$direttoreLavori[ID]\">$direttoreLavori[Cognome] $direttoreLavori[Nome] ($direttoreLavori[Codice_fiscale] - $direttoreLavori[Partita_iva])</a>"
         ?>
         </p>
-        <p id="impresa">Impresa:
+        <p><span>Impresa:</span>
         <?php
           $impresa = $c->getDatiImpresa($datiGenericiPratica['Impresa']);
           if($impresa)
@@ -142,14 +148,13 @@
     </div>
     <p class="sottotitolo">Date:</p>
     <div id="date">
-        <p>Data presentazione: <?= $datiGenericiPratica['Data'] ?></p>
-        <p>Data inizio lavori: <?= $datiGenericiPratica['Data_inizio_lavori'] ?></p>
+        <p><span>Data presentazione:</span> <?= $datiGenericiPratica['Data'] ?></p>
+        <p><span>Data inizio lavori:</span> <?= $datiGenericiPratica['Data_inizio_lavori'] ?></p>
     </div>
     <p class="sottotitolo">Ulteriori informazioni:</p>
     <div id="ultInfo">
-    	<p id="docElettronico">Documento elettronico: <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
-    	<p id="note">Intervento: <?= $datiGenericiPratica['Intervento'] ?></p>
-        <p id="note">Note: <?= $datiGenericiPratica['Note'] ?></p>
+    	<p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
+        <p><span>Note:</span> <?= $datiGenericiPratica['Note'] ?></p>
     </div>
   </body>
 </html>

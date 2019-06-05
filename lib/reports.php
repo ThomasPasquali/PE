@@ -143,11 +143,7 @@
     						<p><span class="title">Codice fiscale:</span> <?= $row['cf'] ?></p>
     						<p><span class="title">Data di nascita:</span> <?= $codiceFiscale->getBirthDate(); ?></p>
     						<p><span class="title">Luogo di nascita:</span>
-    							<?php
-    							$db->query('USE utils');
-    							echo $db->ql('SELECT Nome FROM belfiore WHERE Belfiore = ?', [$codiceFiscale->getCountryBirth()])[0]['Nome'];
-    							$db->query('USE pe');
-    							?>
+    							<?= $db->ql('SELECT Nome FROM belfiore WHERE Belfiore = ?', [$codiceFiscale->getCountryBirth()])[0]['Nome']??'N/A'; ?>
     						</p>
     						<p><span class="title">Sesso:</span> <?= $codiceFiscale->getSex() ?></p>
 

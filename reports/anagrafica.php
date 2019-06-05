@@ -1,18 +1,15 @@
 <html>
 <head>
-	<meta charset="utf-8"/>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
-<body>
+<body style="padding-top: 60px;">
 <?php
     include_once '../controls.php';
-    $controls = new Controls();
+    $c = new Controls();
     
-    /*print_r($_POST);
-    print_r($_GET);
-    print_r($_REQUEST);*/
+    $c->includeHTML('../htmlUtils/utils_bar.html');
     
-    if(!$controls->logged()){
+    if(!$c->logged()){
         header('Location: ../index.php?err=Utente non loggato');
         exit();
     }
@@ -21,7 +18,7 @@
     $id = '';
     $type = '';
     
-    if($controls->check(['persona'], $_REQUEST)){
+    if($c->check(['persona'], $_REQUEST)){
         
         $sql = 'SELECT Cognome, Nome, Codice_fiscale, Indirizzo, Citta, Provincia, Note
                     FROM intestatari_persone
@@ -29,7 +26,7 @@
         $id = $_REQUEST['persona'];
         $type = 'Intestatario persona';
         
-    }else if($controls->check(['societa'], $_REQUEST)){
+    }else if($c->check(['societa'], $_REQUEST)){
         
         $sql = 'SELECT Intestazione, Partita_iva, Indirizzo, Citta, Provincia, Note
                     FROM intestatari_societa
@@ -37,7 +34,7 @@
         $id = $_REQUEST['societa'];
         $type = 'Intestatario società';
         
-    }else if($controls->check(['tecnico'], $_REQUEST)){
+    }else if($c->check(['tecnico'], $_REQUEST)){
         
         $sql = 'SELECT Cognome, Nome, Codice_fiscale, Partita_iva, Albo, Numero_ordine, Provncia_albo, Indirizzo, Citta, Provincia, Note
                     FROM tecnici
@@ -45,7 +42,7 @@
         $id = $_REQUEST['tecnico'];
         $type = 'Tecnico';
         
-    }else if($controls->check(['impresa'], $_REQUEST)){
+    }else if($c->check(['impresa'], $_REQUEST)){
         
         $sql = 'SELECT Intestazione, Codice_fiscale, Partita_iva, Note
                     FROM imprese
@@ -58,7 +55,7 @@
     if(empty($sql))
         exit();
     
-    if($controls->check(['m'], $_REQUEST)&&$_REQUEST['m'] == 2){
+    if($c->check(['m'], $_REQUEST)&&$_REQUEST['m'] == 2){
         $err = '';
         foreach ($_REQUEST as $key => $value) 
             if(empty($value))
@@ -66,7 +63,7 @@
         
         switch ($type) {
             case 'Intestatario persona':
-                $res = $controls->db->dml(
+                $res = $c->db->dml(
                     'UPDATE intestatari_persone
                     	SET 	Cognome = :c,
                         			Nome = :n,
@@ -89,7 +86,7 @@
                 break;
                 
             case 'Intestatario società':
-                $res = $controls->db->dml(
+                $res = $c->db->dml(
                 'UPDATE intestatari_societa
                     	SET 	Intestazione = :int,
                         			Partita_iva = :piva,
@@ -110,7 +107,7 @@
                     	    break;
                 
             case 'Tecnico':
-                $res = $controls->db->dml(
+                $res = $c->db->dml(
                     'UPDATE tecnici
                     	SET 	Cognome = :c,
                         			Nome = :n,
@@ -141,7 +138,7 @@
                 break;
                 
             case 'Impresa':
-                $res = $controls->db->dml(
+                $res = $c->db->dml(
                     'UPDATE imprese
                     	SET 	Intestazione = :int,
                         			Codice_fiscale = :cf,
@@ -171,7 +168,7 @@
         unset($_REQUEST['m']);
     }
     
-    $res = $controls->db->ql($sql, [$id]);
+    $res = $c->db->ql($sql, [$id]);
     
     if(count($res) != 1){
         echo '<h1 style="color:red; text-align:center;">Nessun risultato</h1></body></html>';

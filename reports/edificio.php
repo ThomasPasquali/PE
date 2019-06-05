@@ -187,6 +187,7 @@
        </div>
        <img src="..\imgs\logo.jpg" id="logo" alt="logo"></img>
     </div>
+    
     <div id="generalita">
         <p><span>Localit&agrave;:</span> <?= $datiGenericiEdificio['Stradario'] ?></p>
         <p><span>Fogli-mappali:</span> <?= $datiGenericiEdificio['Mappali'] ?></p>
@@ -218,7 +219,7 @@
     <div id="condoni">
       <div>
         <p><span>Condoni:</span></p>
-        <p class="listaPE" id="condoni"><?php
+        <p><?php
             $temp = [];
             foreach ($condoni as $pra)
                 $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Nome] $pra[Cognome] - $pra[cf])";
@@ -230,7 +231,7 @@
     <div id="rubriche">
       <div>
         <p><span>Pratiche rubrica:</span></p>
-        <p class="listaPE" id="pratiche"><?php
+        <p id="pratiche"><?php
             $temp = [];
             foreach ($rubriche as $pra)
                 $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Nome] $pra[Cognome])";
@@ -242,7 +243,7 @@
     <div id="pe">
       <div>
         <p><span>SCIA:</span></p>
-        <p class="listaPE" id="scia"><?php
+        <p id="scia"><?php
             $temp = [];
             foreach ($scia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
@@ -252,7 +253,7 @@
 
       <div>
         <p><span>DIA:</span></p>
-        <p class="listaPE" id="dia"><?php
+        <p id="dia"><?php
             $temp = [];
             foreach ($dia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
@@ -262,7 +263,7 @@
 
       <div>
         <p><span>CILA:</span></p>
-        <p class="listaPE" id="cila"><?php
+        <p id="cila"><?php
             $temp = [];
             foreach ($cila as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
@@ -272,7 +273,7 @@
 
       <div>
         <p><span>CIL:</span></p>
-        <p class="listaPE" id="cil"><?php
+        <p id="cil"><?php
             $temp = [];
             foreach ($cil as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
@@ -282,7 +283,7 @@
 
       <div>
         <p><span>Varie:</span></p>
-        <p class="listaPE" id="varie"><?php
+        <p id="varie"><?php
             $temp = [];
             foreach ($varie as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
@@ -294,7 +295,7 @@
     <div id="tec">
       <div>
         <p><span>Autorizzazioni:</span></p>
-        <p class="listaPE" id="autorizzazioni"><?php
+        <p id="autorizzazioni"><?php
             $temp = [];
             foreach ($aut as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
@@ -304,7 +305,7 @@
 
       <div>
         <p><span>Permessi:</span></p>
-        <p class="listaPE" id="permessi"><?php
+        <p id="permessi"><?php
             $temp = [];
             foreach ($perm as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
@@ -314,7 +315,7 @@
 
       <div>
         <p><span>Concessioni:</span></p>
-        <p class="listaPE" id="concessioni"><?php
+        <p id="concessioni"><?php
             $temp = [];
             foreach ($conc as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
@@ -324,7 +325,7 @@
 
       <div>
         <p><span>Sanatorie:</span></p>
-        <p class="listaPE" id="sanatorie"><?php
+        <p id="sanatorie"><?php
             $temp = [];
             foreach ($san as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
@@ -334,7 +335,7 @@
 
       <div>
         <p><span>Opere interne:</span></p>
-        <p class="listaPE" id="opereInterne"><?php
+        <p id="opereInterne"><?php
             $temp = [];
             foreach ($opere as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";

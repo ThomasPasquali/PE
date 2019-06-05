@@ -13,6 +13,12 @@ p > span{
   font-weight: bold;
 }
 
+a, a:visited{
+	font-style: italic;
+	text-decoration: none;
+	color: black;
+}
+
 #intestazione{
   display: grid;
   grid-template-columns: 4fr auto;
@@ -36,7 +42,7 @@ p > span{
 #generalita{
     padding: 10px 5% 10px 5%;
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr auto;
     grid-column-gap: 5%;
     grid-row-gap: 10px;
     text-align: left;
@@ -48,7 +54,6 @@ p > span{
 }
 
 #pe > div, #tec > div, #condoni > div, #rubriche > div, #intestatari > div{
-    margin-bottom: dotted black 1px;
     display: grid;
     grid-template-columns: 1fr 4fr;
     border-bottom: dotted black 1px;
