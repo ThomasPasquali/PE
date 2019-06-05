@@ -91,7 +91,7 @@
         <?php
         $i = 0;
         foreach ($edifici as $edificio){
-          $sep = $i > 0 ? ', ' : '';
+          $sep = $i > 0 ? ' - ' : '';
           echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\">(Ed. $edificio[ID])</a>";
           $i++;
         }
@@ -106,7 +106,7 @@
         <?php
         $i = 0;
         foreach ($intestatariPersone as $intestatario){
-          $sep = $i > 0 ? ', ' : '';
+          $sep = $i > 0 ? ' - ' : '';
           echo "$sep<a href=\"anagrafica.php?persona=$intestatario[ID]\">$intestatario[Cognome] $intestatario[Nome]</a>";
           $i++;
         }
@@ -117,7 +117,7 @@
         <?php
         $i = 0;
         foreach ($intestatariSocieta as $intestatario){
-          $sep = $i > 0 ? ', ' : '';
+          $sep = $i > 0 ? ' - ' : '';
           echo "$sep<a href=\"anagrafica.php?societa=$intestatario[ID]\">$intestatario[Intestazione]</a>";
           $i++;
         }

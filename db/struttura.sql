@@ -573,6 +573,123 @@ SELECT  p.ID,
 FROM pe_pratiche p
 LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale;
 
+CREATE TABLE `log_cancellazioni` (
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`Utente` INT(10) UNSIGNED NOT NULL,
+	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`IP` CHAR(15) NOT NULL,
+	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
+	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+	`Valore` TEXT NOT NULL,
+	UNIQUE INDEX `ID` (`ID`),
+	INDEX `FK_log_inserimenti_utenti` (`Utente`),
+	CONSTRAINT `log_cancellazioni_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `log_gestione_utenti` (
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`Utente` INT(10) UNSIGNED NOT NULL,
+	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`IP` CHAR(15) NOT NULL,
+	`Azione` ENUM('Attivazione','Rimozione','Promozione','Declassazione') NOT NULL,
+	UNIQUE INDEX `ID` (`ID`),
+	INDEX `FK_log_inserimenti_utenti` (`Utente`),
+	CONSTRAINT `log_gestione_utenti_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `log_inserimenti` (
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`Utente` INT(10) UNSIGNED NOT NULL,
+	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`IP` CHAR(15) NOT NULL,
+	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
+	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+	`Valore` TEXT NOT NULL,
+	UNIQUE INDEX `ID` (`ID`),
+	INDEX `FK_log_inserimenti_utenti` (`Utente`),
+	CONSTRAINT `FK_log_inserimenti_utenti` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `log_modifiche` (
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`Utente` INT(10) UNSIGNED NOT NULL,
+	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`IP` CHAR(15) NOT NULL,
+	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
+	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+	`Valore_vecchio` TEXT NOT NULL,
+	`Valore_nuovo` TEXT NOT NULL,
+	UNIQUE INDEX `ID` (`ID`),
+	INDEX `FK_log_inserimenti_utenti` (`Utente`),
+	CONSTRAINT `log_modifiche_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `log_report` (
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`Utente` INT(10) UNSIGNED NOT NULL,
+	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`IP` CHAR(15) NOT NULL,
+	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
+	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+	UNIQUE INDEX `ID` (`ID`),
+	INDEX `FK_log_inserimenti_utenti` (`Utente`),
+	CONSTRAINT `log_report_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `oneri_cc` (
+	`Pratica` CHAR(10) NOT NULL,
+	`Descrizione_intervento` CHAR(255) NOT NULL,
+	`Segno` CHAR(1) NOT NULL,
+	`Zona_omogenea` CHAR(6) NOT NULL,
+	`Densita_fondiaria` CHAR(3) NOT NULL,
+	`Caratteristiche_intervento` CHAR(3) NOT NULL,
+	`Caratteristiche_edificio` CHAR(3) NOT NULL,
+	`Tipo_edificio` CHAR(3) NOT NULL,
+	`Tipo_intervento` CHAR(3) NOT NULL,
+	`Codice_attivita` CHAR(3) NULL DEFAULT NULL,
+	`Modo` INT(11) NOT NULL,
+	`Volume` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`Superficie` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`Superficie_non_residenziale` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`Superficie_scoperta` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`Alloggi` INT(11) UNSIGNED NOT NULL,
+	`Incremento` INT(11) UNSIGNED NOT NULL,
+	`Computo_metrico` INT(11) UNSIGNED NOT NULL,
+	`CC` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`OU1` DECIMAL(10,2) UNSIGNED NOT NULL,
+	`OU2` DECIMAL(10,2) UNSIGNED NOT NULL,
+	INDEX `FK_oneri_tec_pratiche` (`Pratica`),
+	CONSTRAINT `FK_oneri_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `oneri_cc_superfici_alloggi` (
+	`Pratica` CHAR(10) NOT NULL,
+	`Superficie` DECIMAL(10,2) UNSIGNED NOT NULL,
+	INDEX `FK_oneri_superfici_alloggi_tec_pratiche` (`Pratica`),
+	CONSTRAINT `FK_oneri_superfici_alloggi_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

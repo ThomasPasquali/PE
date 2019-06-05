@@ -1,5 +1,5 @@
 body{
-  padding: 0px 5% 0px 5%;
+  padding: 0px 2% 0px 2%;
 }
 
 p{
@@ -21,7 +21,7 @@ a, a:visited{
 
 #intestazione{
   display: grid;
-  grid-template-columns: 4fr auto;
+  grid-template-columns: 4fr 1fr;
   padding: 1% 10% 0px 10%;
 }
 

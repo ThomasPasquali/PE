@@ -201,7 +201,7 @@
             $temp = [];
             foreach ($intest_persone as $pers)
                 $temp[] = "<a href=\"anagrafica.php?persona=$pers[ID]\" target=\"_blank\">$pers[Cognome] $pers[Nome]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -211,7 +211,7 @@
             $temp = [];
             foreach ($intest_societa as $soc)
                 $temp[] = "<a href=\"anagrafica.php?societa=$soc[ID]\" target=\"_blank\">$soc[Intestazione]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
     </div>
@@ -223,7 +223,7 @@
             $temp = [];
             foreach ($condoni as $pra)
                 $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Nome] $pra[Cognome] - $pra[cf])";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
     </div>
@@ -235,7 +235,7 @@
             $temp = [];
             foreach ($rubriche as $pra)
                 $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Nome] $pra[Cognome])";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
     </div>
@@ -247,7 +247,7 @@
             $temp = [];
             foreach ($scia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -257,7 +257,7 @@
             $temp = [];
             foreach ($dia as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -267,7 +267,7 @@
             $temp = [];
             foreach ($cila as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -277,7 +277,7 @@
             $temp = [];
             foreach ($cil as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -287,7 +287,7 @@
             $temp = [];
             foreach ($varie as $pra)
                 $temp[] = "<a href=\"praticaPE.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
     </div>
@@ -299,7 +299,7 @@
             $temp = [];
             foreach ($aut as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
@@ -309,7 +309,7 @@
             $temp = [];
             foreach ($perm as $pra)
                 $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
-            echo implode(', ', $temp)
+            echo implode(' - ', $temp)
         ?></p>
       </div>
 
