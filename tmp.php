@@ -12,3 +12,7 @@
             $c->db->dml("INSERT INTO oneri_superfici_alloggi (Pratica, Superficie) VALUES ('$tmp[p]',$superficie)") ;
     }
     var_dump($c->getLastDBErrorInfo());*/
+    
+    include_once 'lib/oneriEcosti/oneriEcosti.php';
+    OneriECosti::calcola('Intervento', '2019-06-06', 1.5, 'A', 'A', 'A', 'A', 'A', 0, [50, 10.5], 0, 0);
+    
