@@ -1,10 +1,11 @@
 <?php 
     class OneriECosti {
         
-        private static $costiBase;
-        
         static function init() {
-            self::$costiBase = json_decode(file_get_contents('/lib/oneriEcosti/costiBase.json'), true);
+            $ob = simplexml_load_file(__DIR__.'\costiBase.xml');
+            $json = json_encode($ob);
+            $array = json_decode($json, true);
+            define('COSTI_BASE', $array);
         }
         /**
          * 
@@ -29,7 +30,10 @@
             $caratteristiche_edificio, $superficie_scoperta, $superfici_alloggi,
             $superficie_non_residenziabile, $incremento, $modo = 3) {
             
-            var_dump(self::$costiBase);
+            print_r(COSTI_BASE[$tipo_intervento][$caratteristiche_intervento][substr($zona, 0, 1)]['Dens']);
+                
+            print_r(COSTI_BASE);
+            
             /*/TODO
             //OU1, OU2 
             switch ($tipo_intervento) {
