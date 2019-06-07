@@ -205,7 +205,7 @@
             	<button class="dropbtn">Inserimenti<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
                 	<a href="inserimenti/praticaPE.php">Pratica</a>
-                	<a onclick="changeContent('insPraticheTec');">Pratica tec</a>
+                	<a href="inserimenti/praticaTEC.php">Pratica tec</a>
                     <a onclick="changeContent('insAnagIntestPers');">Persona</a>
                     <a onclick="changeContent('insAnagTecnici');">Tecnico</a>
                     <a onclick="changeContent('insAnagSocieta');">Società</a>
@@ -424,7 +424,7 @@
 
         <div id="insAnagImprese" class="content">
         	<div class="form">
-        		<h1>Inserimento Impresa</h1>
+        		<h1>Inserimento Imprese</h1>
 
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="impresa">

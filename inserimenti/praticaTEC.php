@@ -11,7 +11,7 @@
 
     $infos = [];
     $errors = [];
-    if($c->check(['tipo', 'anno', 'numero'], $_POST)){
+    /*if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         if(isset($_POST['documento_elettronico'])){
             $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
             $path = $c->doc_el_root_path."\\$relPath";
@@ -117,7 +117,7 @@
 
         }else
           $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
-    }
+    }*/
 
 
   //Misc functions
@@ -128,7 +128,7 @@
 ?>
 <html>
 <head>
-    <title>Inerimento pratica PE</title>
+    <title>Inerimento pratica TEC</title>
     <script src="../lib/jquery-3.3.1.min.js"></script>
     <script src="../js/hints.js"></script>
     <script src="../js/misc.js"></script>
@@ -151,6 +151,7 @@
 
   <div class="form">
     <h1>Inserimento pratiche <span id="info-edificio"></span></h1>
+      <input type="hidden" name="tipo" value="pe">
 
       <div id="dati-edificio">
 
@@ -198,7 +199,7 @@
               <label>Tipo</label>
               <select id="tipo-pratica" name="tipo">
                 <?php
-                $types = $c->getEnumValues('pe_pratiche', 'Tipo', $c->db);
+                $types = $c->getEnumValues('tec_pratiche', 'Tipo', $c->db);
                 foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
                 ?>
               </select>

@@ -16,13 +16,12 @@ $('input[name=anno]').keyup(function(){
     $.ajax({
       url: "../runtime/handler.php",
       type: "POST",
-      data: {'action' : 'getPraticaNumberForAnno', 'anno' : val},
-      success: function(msg) { console.log(msg);$('input[name=numero]').val((msg.length == 0?'1':msg)); }
+      data: {'action' : 'getPraticaPENumberForTipoAnno', 'tipo' : $('#tipo-pratica').val(),'anno' : val},
+      success: function(msg) { $('input[name=numero]').val((msg.length == 0?'1':msg)); }
     });
   }else if(val.length > 4)
     $(this).val(val.substr(0,4))
 });
-
 
 $('#form-pratica').submit(function(e) {
 	console.log(edifici);

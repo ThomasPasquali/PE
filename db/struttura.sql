@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versione server:              10.3.10-MariaDB - mariadb.org binary distribution
--- S.O. server:                  Win64
--- HeidiSQL Versione:            10.1.0.5532
+-- Versione server:              10.1.34-MariaDB - mariadb.org binary distribution
+-- S.O. server:                  Win32
+-- HeidiSQL Versione:            10.1.0.5546
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -101,6 +101,84 @@ CREATE TABLE IF NOT EXISTS `intestatari_societa` (
 
 -- L’esportazione dei dati non era selezionata.
 
+-- Dump della struttura di tabella pe.log_cancellazioni
+CREATE TABLE IF NOT EXISTS `log_cancellazioni` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Utente` int(10) unsigned NOT NULL,
+  `Data_ora` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `IP` char(15) NOT NULL,
+  `Categoria` enum('Anagrafica','Pratica','Edificio') NOT NULL,
+  `Tipo` enum('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+  `Valore` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `FK_log_inserimenti_utenti` (`Utente`),
+  CONSTRAINT `log_cancellazioni_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.log_gestione_utenti
+CREATE TABLE IF NOT EXISTS `log_gestione_utenti` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Utente` int(10) unsigned NOT NULL,
+  `Data_ora` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `IP` char(15) NOT NULL,
+  `Azione` enum('Attivazione','Rimozione','Promozione','Declassazione') NOT NULL,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `FK_log_inserimenti_utenti` (`Utente`),
+  CONSTRAINT `log_gestione_utenti_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.log_inserimenti
+CREATE TABLE IF NOT EXISTS `log_inserimenti` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Utente` int(10) unsigned NOT NULL,
+  `Data_ora` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `IP` char(15) NOT NULL,
+  `Categoria` enum('Anagrafica','Pratica','Edificio') NOT NULL,
+  `Tipo` enum('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+  `Valore` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `FK_log_inserimenti_utenti` (`Utente`),
+  CONSTRAINT `FK_log_inserimenti_utenti` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.log_modifiche
+CREATE TABLE IF NOT EXISTS `log_modifiche` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Utente` int(10) unsigned NOT NULL,
+  `Data_ora` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `IP` char(15) NOT NULL,
+  `Categoria` enum('Anagrafica','Pratica','Edificio') NOT NULL,
+  `Tipo` enum('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+  `Valore_vecchio` text NOT NULL,
+  `Valore_nuovo` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `FK_log_inserimenti_utenti` (`Utente`),
+  CONSTRAINT `log_modifiche_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.log_report
+CREATE TABLE IF NOT EXISTS `log_report` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Utente` int(10) unsigned NOT NULL,
+  `Data_ora` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `IP` char(15) NOT NULL,
+  `Categoria` enum('Anagrafica','Pratica','Edificio') NOT NULL,
+  `Tipo` enum('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `FK_log_inserimenti_utenti` (`Utente`),
+  CONSTRAINT `log_report_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
 -- Dump della struttura di tabella pe.pe_condoni
 CREATE TABLE IF NOT EXISTS `pe_condoni` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -147,8 +225,8 @@ CREATE TABLE IF NOT EXISTS `pe_fogli_mappali_pratiche` (
   KEY `FK_pe_mappali_pratiche_fogli_mappali_edifici` (`Edificio`,`Foglio`,`Mappale`),
   KEY `FK_pe_mappali_pratiche_pe_pratiche` (`Pratica`,`Edificio`),
   KEY `Pratica1` (`Pratica`,`Edificio`,`Foglio`,`Mappale`),
-  CONSTRAINT `FK_pe_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`),
-  CONSTRAINT `FK_pe_mappali_pratiche_pe_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `pe_edifici_pratiche` (`Pratica`, `Edificio`)
+  CONSTRAINT `FK_pe_fogli_mappali_pratiche_pe_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `pe_edifici_pratiche` (`Pratica`, `Edificio`),
+  CONSTRAINT `FK_pe_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
@@ -237,7 +315,6 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche_non_trovate` (
   PRIMARY KEY (`Anno`,`Numero`),
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=235 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
 -- L’esportazione dei dati non era selezionata.
 
 -- Dump della struttura di tabella pe.pe_rubrica
@@ -273,6 +350,7 @@ CREATE TABLE IF NOT EXISTS `pe_subalterni_pratiche` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
+
 -- Dump della struttura di tabella pe.stradario
 CREATE TABLE IF NOT EXISTS `stradario` (
   `Identificativo_nazionale` int(6) unsigned NOT NULL,
@@ -319,7 +397,7 @@ CREATE TABLE IF NOT EXISTS `tecnici` (
 
 -- Dump della struttura di tabella pe.tec_edifici_pratiche
 CREATE TABLE IF NOT EXISTS `tec_edifici_pratiche` (
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
   PRIMARY KEY (`Edificio`,`Pratica`),
   KEY `FK_tec_edifici_pratiche_tec_pratiche` (`Pratica`),
@@ -331,7 +409,7 @@ CREATE TABLE IF NOT EXISTS `tec_edifici_pratiche` (
 
 -- Dump della struttura di tabella pe.tec_fogli_mappali_pratiche
 CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
   `Mappale` char(6) NOT NULL,
@@ -340,8 +418,8 @@ CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
   UNIQUE KEY `Pratica` (`Pratica`,`Foglio`,`Mappale`),
   KEY `FK_tec_mappali_pratiche_tec_pratiche` (`Pratica`,`Edificio`),
   KEY `FK_tec_mappali_pratiche_fogli_mappali_edifici` (`Edificio`,`Foglio`,`Mappale`),
-  CONSTRAINT `FK_tec_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`),
-  CONSTRAINT `FK_tec_mappali_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_edifici_pratiche` (`Pratica`, `Edificio`)
+  CONSTRAINT `FK_tec_fogli_mappali_pratiche_tec_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_edifici_pratiche` (`Pratica`, `Edificio`),
+  CONSTRAINT `FK_tec_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='Vari mappali sono identificati con 0 (VARI, STRADE)';
 
 -- L’esportazione dei dati non era selezionata.
@@ -349,7 +427,7 @@ CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
 -- Dump della struttura di tabella pe.tec_intestatari_persone_pratiche
 CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
   `Persona` int(10) unsigned NOT NULL,
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Note` char(10) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Persona`),
   KEY `FK_tec_intestatari_persone_pratiche_new_intestatari_persone` (`Persona`),
@@ -362,7 +440,7 @@ CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
 -- Dump della struttura di tabella pe.tec_intestatari_societa_pratiche
 CREATE TABLE IF NOT EXISTS `tec_intestatari_societa_pratiche` (
   `Societa` int(10) unsigned NOT NULL,
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Note` char(10) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Societa`),
   KEY `Societa` (`Societa`),
@@ -372,31 +450,75 @@ CREATE TABLE IF NOT EXISTS `tec_intestatari_societa_pratiche` (
 
 -- L’esportazione dei dati non era selezionata.
 
+-- Dump della struttura di tabella pe.tec_oneri_e_cc
+CREATE TABLE IF NOT EXISTS `tec_oneri_e_cc` (
+  `Pratica` int(10) unsigned NOT NULL,
+  `Descrizione_intervento` char(255) NOT NULL,
+  `Segno` char(1) NOT NULL,
+  `Zona_omogenea` char(6) NOT NULL,
+  `Densita_fondiaria` char(3) NOT NULL,
+  `Caratteristiche_intervento` char(3) NOT NULL,
+  `Caratteristiche_edificio` char(3) NOT NULL,
+  `Tipo_edificio` char(3) NOT NULL,
+  `Tipo_intervento` char(3) NOT NULL,
+  `Codice_attivita` char(3) DEFAULT NULL,
+  `Modo` int(11) NOT NULL,
+  `Volume` decimal(10,2) unsigned NOT NULL,
+  `Superficie` decimal(10,2) unsigned NOT NULL,
+  `Superficie_non_residenziale` decimal(10,2) unsigned NOT NULL,
+  `Superficie_scoperta` decimal(10,2) unsigned NOT NULL,
+  `Alloggi` int(11) unsigned NOT NULL,
+  `Incremento` int(11) unsigned NOT NULL,
+  `Computo_metrico` int(11) unsigned NOT NULL,
+  `CC` decimal(10,2) unsigned NOT NULL,
+  `OU1` decimal(10,2) unsigned NOT NULL,
+  `OU2` decimal(10,2) unsigned NOT NULL,
+  KEY `FK_tec_oneri_e_cc_tec_pratiche` (`Pratica`),
+  CONSTRAINT `FK_tec_oneri_e_cc_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.tec_oneri_e_cc_superfici_alloggi
+CREATE TABLE IF NOT EXISTS `tec_oneri_e_cc_superfici_alloggi` (
+  `Pratica` int(10) unsigned NOT NULL,
+  `Superficie` decimal(10,2) unsigned NOT NULL,
+  KEY `FK_tec_oneri_e_cc_superfici_alloggi_tec_pratiche` (`Pratica`),
+  CONSTRAINT `FK_tec_oneri_e_cc_superfici_alloggi_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata.
+
 -- Dump della struttura di tabella pe.tec_pagamenti_cc
 CREATE TABLE IF NOT EXISTS `tec_pagamenti_cc` (
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Importo` decimal(10,2) unsigned NOT NULL,
   `Data` date DEFAULT NULL,
   KEY `FK_tec_pagamenti_cc_new_tec_pratiche` (`Pratica`),
-  CONSTRAINT `FK_tec_pagamenti_cc_new_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+  CONSTRAINT `FK_tec_pagamenti_cc_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
 -- Dump della struttura di tabella pe.tec_pagamenti_ou
 CREATE TABLE IF NOT EXISTS `tec_pagamenti_ou` (
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Importo` decimal(10,2) unsigned NOT NULL,
   `Data` date DEFAULT NULL,
   KEY `FK_tec_pagamenti_ou_new_tec_pratiche` (`Pratica`),
-  CONSTRAINT `FK_tec_pagamenti_ou_new_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
+  CONSTRAINT `FK_tec_pagamenti_ou_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
 -- Dump della struttura di tabella pe.tec_pratiche
 CREATE TABLE IF NOT EXISTS `tec_pratiche` (
-  `ID` char(10) NOT NULL,
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `IDold` char(10) DEFAULT NULL,
+  `TIPO` enum('Autorizzazione','Permesso','Concessione','Sanatoria','Opera_interna','Condono') NOT NULL,
+  `Anno` int(4) NOT NULL,
+  `Numero` int(4) NOT NULL,
+  `Barrato` char(12) NOT NULL,
   `Oggetto` varchar(300) DEFAULT NULL,
   `Tipologia_fabbricato` int(11) DEFAULT NULL,
   `COD_INT` int(11) DEFAULT NULL,
@@ -405,14 +527,14 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `Data_domanda` date DEFAULT NULL,
   `N_protocollo` varchar(6) DEFAULT NULL,
   `N_verbale` varchar(6) DEFAULT NULL,
-  `Verbale` text DEFAULT NULL,
-  `Prescrizioni` text DEFAULT NULL,
-  `Parere` text DEFAULT NULL,
-  `Parere_Note` text DEFAULT NULL,
+  `Verbale` text,
+  `Prescrizioni` text,
+  `Parere` text,
+  `Parere_Note` text,
   `Approvata` varchar(1) DEFAULT NULL,
   `Onerosa` varchar(1) DEFAULT NULL,
   `Beni_Ambientali` varchar(3) DEFAULT NULL,
-  `Pratica_Note` text DEFAULT NULL,
+  `Pratica_Note` text,
   `Pagam_Note` varchar(112) DEFAULT NULL,
   `DATA_RDA` date DEFAULT NULL,
   `DATA_SDA` date DEFAULT NULL,
@@ -431,16 +553,18 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `DATA_SDT` date DEFAULT NULL,
   `DATA_AA` date DEFAULT NULL,
   `DATA_ARC` date DEFAULT NULL,
-  PRIMARY KEY (`ID`),
+  PRIMARY KEY (`TIPO`,`Anno`,`Numero`,`Barrato`),
+  UNIQUE KEY `new_ID` (`ID`),
+  UNIQUE KEY `ID` (`IDold`),
   KEY `FK_tec_pratiche_stradario` (`Stradario`),
   CONSTRAINT `FK_tec_pratiche_stradario` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`Identificativo_nazionale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1779 DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
 -- Dump della struttura di tabella pe.tec_subalterni_pratiche
 CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
   `Mappale` char(6) NOT NULL,
@@ -457,7 +581,7 @@ CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
 -- Dump della struttura di tabella pe.tec_tecnici_pratiche
 CREATE TABLE IF NOT EXISTS `tec_tecnici_pratiche` (
   `Tecnico` int(10) unsigned NOT NULL,
-  `Pratica` char(10) NOT NULL,
+  `Pratica` int(10) unsigned NOT NULL,
   `Tipo` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`Pratica`,`Tecnico`),
   KEY `FK_tec_tecnici_pratiche_new_tecnici` (`Tecnico`),
@@ -476,7 +600,7 @@ CREATE TABLE IF NOT EXISTS `utenti` (
   `Active` enum('1','0') NOT NULL DEFAULT '0',
   PRIMARY KEY (`Email`),
   UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -511,10 +635,9 @@ CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note 
 FROM edifici e
 JOIN stradario s ON s.Identificativo_nazionale = e.Stradario ;
 
--- Dump della struttura di vista pe.pratiche_view
+-- Dump della struttura di vista pe.pe_pratiche_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
-CREATE VIEW `pe_pratiche_view` AS
-SELECT  p.ID,
+CREATE VIEW `pe_pratiche_view` AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
 		p.Numero,
@@ -571,124 +694,7 @@ SELECT  p.ID,
 		WHERE isp.Pratica = p.ID) Intestatari_societa
 
 FROM pe_pratiche p
-LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale;
-
-CREATE TABLE `log_cancellazioni` (
-	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`Utente` INT(10) UNSIGNED NOT NULL,
-	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`IP` CHAR(15) NOT NULL,
-	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
-	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
-	`Valore` TEXT NOT NULL,
-	UNIQUE INDEX `ID` (`ID`),
-	INDEX `FK_log_inserimenti_utenti` (`Utente`),
-	CONSTRAINT `log_cancellazioni_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `log_gestione_utenti` (
-	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`Utente` INT(10) UNSIGNED NOT NULL,
-	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`IP` CHAR(15) NOT NULL,
-	`Azione` ENUM('Attivazione','Rimozione','Promozione','Declassazione') NOT NULL,
-	UNIQUE INDEX `ID` (`ID`),
-	INDEX `FK_log_inserimenti_utenti` (`Utente`),
-	CONSTRAINT `log_gestione_utenti_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `log_inserimenti` (
-	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`Utente` INT(10) UNSIGNED NOT NULL,
-	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`IP` CHAR(15) NOT NULL,
-	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
-	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
-	`Valore` TEXT NOT NULL,
-	UNIQUE INDEX `ID` (`ID`),
-	INDEX `FK_log_inserimenti_utenti` (`Utente`),
-	CONSTRAINT `FK_log_inserimenti_utenti` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `log_modifiche` (
-	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`Utente` INT(10) UNSIGNED NOT NULL,
-	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`IP` CHAR(15) NOT NULL,
-	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
-	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
-	`Valore_vecchio` TEXT NOT NULL,
-	`Valore_nuovo` TEXT NOT NULL,
-	UNIQUE INDEX `ID` (`ID`),
-	INDEX `FK_log_inserimenti_utenti` (`Utente`),
-	CONSTRAINT `log_modifiche_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `log_report` (
-	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`Utente` INT(10) UNSIGNED NOT NULL,
-	`Data_ora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`IP` CHAR(15) NOT NULL,
-	`Categoria` ENUM('Anagrafica','Pratica','Edificio') NOT NULL,
-	`Tipo` ENUM('Persona','Societa','Tecnico','Impresa','PE','TEC','Edificio') NOT NULL,
-	UNIQUE INDEX `ID` (`ID`),
-	INDEX `FK_log_inserimenti_utenti` (`Utente`),
-	CONSTRAINT `log_report_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `oneri_cc` (
-	`Pratica` CHAR(10) NOT NULL,
-	`Descrizione_intervento` CHAR(255) NOT NULL,
-	`Segno` CHAR(1) NOT NULL,
-	`Zona_omogenea` CHAR(6) NOT NULL,
-	`Densita_fondiaria` CHAR(3) NOT NULL,
-	`Caratteristiche_intervento` CHAR(3) NOT NULL,
-	`Caratteristiche_edificio` CHAR(3) NOT NULL,
-	`Tipo_edificio` CHAR(3) NOT NULL,
-	`Tipo_intervento` CHAR(3) NOT NULL,
-	`Codice_attivita` CHAR(3) NULL DEFAULT NULL,
-	`Modo` INT(11) NOT NULL,
-	`Volume` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`Superficie` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`Superficie_non_residenziale` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`Superficie_scoperta` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`Alloggi` INT(11) UNSIGNED NOT NULL,
-	`Incremento` INT(11) UNSIGNED NOT NULL,
-	`Computo_metrico` INT(11) UNSIGNED NOT NULL,
-	`CC` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`OU1` DECIMAL(10,2) UNSIGNED NOT NULL,
-	`OU2` DECIMAL(10,2) UNSIGNED NOT NULL,
-	INDEX `FK_oneri_tec_pratiche` (`Pratica`),
-	CONSTRAINT `FK_oneri_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
-
-CREATE TABLE `oneri_cc_superfici_alloggi` (
-	`Pratica` CHAR(10) NOT NULL,
-	`Superficie` DECIMAL(10,2) UNSIGNED NOT NULL,
-	INDEX `FK_oneri_superfici_alloggi_tec_pratiche` (`Pratica`),
-	CONSTRAINT `FK_oneri_superfici_alloggi_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
+LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

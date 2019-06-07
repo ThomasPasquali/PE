@@ -68,10 +68,13 @@
                 getSubalterniEdifici($_POST['edifici'], $c->db);
                 exit();
 
-            case 'getPraticaNumberForAnno':
-                getPraticaNumberForAnno($_POST['anno'], $c->db);
+            case 'getPraticaPENumberForTipoAnno':
+                getPraticaNumberForTipoAnno($_POST['tipo'], $_POST['anno'], 'pe', $c->db);
                 exit();
-
+                
+            case 'getPraticaTECNumberForTipoAnno':
+                getPraticaNumberForTipoAnno($_POST['tipo'], $_POST['anno'], 'tec', $c->db);
+                exit();
 
             default:
                 header('Content-type: text/plain');
@@ -227,12 +230,12 @@
         }
     }
 
-    function getPraticaNumberForAnno($anno, $db){
+    function getPraticaNumberForTipoAnno($tipo, $anno, $tec_o_pe, $db){
       $res = $db->ql(
           'SELECT MAX(Numero)+1 n
-           FROM pe_pratiche
-           WHERE Anno = ?',
-          [$anno]);
+           FROM '.$tec_o_pe.'_pratiche
+           WHERE Tipo = ? AND Anno = ?',
+          [$tipo, $anno]);
 
       header('Content-type: text/plain');
       echo ($res?$res[0]['n']:'');
