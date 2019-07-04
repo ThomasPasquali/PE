@@ -6,6 +6,7 @@
             $json = json_encode($ob);
             $array = json_decode($json, true);
             define('COSTI_BASE', $array);
+            //var_dump(COSTI_BASE);
         }
         /**
          * 
@@ -25,37 +26,22 @@
          * 
          * @return array Array contenente le chiavi CC, OU1, OU2
          */
-        public static function calcola($intervento, $data, $densita_fondiaria, $zona,
+        public static function calcola($descrizione_intervento, $data, $destinazione_uso, $zona) {/*$densita_fondiaria, $zona,
             $tipo_intervento, $tipo_edificio, $caratteristiche_intervento, 
             $caratteristiche_edificio, $superficie_scoperta, $superfici_alloggi,
-            $superficie_non_residenziabile, $incremento, $modo = 3) {
+            $superficie_non_residenziabile, $incremento, $modo = 3) {*/
             
-            print_r(COSTI_BASE[$tipo_intervento][$caratteristiche_intervento][substr($zona, 0, 1)]['Dens']);
-                
-            print_r(COSTI_BASE);
-            
-            /*/TODO
+            //print_r(COSTI_BASE['OU'][$tipo_intervento][$caratteristiche_intervento][substr($zona, 0, 1)]['Dens']);
+        
             //OU1, OU2 
-            switch ($tipo_intervento) {
-                
-                case 'A':
-                    
-                $arr = ['A' => ['1336', '2005'], 'B'];
-                $da_pagare_OU1 = $quantita * $tariffa_OU1_da_array;
-                $da_pagare_OU2 = $quantita * $tariffa_OU2_da_array;
-                break;
-                
-                //TODO
-                
-                default:
-                    ;
-                break;
-            }*/
+            
             
             
             
         }
       
     }
+    
+    //Initialization
     OneriECosti::init();
 ?>

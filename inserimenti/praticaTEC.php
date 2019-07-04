@@ -128,7 +128,7 @@
 ?>
 <html>
 <head>
-    <title>Inerimento pratica TEC</title>
+    <title>Inserimento pratica TEC</title>
     <script src="../lib/jquery-3.3.1.min.js"></script>
     <script src="../js/hints.js"></script>
     <script src="../js/misc.js"></script>

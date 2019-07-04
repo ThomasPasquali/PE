@@ -14,7 +14,19 @@
     var_dump($c->getLastDBErrorInfo());*/
     
     include_once 'lib/oneriEcosti/oneriEcosti.php';
-    //OneriECosti::calcola($intervento, $data, $densita_fondiaria, $zona, $tipo_intervento, $tipo_edificio, $caratteristiche_intervento, $caratteristiche_edificio, $superficie_scoperta, $superfici_alloggi, $superficie_non_residenziabile, $incremento)
+    $intervento = 'Intervento';
+    $data = '2019-06-22';
+    $densita_fondiaria = 1.5;
+    $zona = 'A';
+    $tipo_intervento = 'A';
+    $tipo_edificio = 'A';
+    $caratteristiche_intervento = 'A';
+    $caratteristiche_edificio = 'A';
+    $superficie_scoperta = 0;
+    $superfici_alloggi = 100;
+    $superficie_non_residenziabile = 0;
+    $incremento = 0;
+    //OneriECosti::calcola($intervento, $data, $densita_fondiaria, $zona, $tipo_intervento, $tipo_edificio, $caratteristiche_intervento, $caratteristiche_edificio, $superficie_scoperta, $superfici_alloggi, $superficie_non_residenziabile, $incremento);
     //OneriECosti::calcola('Intervento', '2019-06-06', 1.5, 'B', 'A', 'A', 'A', 'A', 0, [50, 10.5], 0, 0);
     
     /*$res = $c->db->ql('SELECT ID FROM tec_pratiche');
