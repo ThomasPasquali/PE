@@ -108,8 +108,8 @@
 		
 		<Attività_produttiva title="Destinazione_d'uso">
 		
-			<A title="Zona" description="Centro_storico">
-			
+			<!-- <A title="Zona" description="Centro_storico">
+				
 			</A>
 			
 			<B title="Zona" description="Di_completamento">
@@ -118,14 +118,120 @@
 			
 			<C title="Zona" description="Di_espansione">
 			
-			</C>
+			</C> -->
 			
 			<D title="Zona" description="Insediamenti_produttivi">
 			
+				<Agricolutra title="Settore">
+				
+					<Question text="Tipologia titolare">
+						<Option value="Nessuna nota">
+							<OU1>5.24927</OU1>
+							<OU2>0.65642</OU2>
+						</Option>
+						<Option value="Nota 5a2 (imprenditore agricolo a titolo principale non fruizione fondo)">
+							<OU1>1.57416</OU1>
+							<OU2>0.19677</OU2>
+						</Option>
+						<Option value="Nota 5b1 (imprenditore agricolo diverso in fruizione fondo)">
+							<OU1>3.14832</OU1>
+							<OU2>0.39354</OU2>
+						</Option>
+						<Option value="Nota 5b2 (imprenditore agricolo diverso non fruizione fondo)">
+							<OU1>5.24927</OU1>
+							<OU2>0.65642</OU2>
+						</Option>
+						<Option value="Nota 7 (intervento agro-industriale zone di completamento)">
+							<OU1>2.62773</OU1>
+							<OU2>0.32847</OU2>
+						</Option>
+					</Question>
+					
+				</Agricolutra>
+					
+				<Artigianato title="Settore">
+				
+					<Question text="Tipologia artigianale">
+						<Option value="Nessuna nota">
+							<OU1>4.77206</OU1>
+							<OU2>1.78952</OU2>
+						</Option>
+						<Option value="Nota 6 (artistico e di servizio)">
+							<OU1>2.38603</OU1>
+							<OU2>0.89502</OU2>
+						</Option>
+						<Option value="Nota 7 (artigianale in zone di completamento)">
+							<OU1>2.38603</OU1>
+							<OU2>0.89502</OU2>
+						</Option>
+					</Question>
+					
+				</Artigianato>
+				
+				<Industria title="Settore">
+					
+					<Question text="Tipologia industriale">
+						<Option value="Nessuna nota">
+							<OU1>5.96508</OU1>
+							<OU2>4.77206</OU2>
+						</Option>
+						<Option value="In zone di completamento">
+							<OU1>2.98254</OU1>
+							<OU2>2.38603</OU2>
+						</Option>
+					</Question>
+					
+				</Industria>
+				
 			</D>
 			
 			<E title="Zona" description="Agricola">
-			
+				
+				<Agricolutra title="Settore">
+				
+					<Question text="Tipologia titolare">
+						<Option value="Nessuna nota">
+							<OU1>4.77206</OU1>
+							<OU2>0.59651</OU2>
+						</Option>
+						<Option value="Nota 5a2 (imprenditore agricolo a titolo principale non fruizione fondo)">
+							<OU1>1.43162</OU1>
+							<OU2>0.17921</OU2>
+						</Option>
+						<Option value="Nota 5b1 (imprenditore agricolo diverso in fruizione fondo)">
+							<OU1>2.86324</OU1>
+							<OU2>0.35790</OU2>
+						</Option>
+						<Option value="Nota 5b2 (imprenditore agricolo diverso non fruizione fondo)">
+							<OU1>4.77206</OU1>
+							<OU2>0.59651</OU2>
+						</Option>
+					</Question>
+					
+				</Agricolutra>
+				
+				<Artigianato title="Settore">
+				
+					<Question text="Tipologia artigianale">
+						<Option value="Nessuna nota">
+							<OU1>4.77206</OU1>
+							<OU2>1.78952</OU2>
+						</Option>
+						<Option value="Nota 6 (artistico e di servizio)">
+							<OU1>2.38603</OU1>
+							<OU2>0.89502</OU2>
+						</Option>
+					</Question>
+					
+				</Artigianato>
+				
+				<Industria title="Settore">
+					
+					<OU1>5.96508</OU1>
+					<OU2>4.77206</OU2>
+					
+				</Industria>
+				
 			</E>
 		
 		</Attività_produttiva>
@@ -133,27 +239,38 @@
 		<Turistica title="Destinazione_d'uso">
 		
 			<A title="Zona" description="Centro_storico">
-			
+				<OU1>3.03677</OU1>
+				<OU2>6.16650</OU2>
 			</A>
 			
 			<B title="Zona" description="Di_completamento">
-			
+				<OU1>3.90183</OU1>
+				<OU2>4.93320</OU2>
 			</B>
 			
-			<C title="Zona" description="Di_espansione">
+			<C1 title="Zona" description="Di_espansione">
+				<OU1>5.85301</OU1>
+				<OU2>7.39979</OU2>
+			</C1>
 			
-			</C>
+			<C2 title="Zona" description="Di_espansione">
+				<OU1>10.27026</OU1>
+				<OU2>6.16598</OU2>
+			</C2>
 			
 			<D title="Zona" description="Insediamenti_produttivi">
-			
+				<OU1>4.87794</OU1>
+				<OU2>4.93320</OU2>
 			</D>
 			
 			<E title="Zona" description="Agricola">
-			
+				<OU1>6.84667</OU1>
+				<OU2>5.54933</OU2>
 			</E>
 			
 			<F title="Zona" description="Attrezzatura">
-			
+				<OU1>2.73361</OU1>
+				<OU2>9.30397</OU2>
 			</F>
 		
 		</Turistica>
@@ -161,27 +278,38 @@
 		<Commerciale title="Destinazione_d'uso">
 		
 			<A title="Zona" description="Centro_storico">
-			
+				<OU1>6.84667</OU1>
+				<OU2>8.18119</OU2>
 			</A>
 			
 			<B title="Zona" description="Di_completamento">
-			
+				<OU1>12.04739</OU1>
+				<OU2>9.35045</OU2>
 			</B>
 			
-			<C title="Zona" description="Di_espansione">
+			<C1 title="Zona" description="Di_espansione">
+				<OU1>13.76874</OU1>
+				<OU2>9.35045</OU2>
+			</C1>
 			
-			</C>
+			<C2 title="Zona" description="Di_espansione">
+				<OU1>22.60377</OU1>
+				<OU2>11.68794</OU2>
+			</C2>
 			
 			<D title="Zona" description="Insediamenti_produttivi">
-			
+				<OU1>17.21041</OU1>
+				<OU2>14.02594</OU2>
 			</D>
 			
 			<E title="Zona" description="Agricola">
-			
+				<OU1>33.90488</OU1>
+				<OU2>10.51868</OU2>
 			</E>
 			
 			<F title="Zona" description="Attrezzatura">
-			
+				<OU1>7.70347</OU1>
+				<OU2>10.51868</OU2>
 			</F>
 			
 		</Commerciale>
@@ -189,27 +317,38 @@
 		<Direzionale title="Destinazione_d'uso">
 			
 			<A title="Zona" description="Centro_storico">
-			
+				<OU1>7.70347</OU1>
+				<OU2>10.51868</OU2>
 			</A>
 			
 			<B title="Zona" description="Di_completamento">
-			
+				<OU1>13.76874</OU1>
+				<OU2>9.35045</OU2>
 			</B>
 			
-			<C title="Zona" description="Di_espansione">
+			<C1 title="Zona" description="Di_espansione">
+				<OU1>20.65156</OU1>
+				<OU2>14.02594</OU2>
+			</C1>
 			
-			</C>
+			<C2 title="Zona" description="Di_espansione">
+				<OU1>33.90488</OU1>
+				<OU2>14.02594</OU2>
+			</C2>
 			
 			<D title="Zona" description="Insediamenti_produttivi">
-			
+				<OU1>17.21041</OU1>
+				<OU2>11.68794</OU2>
 			</D>
 			
 			<E title="Zona" description="Agricola">
-			
+				<OU1>33.90488</OU1>
+				<OU2>14.02594</OU2>
 			</E>
 			
 			<F title="Zona" description="Attrezzatura">
-			
+				<OU1>7.70347</OU1>
+				<OU2>10.51868</OU2>
 			</F>
 			
 		</Direzionale>
