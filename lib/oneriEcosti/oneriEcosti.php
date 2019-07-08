@@ -1,12 +1,12 @@
 <?php 
     class OneriECosti {
         
+        private static $branchCount;
+        private static $costi_e_oneri;
+        
         static function init() {
-            $ob = simplexml_load_file(__DIR__.'\costiBase.xml');
-            $json = json_encode($ob);
-            $array = json_decode($json, true);
-            define('COSTI_BASE', $array);
-            //var_dump(COSTI_BASE);
+            OneriECosti::$branchCount = 0;
+            OneriECosti::$costi_e_oneri = json_decode(json_encode(simplexml_load_file(__DIR__.'\costiBase.xml')), true);
         }
         /**
          * 
@@ -38,6 +38,52 @@
             
             
             
+        }
+        
+        public static function generaQuestionario() {
+            OneriECosti::createSelect(OneriECosti::$costi_e_oneri['OU']);
+        }
+        
+        private static function createSelect($xml, $loopCount = 0, $branch = NULL) {
+            
+            foreach ($xml as $key => $items)
+                if($key != '@attributes' && $key != 'comment'){
+                    
+                    $branch = $branch==NULL?OneriECosti::$branchCount++:$branch;
+                    
+                    echo "<div class=\"branch".$branch." level$loopCount".(isset($xml['@attributes']['value'])?' '.$xml['@attributes']['value']:'').($loopCount>0?' hidden':'')."\">";
+                    
+                    echo "<h2>$key</h2>";
+                    
+                    echo '<select onclick="showOnlyThatDiv(\'level'.($loopCount+1).($branch>0?' branch'.$branch:'').'\', this.options[this.selectedIndex].getAttribute(\'value\'));">';
+                    echo '<option></option>';
+                    foreach ($items as $option)
+                        echo '<option value="'.$option['@attributes']['value'].'">'.$option['@attributes']['value'].'</option>';
+                    echo '</select>';
+                        
+                    foreach ($items as $option)
+                        if(OneriECosti::has_all_keys($option, ['OU1', 'OU2']))
+                            echo '<button type="button" class="branch'.$branch.' level'.($loopCount+1).' '.$option['@attributes']['value'].' hidden" onclick="setOU1OU2('.$option['OU1'].', '.$option['OU2'].');">Conferma oneri</button>';
+                        else
+                    OneriECosti::createSelect($option, $loopCount+1, $branch);
+                                    
+                    echo '</div>';
+            }
+            
+        }
+        
+        private static function has_more_keys($array, $exclusions) {
+            foreach ($array as $key => $value)
+                if(!in_array($key, $exclusions))
+                    return true;
+                    return false;
+        }
+        
+        private static function has_all_keys($array, $keys) {
+            foreach ($keys as $key)
+                if(!isset($array[$key]))
+                    return false;
+                    return true;
         }
       
     }

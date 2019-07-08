@@ -83,16 +83,14 @@
 				</Zona>
 				
 				<Zona value="E " description="Agricola">
-					<Question text="Imprenditore agricolo a titolo principale?">
-						<Option text="Si">
-							<OU1>1.65679</OU1>
-							<OU2>0.82840</OU2>
-						</Option>
-						<Option value="No">
-							<OU1>0.82840</OU1>
-							<OU2>0.41420</OU2>
-						</Option>
-					</Question>
+					<Option value="Imprenditore_agricolo_a_titolo_principale">
+						<OU1>1.65679</OU1>
+						<OU2>0.82840</OU2>
+					</Option>
+					<Option value="Imprenditore_agricolo_NON_a_titolo_principale">
+						<OU1>0.82840</OU1>
+						<OU2>0.41420</OU2>
+					</Option>
 				</Zona>
 				
 			</Tipo_di_intervento>
