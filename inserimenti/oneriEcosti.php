@@ -34,7 +34,6 @@
 <head>
 	<title>Calcolo CC e OU</title>
     <script src="../lib/jquery-3.3.1.min.js"></script>
-    <script src="../js/inserimento_oneriEcosti.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/form.css">
     <link rel="stylesheet" type="text/css" href="../css/inserimento_oneriEcosti.css">
 </head>
@@ -74,53 +73,15 @@
 	    include_once '../lib/oneriEcosti/oneriEcosti.php';
 	    OneriECosti::generaQuestionario();
 	}
-	    /*libxml_use_internal_errors(true);
-	    $xml = simplexml_load_string(file_get_contents('../lib/oneriEcosti/costiBase.xml'));
-	    if(!$xml){ echo "ERRORE NEL PARSING DEL FILE XML"; exit(); }
-	    
-	    $ob = simplexml_load_file('../lib/oneriEcosti/costiBase.xml');
-	    $json = json_encode($ob);
-	    $xmlArray = json_decode($json, true);
-	    
-        $ou = $xml->OU;
-        echo '<h2>Destinazione d\'uso</h2>';
-        echo '<select onchange="showOnlyThatDiv(\'divDestinazioneUso\', this.options[this.selectedIndex].innerHTML);">';
-        echo '<option></option>';
-        foreach ($ou->Destinazione_uso as $dest_uso) echo "<option value=\"$dest_uso[value]\">$dest_uso[value]</option>";
-        echo '</select>';
-            
-        foreach ($ou->Destinazione_uso as $dest_uso){
-            echo "<div class=\"divDestinazioneUso\" id=\"$dest_uso[value]\">";
-            switch ($dest_uso['value']) {
-                
-                case 'Residenza':
-                    echo '<h2>Tipo di intervento</h2>';
-                    echo '<select onchange="showOnlyThatDiv(\'divTipoIntervento\', this.options[this.selectedIndex].innerHTML);">';
-                    echo '<option></option>';
-                    foreach ($dest_uso->Tipo_di_intervento as $tipo_intervento)
-                        echo "<option value=\"$tipo_intervento[value]\">$tipo_intervento[value]</option>";
-                    echo '</select>';
-                    
-                    foreach ($dest_uso->Tipo_di_intervento as $tipo_intervento){
-                        echo "<div class=\"divTipoIntervento\" id=\"$tipo_intervento[value]\">";
-                        iterateOverZone($tipo_intervento, $countSetDomande++);
-                        echo '</div>';
-                    }
-                        
-                break;
-                
-                
-                default:
-                    echo "Destinazione d'uso $dest_uso[value] non gestito";
-                break;
-            }
-            echo '</div>';
-        }
-        
-        $cc = $xml->CC;
-	} */
 	?>
 	</div>
+	
+	<div id="inserimento-imponibile">
+		<h1 id="titolo-imponibile"></h1>
+		<input id="imponibile" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="0" step="1" value="0.000" >
+		<button id="btnBloccaOneri" type="button">Conferma</button>
+	</div>
 
+	<script src="../js/inserimento_oneriEcosti.js"></script>
 </body>
 </html>

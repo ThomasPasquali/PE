@@ -53,17 +53,17 @@
                     
                     echo "<div class=\"branch".$branch." level$loopCount".(isset($xml['@attributes']['value'])?' '.$xml['@attributes']['value']:'').($loopCount>0?' hidden':'')."\">";
                     
-                    echo "<h2>$key</h2>";
+                    echo '<h2>'.str_replace('_', ' ', $key).'</h2>';
                     
-                    echo '<select onclick="showOnlyThatDiv(\'level'.($loopCount+1).($branch>0?' branch'.$branch:'').'\', this.options[this.selectedIndex].getAttribute(\'value\'));">';
+                    echo '<select onchange="showOnlyThatDiv(\'level'.($loopCount+1).($branch>0?' branch'.$branch:'').'\', this.options[this.selectedIndex].getAttribute(\'value\'));">';
                     echo '<option></option>';
                     foreach ($items as $option)
-                        echo '<option value="'.$option['@attributes']['value'].'">'.$option['@attributes']['value'].'</option>';
+                        echo '<option value="'.$option['@attributes']['value'].'">'.str_replace('_', ' ', $option['@attributes']['value'].(isset($option['@attributes']['description'])?' ('.$option['@attributes']['description'].')':'')).'</option>';
                     echo '</select>';
                         
                     foreach ($items as $option)
                         if(OneriECosti::has_all_keys($option, ['OU1', 'OU2']))
-                            echo '<button type="button" class="branch'.$branch.' level'.($loopCount+1).' '.$option['@attributes']['value'].' hidden" onclick="setOU1OU2('.$option['OU1'].', '.$option['OU2'].');">Conferma oneri</button>';
+                            echo '<button type="button" class="branch'.$branch.' level'.($loopCount+1).' '.$option['@attributes']['value'].' hidden" onclick="setCoefficenti('.$option['OU1'].', '.$option['OU2'].', \''.($option['UM']??'metri quadrati').'\');">Conferma oneri</button>';
                         else
                     OneriECosti::createSelect($option, $loopCount+1, $branch);
                                     

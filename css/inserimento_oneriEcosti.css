@@ -7,6 +7,6 @@
 	cursor: crosshair;
 }
 
-.hidden, #main-div {
+.hidden, #main-div, #inserimento-imponibile {
 	display: none;
 }
