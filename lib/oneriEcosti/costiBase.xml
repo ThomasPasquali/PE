@@ -1,95 +1,88 @@
 <COSTI_E_ONERI>
 	<OU>
 		
-		<Residenza title="Destinazione_d'uso">
+		<Destinazione_uso value="Residenza">
 		
-			<Nuova_costruzione title="Tipo_di_intervento">
-				<A title="Zona" description="Centro_storico">
+			<Tipo_di_intervento value="Nuova_costruzione">
+				<Zona value="A" description="Centro_storico">
 					<OU1>0.68999</OU1>
 					<OU2>1.03550</OU2>
-				</A>
-				<B1 title="Zona" description="Di_completamento">
+				</Zona>
+				<Zona value="B1" description="Di_completamento">
 					<OU1>1.17959</OU1>
 					<OU2>1.24260</OU2>
-				</B1>
-				<B2 title="Zona" description="Di_completamento">
+				</Zona>
+				<Zona value="B2" description="Di_completamento">
 					<OU1>1.17959</OU1>
 					<OU2>1.24260</OU2>
-				</B2>
-				
+				</Zona>
 				<!-- CORREGGERE (eventualmente) ZONE C -->
-				<C1.1 title="Zona" description="Di_espansione">
+				<Zona value="C1.1" description="Di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-				</C1.1>
-				
-				<C1.2 title="Zona" description="Di_espansione">
+				</Zona>
+				<Zona value="C1.2" description="Di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-				</C1.2>
-				
-				<C2.1 title="Zona" description="Di_espansione">
+				</Zona>
+				<Zona value="C2.1" description="Di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-				</C2.1>
-				
-				<C2.2 title="Zona" description="Di_espansione">
+				</Zona>
+				<Zona value="C2.2" description="Di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-				</C2.2>
+				</Zona>
+				<Zona value="E" description="Agricola">
+					<Opzione value="Imprenditore_agricolo_a_titolo_principale">
+						<OU1>8.28294</OU1>
+						<OU2>4.14198</OU2>
+					</Opzione>
+					<Opzione value="Imprenditore_agricolo_NON_a_titolo_principale">
+						<OU1>4.14147</OU1>
+						<OU2>2.07099</OU2>
+					</Opzione>
+				</Zona>
 				
-				<E  title="Zona" description="Agricola">
-						<Question text="Imprenditore agricolo a titolo principale?">
-							<Option text="Si">
-								<OU1>8.28294</OU1>
-								<OU2>4.14198</OU2>
-							</Option>
-							<Option text="No">
-								<OU1>4.14147</OU1>
-								<OU2>2.07099</OU2>
-							</Option>
-						</Question>
-				</E>
-				
-			</Nuova_costruzione>
+			</Tipo_di_intervento>
 			
-			<Ristrutturazione title="Tipo_di_intervento">
+			<Tipo_di_intervento value="Ristrutturazione">
 
-				<A title="Zona" description="Centro_storico">
+				<Zona value="A" description="Centro_storico">
 					<OU1>0.13789</OU1>
 					<OU2>0.20710</OU2>
-				</A>
-				<B1 title="Zona" description="Di_completamento">
+				</Zona>
+				<Zona value="B1" description="Di_completamento">
 					<OU1>0.23602</OU1>
 					<OU2>0.24842</OU2>
-				</B1>
-				<B2 title="Zona" description="Di_completamento">
+				</Zona>
+				<Zona value="B2" description="Di_completamento">
 					<OU1>0.23602</OU1>
 					<OU2>0.24842</OU2>
-				</B2>
+				</Zona>
 				
 				<!-- CORREGGERE (eventualmente) ZONE C -->
-				<C1.1 title="Zona" description="Di_espansione">
+				<Zona value="C1.1" description="Di_espansione">
 					<OU1>0.39354</OU1>
 					<OU2>0.41420</OU2>
-				</C1.1>
+				</Zona>
 				
-				<C1.2 title="Zona" description="Di_espansione">
+				<Zona value="C1.2" description="Di_espansione">
 					<OU1>0.39354</OU1>
 					<OU2>0.41420</OU2>
-				</C1.2>
+				</Zona>
 				
-				<C2.1 title="Zona" description="Di_espansione">
+				<Zona value="C2.1" description="Di_espansione">
 					<OU1>0.39354</OU1>
 					<OU2>0.41420</OU2>
-				</C2.1>
+				</Zona>
 				
-				<C2.2 title="Zona" description="Di_espansione">
+				<Zona value="C2.2" description="Di_espansione">
 					<OU1>0.39354</OU1>
 					<OU2>0.41420</OU2>
-				</C2.2>
+				</Zona>
 				
-				<E  title="Zona" description="Agricola">
+				<Zona value="E " description="Agricola">
 					<Question text="Imprenditore agricolo a titolo principale?">
 						<Option text="Si">
 							<OU1>1.65679</OU1>
@@ -100,27 +93,27 @@
 							<OU2>0.41420</OU2>
 						</Option>
 					</Question>
-				</E>
+				</Zona>
 				
-			</Ristrutturazione>
+			</Tipo_di_intervento>
 			
-		</Residenza>
+		</Destinazione_uso>
 		
-		<Attività_produttiva title="Destinazione_d'uso">
-		
-			<!-- <A title="Zona" description="Centro_storico">
+		<Destinazione_uso value="Attività_produttiva">
+			
+			<!-- <Zona value="A" description="Centro_storico">
 				
-			</A>
+			</Zona>
 			
-			<B title="Zona" description="Di_completamento">
+			<Zona value="B" description="Di_completamento">
 			
-			</B>
+			</Zona>
 			
-			<C title="Zona" description="Di_espansione">
+			<Zona value="C" description="Di_espansione">
 			
-			</C> -->
+			</Zona> -->
 			
-			<D title="Zona" description="Insediamenti_produttivi">
+			<Zona value="D" description="Insediamenti_produttivi">
 			
 				<Agricolutra title="Settore">
 				
@@ -183,9 +176,9 @@
 					
 				</Industria>
 				
-			</D>
+			</Zona>
 			
-			<E title="Zona" description="Agricola">
+			<Zona value="E" description="Agricola">
 				
 				<Agricolutra title="Settore">
 				
@@ -232,126 +225,127 @@
 					
 				</Industria>
 				
-			</E>
+			</Zona>
 		
-		</Attività_produttiva>
+		</Destinazione_uso>
 		
-		<Turistica title="Destinazione_d'uso">
+		<Destinazione_uso value="Turistica">
 		
-			<A title="Zona" description="Centro_storico">
+			<Zona value="A" description="Centro_storico">
 				<OU1>3.03677</OU1>
 				<OU2>6.16650</OU2>
-			</A>
+			</Zona>
 			
-			<B title="Zona" description="Di_completamento">
+			<Zona value="B" description="Di_completamento">
 				<OU1>3.90183</OU1>
 				<OU2>4.93320</OU2>
-			</B>
+			</Zona>
 			
-			<C1 title="Zona" description="Di_espansione">
+			<Zona value="C1" description="Di_espansione">
 				<OU1>5.85301</OU1>
 				<OU2>7.39979</OU2>
-			</C1>
+			</Zona>
 			
-			<C2 title="Zona" description="Di_espansione">
+			<Zona value="C2" description="Di_espansione">
 				<OU1>10.27026</OU1>
 				<OU2>6.16598</OU2>
-			</C2>
+			</Zona>
 			
-			<D title="Zona" description="Insediamenti_produttivi">
+			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>4.87794</OU1>
 				<OU2>4.93320</OU2>
-			</D>
+			</Zona>
 			
-			<E title="Zona" description="Agricola">
+			<Zona value="E" description="Agricola">
 				<OU1>6.84667</OU1>
 				<OU2>5.54933</OU2>
-			</E>
+			</Zona>
 			
-			<F title="Zona" description="Attrezzatura">
+			<Zona value="F" description="Attrezzatura">
 				<OU1>2.73361</OU1>
 				<OU2>9.30397</OU2>
-			</F>
+			</Zona>
 		
-		</Turistica>
+		</Destinazione_uso>
 		
-		<Commerciale title="Destinazione_d'uso">
+		<Destinazione_uso value="Commerciale">
 		
-			<A title="Zona" description="Centro_storico">
+			<Zona value="A" description="Centro_storico">
 				<OU1>6.84667</OU1>
 				<OU2>8.18119</OU2>
-			</A>
+			</Zona>
 			
-			<B title="Zona" description="Di_completamento">
+			<Zona value="B" description="Di_completamento">
 				<OU1>12.04739</OU1>
 				<OU2>9.35045</OU2>
-			</B>
+			</Zona>
 			
-			<C1 title="Zona" description="Di_espansione">
+			<Zona value="C1" description="Di_espansione">
 				<OU1>13.76874</OU1>
 				<OU2>9.35045</OU2>
-			</C1>
+			</Zona>
 			
-			<C2 title="Zona" description="Di_espansione">
+			<Zona value="C2" description="Di_espansione">
 				<OU1>22.60377</OU1>
 				<OU2>11.68794</OU2>
-			</C2>
+			</Zona>
 			
-			<D title="Zona" description="Insediamenti_produttivi">
+			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>17.21041</OU1>
 				<OU2>14.02594</OU2>
-			</D>
+			</Zona>
 			
-			<E title="Zona" description="Agricola">
+			<Zona value="E" description="Agricola">
 				<OU1>33.90488</OU1>
 				<OU2>10.51868</OU2>
-			</E>
+			</Zona>
 			
-			<F title="Zona" description="Attrezzatura">
+			<Zona value="F" description="Attrezzatura">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-			</F>
+			</Zona>
 			
-		</Commerciale>
+		</Destinazione_uso>
 		
-		<Direzionale title="Destinazione_d'uso">
+		<Destinazione_uso value="Direzionale">
 			
-			<A title="Zona" description="Centro_storico">
+			<Zona value="A" description="Centro_storico">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-			</A>
+			</Zona>
 			
-			<B title="Zona" description="Di_completamento">
+			<Zona value="B" description="Di_completamento">
 				<OU1>13.76874</OU1>
 				<OU2>9.35045</OU2>
-			</B>
+			</Zona>
 			
-			<C1 title="Zona" description="Di_espansione">
+			<Zona value="C1" description="Di_espansione">
 				<OU1>20.65156</OU1>
 				<OU2>14.02594</OU2>
-			</C1>
+			</Zona>
 			
-			<C2 title="Zona" description="Di_espansione">
+			<Zona value="C2" description="Di_espansione">
 				<OU1>33.90488</OU1>
 				<OU2>14.02594</OU2>
-			</C2>
+			</Zona>
 			
-			<D title="Zona" description="Insediamenti_produttivi">
+			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>17.21041</OU1>
 				<OU2>11.68794</OU2>
-			</D>
+			</Zona>
 			
-			<E title="Zona" description="Agricola">
+			<Zona value="E" description="Agricola">
 				<OU1>33.90488</OU1>
 				<OU2>14.02594</OU2>
-			</E>
+			</Zona>
 			
-			<F title="Zona" description="Attrezzatura">
+			<Zona value="F" description="Attrezzatura">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-			</F>
+			</Zona>
 			
-		</Direzionale>
+		</Destinazione_uso>
+		
 		
 	</OU>
 	

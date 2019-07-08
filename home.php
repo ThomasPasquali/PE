@@ -206,7 +206,7 @@
                 <div class="dropdown-content">
                 	<a href="inserimenti/praticaPE.php">Pratica</a>
                 	<a href="inserimenti/praticaTEC.php">Pratica tec</a>
-                	<a href="inserimenti/oneriEcosti.php">OU e/o CC</a>
+                	<a href="inserimenti/oneriEcosti.php">OU e CC</a>
                     <a onclick="changeContent('insAnagIntestPers');">Persona</a>
                     <a onclick="changeContent('insAnagTecnici');">Tecnico</a>
                     <a onclick="changeContent('insAnagSocieta');">Società</a>

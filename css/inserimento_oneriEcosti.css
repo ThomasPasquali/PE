@@ -1,4 +1,12 @@
-.box-risultati{
+.box-risultati {
 	display: grid;
 	grid-template-columns: auto auto auto auto auto;
+}
+
+.risultato-pratica {
+	cursor: crosshair;
+}
+
+.hidden, #main-div {
+	display: none;
 }
