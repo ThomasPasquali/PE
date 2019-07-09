@@ -68,18 +68,40 @@
 	</div>
 	
 	<div id="main-div">
+	<h1>Oneri di urbanizzazione</h1>
 	<?php 
 	if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero'])){ 
 	    include_once '../lib/oneriEcosti/oneriEcosti.php';
-	    OneriECosti::generaQuestionario();
+	    OneriECosti::generaQuestionarioOU();
 	}
 	?>
 	</div>
 	
 	<div id="inserimento-imponibile">
-		<h1 id="titolo-imponibile"></h1>
-		<input id="imponibile" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="0" step="1" value="0.000" >
+		<h1 id="titolo-imponibile">Imponibile</h1>
+		<input id="imponibile" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" >
 		<button id="btnBloccaOneri" type="button">Conferma</button>
+	</div>
+	
+	<div id="cc">
+		<h1>Costo di costuzione</h1>
+		<select onchange="switch (this.selectedIndex) { case 0: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').hide(); break; case 1: $('#cc-residenza').show(); $('#cc-turistico-direzionale').hide(); break; case 2: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').show(); break;}">
+			<option></option>
+			<option>Residenza</option>
+			<option>Turistica, commerciale o direzionale</option>
+		</select>
+		<div id="cc-residenza">
+			<h2>Superifici utili abitabili</h2>
+    		<div id="fields-alloggi"></div>
+    		<button onclick="addFieldAlloggio();">Aggiungi alloggio</button>
+    		<button onclick="fineInserimentoAlloggi();">Prosegui</button>
+    		<input id="snr" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. servizi e accessori...">
+		</div>
+		<div id="cc-turistico-direzionale">
+    		<input id="sn" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. calpestabile...">
+    		<input id="sa" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. accessori...">
+    		<button onclick="fineInserimentoAlloggi();">Prosegui</button>
+		</div>
 	</div>
 
 	<script src="../js/inserimento_oneriEcosti.js"></script>

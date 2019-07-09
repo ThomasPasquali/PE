@@ -3,11 +3,13 @@ var pratica, ou1, ou2, um, formOneri, imponibile;
 
 /****************HANDLERS*****************/
 $('#btnBloccaOneri').click(function() {
-	formOneri = serializeByClass('.selezionato');
 	if($('#imponibile').val()<=0)
 		alert('L\'imponibile dev\'essere una quantità possitiva è maggiore di 0');
-	else
+	else{
 		imponibile = $('#imponibile').val();
+		$('#inserimento-imponibile').show();
+		$('#cc').show();
+	}
 });
 
 /****************FUNCTIONS*****************/
@@ -16,6 +18,15 @@ function selectPratica(el) {
 	$('#selezione-pratica').hide();
 	$('#main-div').show();
 };
+
+function addFieldAlloggio() {
+	$('#fields-alloggi').append($('<input>').attr('type', 'number').attr('placeholder', 'Superficie in mq...').addClass('fieldAlloggio'));
+}
+addFieldAlloggio();
+
+function fineInserimentoAlloggi() {
+	
+}
 
 function showOnlyThatDiv(divCommonClasses, divClass) {
 	divCommonClasses = '.'+divCommonClasses.replace( /(:|\.|\[|\])/g, "\\$1" ).replace(/ /, '.');
@@ -39,8 +50,13 @@ function setCoefficenti(OU1, OU2, UM) {
 	ou1=OU1;
 	ou2=OU2;
 	um=UM;
+	formOneri = serializeByClass('.selezionato');
 	$('#main-div').hide();
-	$('#titolo-imponibile').html('Imponibile in '+um);
+	$('#imponibile').attr('placeholder', 'Imponibile in '+um);
+	let div = $('<div></div>');
+	for (let k in formOneri)
+		div.append($('<p></p>').text(k+': ').append($('<span></span>').text(formOneri[k].replace( /_/, " " ))));
+	div.insertAfter($('#titolo-imponibile'));
 	$('#inserimento-imponibile').show();
 }
 

@@ -40,8 +40,12 @@
             
         }
         
-        public static function generaQuestionario() {
+        public static function generaQuestionarioOU() {
             OneriECosti::createSelect(OneriECosti::$costi_e_oneri['OU']);
+        }
+        
+        public static function generaQuestionarioCC() {
+            OneriECosti::createSelect(OneriECosti::$costi_e_oneri['CC']);
         }
         
         private static function createSelect($xml, $loopCount = 0, $branch = NULL) {

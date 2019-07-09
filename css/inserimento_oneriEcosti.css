@@ -7,6 +7,16 @@
 	cursor: crosshair;
 }
 
-.hidden, #main-div, #inserimento-imponibile {
+.hidden, #main-div, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza {
 	display: none;
+}
+
+#titolo-imponibile span {
+	font-weight: bold;
+}
+
+#fields-alloggi {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	width: 50%;
 }

@@ -233,7 +233,7 @@
 							<OU2>1.78952</OU2>
 							<UM>metri quadrati</UM>
 						</Nota>
-						<Nota value="Nota_6_(artistico e di servizio)">
+						<Nota value="Nota_6_(artistico_e_di_servizio)">
 							<OU1>2.38603</OU1>
 							<OU2>0.89502</OU2>
 							<UM>metri quadrati</UM>
@@ -389,11 +389,6 @@
 			
 		</Destinazione_uso>
 		
-		
 	</OU>
-	
-	<CC>
-	
-	</CC>
 	
 </COSTI_E_ONERI>
