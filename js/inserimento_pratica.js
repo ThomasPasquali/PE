@@ -11,12 +11,13 @@ $( "#ricerca-edificio > input" ).keyup(function() {
 });
 
 $('input[name=anno]').keyup(function(){
+  let action = $(this).attr('desc') == 'pe'?'getPraticaPENumberForTipoAnno':'getPraticaTECNumberForTipoAnno';
   let val = $(this).val()+'';
   if(val.length == 4 && $('input[name=numero]').val().length == 0){
     $.ajax({
       url: "../runtime/handler.php",
       type: "POST",
-      data: {'action' : 'getPraticaPENumberForTipoAnno', 'tipo' : $('#tipo-pratica').val(),'anno' : val},
+      data: {'action' : action, 'tipo' : $('#tipo-pratica').val(),'anno' : val},
       success: function(msg) { $('input[name=numero]').val((msg.length == 0?'1':msg)); }
     });
   }else if(val.length > 4)

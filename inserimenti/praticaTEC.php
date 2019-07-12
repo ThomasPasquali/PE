@@ -11,19 +11,11 @@
 
     $infos = [];
     $errors = [];
-    /*if($c->check(['tipo', 'anno', 'numero'], $_POST)){
-        if(isset($_POST['documento_elettronico'])){
-            $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
-            $path = $c->doc_el_root_path."\\$relPath";
-            if(!file_exists($path))
-                mkdir($path, 0777, TRUE);
-            $_POST['documento_elettronico'] = $relPath;
-            if(file_exists($path)) $infos[] = 'Cartella documenti elettronici creata';
-            else                    $errors[] = 'Errore nella creazione della cartella documenti elettronici';
-        }else
-        $_POST['documento_elettronico'] = '';
+    if($c->check(['tipo', 'anno', 'numero'], $_POST)){
+        
+        
 
-        $res = $c->db->dml(
+        /*$res = $c->db->dml(
             'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
               VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
             [':tipo' => $_POST['tipo'],
@@ -49,7 +41,7 @@
 
             $idPratica =  $c->db->ql(
                 'SELECT ID
-                FROM pe_pratiche
+                FROM tec_pratiche
                 WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
                 [$_POST['tipo'], $_POST['anno'], $_POST['numero'], $_POST['barrato']])[0]['ID'];
 
@@ -116,8 +108,8 @@
             }
 
         }else
-          $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
-    }*/
+          $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];*/
+    }
 
 
   //Misc functions
@@ -150,7 +142,7 @@
   ?>
 
   <div class="form">
-    <h1>Inserimento pratiche <span id="info-edificio"></span></h1>
+    <h1>Inserimento pratiche TEC<span id="info-edificio"></span></h1>
       <input type="hidden" name="tipo" value="pe">
 
       <div id="dati-edificio">
@@ -207,7 +199,7 @@
 
             <div class="field">
               <label>Anno</label>
-              <input type="number" name="anno" required="required" pattern="\d{4}">
+              <input type="number" name="anno" desc="tec" required="required" pattern="\d{4}">
             </div>
 
             <div class="field">
@@ -237,38 +229,20 @@
             </div>
 
             <div class="field">
-              <label>Tecnico</label>
+              <label>Tecnici DA FARE</label>
               <input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
               <input id="tecnicoID" name="tecnico" type="hidden">
               <div id="hintsTecnici" class="hintBox"></div>
             </div>
 
-            <div class="field">
-              <label>Impresa</label>
-              <input id="impresa" type="text" onkeyup="updateHints('impresa', this, '#hintsImprese', '#impresaID');" onclick="this.select();">
-              <input id="impresaID" name="impresa" type="hidden">
-              <div id="hintsImprese" class="hintBox"></div>
-            </div>
-
-            <div class="field">
-              <label>Direzione lavori</label>
-              <input id="direzione_lavori" type="text" onkeyup="updateHints('tecnico', this, '#hintsDirezione_lavori', '#direzione_lavoriID');" onclick="this.select();">
-              <input id="direzione_lavoriID" name="direzione_lavori" type="hidden">
-              <div id="hintsDirezione_lavori" class="hintBox"></div>
-            </div>
-
           </div>
 
           <div class="section">Altre informazioni</div>
-          <div class="inner-wrap">
-            <div class="field">
-              <label>Data presentazione</label>
-              <input type="date" name="data" value="<?= $_POST['data']??date('Y-m-d') ?>">
-            </div>
-
-            <div class="field">
-              <label>Protocollo</label>
-              <input type="number" name="protocollo">
+          	<div class="inner-wrap">
+          
+          	<div class="field">
+              <label>Oggetto</label>
+              <textarea rows="3" name="oggetto"></textarea>
             </div>
 
             <div class="field">
@@ -277,28 +251,92 @@
               <input id="stradarioID" name="stradario" type="hidden">
               <div id="hintsStradari" class="hintBox"></div>
             </div>
-
+            
             <div class="field">
-              <label>Intervento</label>
-              <textarea rows="3" name="intervento"></textarea>
+              <label>Civico</label>
+              <input type="number" name="civico">
+            </div>
+
+             <div class="field">
+              <label>N. protocollo</label>
+              <input type="number" name="protocollo">
+            </div>
+            
+            <div class="field">
+              <label>N. verbale</label>
+              <input type="number" name="n_verbale">
+            </div>
+            
+            <div class="field">
+              <label>Verbale</label>
+              <textarea rows="3" name="verbale"></textarea>
+            </div>
+            
+            <div class="field">
+              <label>Prescrizioni</label>
+              <textarea rows="3" name="prescrizioni"></textarea>
+            </div>
+            
+            <div class="field">
+              <label>Parere</label>
+              <textarea rows="3" name="Parere"></textarea>
+            </div>
+            
+            <div class="field">
+              <label>Note parere</label>
+              <textarea rows="3" name="note_parere"></textarea>
+            </div>
+            
+            <div class="field">
+              <label>Approvata</label>
+                <select name="approvata">
+                	<option value=""></option>
+                	<option value="S">Si</option>
+                	<option value="N">No</option>
+                </select>
+            </div>
+            
+            <div class="field">
+              <label>Onerosa</label>
+                <select name="onerosa">
+                	<option value=""></option>
+                	<option value="S">Si</option>
+                	<option value="N">No</option>
+                </select>
+            </div>
+            
+            <div class="field">
+              <label>Beni ambientali</label>
+                <select name="beni_ambientali">
+                	<option value="S">Si</option>
+                	<option value="N">No</option>
+                </select>
+            </div>
+
+			<div class="field">
+              <label>Note pagamenti</label>
+              <textarea rows="3" name="note_pagamenti"></textarea>
             </div>
 
             <div class="field">
-              <label style="display: inline-flex;">Genera cartella documenti elettronici</label>
-              <input type="checkbox" name="documento_elettronico" checked="checked" style="display: inline-flex;">
-            </div>
-
-            <div class="field">
-              <label>Data inizio lavori</label>
-              <input type="date" name="data_inizio_lavori">
-            </div>
-
-            <div class="field">
-              <label>Note</label>
-              <textarea rows="3" name="note"></textarea>
+              <label>Note pratica</label>
+              <textarea rows="3" name="note_pratica"></textarea>
             </div>
 
           </div>
+          
+          <div class="section">Date</div>
+          	<div class="inner-wrap">
+          		<?php 
+          		$fields = $c->db->ql('DESCRIBE tec_pratiche');
+          		foreach ($fields as $field)
+          		    if(substr($field['Field'], 0, 5) == 'Data_')
+          		        echo '<div class="field">
+                                      <label>'.str_replace('_', ' ', $field['Field']).'</label>
+                                      <input type="date" name="'.$field['Field'].'">
+                                    </div>';
+          		?>
+          	</div>
 
           <button type="submit">Inserisci pratica</button>
         </div>

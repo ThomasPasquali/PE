@@ -150,7 +150,7 @@
   ?>
 
   <div class="form">
-    <h1>Inserimento pratiche <span id="info-edificio"></span></h1>
+    <h1>Inserimento pratiche PE<span id="info-edificio"></span></h1>
 
       <div id="dati-edificio">
 
@@ -206,7 +206,7 @@
 
             <div class="field">
               <label>Anno</label>
-              <input type="number" name="anno" required="required" pattern="\d{4}">
+              <input type="number" name="anno"  desc="pe" required="required" pattern="\d{4}">
             </div>
 
             <div class="field">
