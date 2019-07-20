@@ -8,47 +8,113 @@
             OneriECosti::$branchCount = 0;
             OneriECosti::$costi_e_oneri = json_decode(json_encode(simplexml_load_file(__DIR__.'\costiBase.xml')), true);
         }
-        /**
-         * 
-         * @param string $intervento Descrizione
-         * @param DateTime $data Data
-         * @param string $densita_fondiaria
-         * @param string $zona
-         * @param string $tipo_intervento Su che tipo di edificio è fatto
-         * @param string $tipo_edificio
-         * @param string $caratteristiche_intervento Se applicabile a riduzioni
-         * @param string $caratteristiche_edificio
-         * @param float $superficie_scoperta
-         * @param array $superfici_alloggi Valori delle superfici degli alloggi
-         * @param float $superficie_non_residenziabile
-         * @param int $incremento Codice da Tab.4
-         * @param int $modo 1 Nessun contributo, 2 Stima analitica, 3 Calcolo tabellare 
-         * 
-         * @return array Array contenente le chiavi CC, OU1, OU2
-         */
-        public static function calcola($descrizione_intervento, $data, $destinazione_uso, $zona) {/*$densita_fondiaria, $zona,
-            $tipo_intervento, $tipo_edificio, $caratteristiche_intervento, 
-            $caratteristiche_edificio, $superficie_scoperta, $superfici_alloggi,
-            $superficie_non_residenziabile, $incremento, $modo = 3) {*/
-            
-            //print_r(COSTI_BASE['OU'][$tipo_intervento][$caratteristiche_intervento][substr($zona, 0, 1)]['Dens']);
         
-            //OU1, OU2 
+        public static function calcola($dati) {
+            print_r($dati);
+            //OU
+            $ou1 = $dati['imponibileOU'] * $dati['OU1'];
+            $ou2 = $dati['imponibileOU'] * $dati['OU2'];
+            $ou = json_decode($dati['formOneri'], TRUE);
+            
+            if($dati['destUsoCC'] == 'Residenza') {
+                //CC Tab 1
+                $superficiAlloggi = explode(',', $dati['alloggi']);
+                sort($superficiAlloggi);
+                $rangesSuperfici = [];
+                $i = 0;
+                $ranges = [95, 110, 130, 160];
+                $coeffTab1 = [0, 5, 15, 30, 50];
+                $su = 0;
+                foreach ($superficiAlloggi as $sup) {
+                    while(isset($ranges[$i]) && $sup > $ranges[$i]) $i++;
+                    
+                    if(!isset($rangesSuperfici[$i]))
+                        $rangesSuperfici[$i] = 0;
+                        
+                        $rangesSuperfici[$i] = $rangesSuperfici[$i] + $sup;
+                        
+                        $su = $su + $sup;
+                }
+                print_r($rangesSuperfici);
+                $i = 0;
+                $ccTab1 = 0;
+                foreach ($rangesSuperfici as $sup)
+                    $ccTab1 = $ccTab1 + ($coeffTab1[$i++] * ($sup / $su));
+                    
+                //CC Tab 3
+                $ccTab3 = $dati['snr'] / $su * 100;
+                $ccTab3 =   ($ccTab3 <= 50) ? 0 :
+                                    ($ccTab3 > 50 && $ccTab3 <= 75) ? 10 :
+                                    ($ccTab3 > 75 && $ccTab3 <= 100) ? 20 : 30;
+                
+                //CC Tab 4
+                $ccTab4 = 0;
+                foreach ($dati as $key => $value) 
+                    if(substr($key, 0, strlen('aumento')) == 'aumento')
+                        $ccTab4 = $ccTab4 + 10;
+            
+                $ccTotIncr = $ccTab1 + $ccTab3 + $ccTab4;
+                $maggiorazione =   ($ccTotIncr <= 5) ? 1 :
+                                                ($ccTotIncr > 5 && $ccTotIncr <= 10) ? 1.05 :
+                                                ($ccTotIncr > 10 && $ccTotIncr <= 15) ? 1.1 :
+                                                ($ccTotIncr > 15 && $ccTotIncr <= 20) ? 1.15 :
+                                                ($ccTotIncr > 20 && $ccTotIncr <= 25) ? 1.2 :
+                                                ($ccTotIncr > 25 && $ccTotIncr <= 30) ? 1.25 :
+                                                ($ccTotIncr > 30 && $ccTotIncr <= 35) ? 1.3 :
+                                                ($ccTotIncr > 35 && $ccTotIncr <= 40) ? 1.35 :
+                                                ($ccTotIncr > 40 && $ccTotIncr <= 45) ? 1.4 :
+                                                ($ccTotIncr > 45 && $ccTotIncr <= 50) ? 1.45 : 1.5;
+                
+                $cc = (205.04992 * $maggiorazione) * ($su + ($dati['snr'] * 0.6));
+                
+                $percTassaCC = 0;
+                if($ou['Tipo di intervento'] == 'Nuova_costruzione') {
+                    switch($dati['Caratteristiche_edificio']){
+                        case 'Lusso': $percTassaCC = $percTassaCC + 0.04; break;
+                        case 'Medie': $percTassaCC = $percTassaCC + 0.025; break;
+                        case 'Economiche': $percTassaCC = $percTassaCC + 0.01; break;
+                    }
+                    switch($dati['Tipologia_edificio']){
+                        case 'A_blocco_con_piu_di_due_alloggi': $percTassaCC = $percTassaCC + 0.02; break;
+                        case 'A_schiera_con_piu_di_due_alloggi': $percTassaCC = $percTassaCC + 0.02; break;
+                        case 'Fino_a_due_alloggi': $percTassaCC = $percTassaCC + 0.03; break;
+                    }
+                    switch($dati['Zona']){
+                        case 'A': $percTassaCC = $percTassaCC + 0.02; break;
+                        case 'B': $percTassaCC = $percTassaCC + 0.02; break;
+                        case 'C': $percTassaCC = $percTassaCC + 0.025; break;
+                        default: $percTassaCC = $percTassaCC + 0.04; break;
+                    }
+                    
+                    $cc = $cc * $percTassaCC;
+                }else
+                $cc = (205.04992 * ($su + ($dati['snr'] * 0.6))) * 0.03;
+                
+                echo $cc;
+            }
             
             
             
+            $cols = [];
+            $cols['OU1'] = $ou1;
+            $cols['OU2'] = $ou2;
+            foreach ($ou as $key => $value) $cols[$key] = $value;
+                
             
+            /*$sql = 'INSERT INTO tec_ou_cc ('.implode(', ', $colsNames).')
+                        VALUES ('.implode(', ', $colsValues).')';
+            echo $sql;*/
         }
         
         public static function generaQuestionarioOU() {
-            OneriECosti::createSelect(OneriECosti::$costi_e_oneri['OU']);
+            OneriECosti::createSelectOU(OneriECosti::$costi_e_oneri['OU']);
         }
         
-        public static function generaQuestionarioCC() {
-            OneriECosti::createSelect(OneriECosti::$costi_e_oneri['CC']);
+        public static function generaQuestionarioIncrementoCC() {
+            OneriECosti::createSelectCC(OneriECosti::$costi_e_oneri['CC']);
         }
         
-        private static function createSelect($xml, $loopCount = 0, $branch = NULL) {
+        private static function createSelectOU($xml, $loopCount = 0, $branch = NULL) {
             
             foreach ($xml as $key => $items)
                 if($key != '@attributes' && $key != 'comment'){
@@ -69,7 +135,29 @@
                         if(OneriECosti::has_all_keys($option, ['OU1', 'OU2']))
                             echo '<button type="button" class="branch'.$branch.' level'.($loopCount+1).' '.$option['@attributes']['value'].' hidden" onclick="setCoefficenti('.$option['OU1'].', '.$option['OU2'].', \''.($option['UM']??'metri quadrati').'\');">Conferma oneri</button>';
                         else
-                    OneriECosti::createSelect($option, $loopCount+1, $branch);
+                    OneriECosti::createSelectOU($option, $loopCount+1, $branch);
+                                    
+                    echo '</div>';
+            }
+            
+        }
+        
+        private static function createSelectCC($xml, $loopCount = 0, $branch = NULL) {
+            
+            foreach ($xml as $key => $items)
+                if($key != '@attributes' && $key != 'comment'){
+                    
+                    $branch = $branch==NULL?OneriECosti::$branchCount++:$branch;
+                    
+                    echo "<div>";
+                    
+                    echo '<h3>'.str_replace('_', ' ', $key).'</h3>';
+                    
+                    echo "<select name=\"$key\">";
+                    echo '<option></option>';
+                    foreach ($items as $option)
+                        echo '<option value="'.$option['@attributes']['value'].'">'.str_replace('_', ' ', $option['@attributes']['value'].(isset($option['@attributes']['description'])?' ('.$option['@attributes']['description'].')':'')).'</option>';
+                   echo '</select>';
                                     
                     echo '</div>';
             }

@@ -1,3 +1,12 @@
+body {
+	text-align: center;
+}
+
+button, input, #fields-alloggi {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .box-risultati {
 	display: grid;
 	grid-template-columns: auto auto auto auto auto;
@@ -7,7 +16,7 @@
 	cursor: crosshair;
 }
 
-.hidden, #main-div, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza {
+.hidden, #calcola, #container, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza {
 	display: none;
 }
 
@@ -19,4 +28,22 @@
 	display: grid;
 	grid-template-columns: auto auto auto;
 	width: 50%;
+}
+
+#cc-residenza input, button{
+	display: block;
+	margin-top: 10px;
+}
+
+.aumento {
+	display: inline-flex !important;
+}
+
+#container {
+	grid-template-columns: 1fr 1fr;
+}
+
+#calcola {
+	margin-top: 50px;
+	font-size: 1.5em;
 }

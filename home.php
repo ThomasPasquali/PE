@@ -198,6 +198,7 @@
            		    <a onclick="changeContent('intEdificio');">Storico edificio</a>
                 	<a onclick="changeContent('intAnag');">Anagrafiche</a>
                     <a onclick="changeContent('intPra');">Pratiche</a>
+                    <a href="reports/pratiche.php">Pratiche da-a</a>
                 </div>
             </div>
 

@@ -1,4 +1,5 @@
 <?php 
+    include_once '../lib/oneriEcosti/oneriEcosti.php';
     include_once '../controls.php';
     $c = new Controls();
     
@@ -6,6 +7,9 @@
         header('Location: ../index.php?err=Utente non loggato');
         exit();
     }
+    
+    if($c->check(['OU1', 'OU2', 'imponibileOU', 'formOneri'], $_POST))
+        OneriECosti::calcola($_POST);
     
     if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero'])){
         $where = [];
@@ -27,8 +31,6 @@
                                         WHERE '.implode(' AND ', $where), $params);
     }
     
-    
-    
 ?>
 <html>
 <head>
@@ -38,7 +40,6 @@
     <link rel="stylesheet" type="text/css" href="../css/inserimento_oneriEcosti.css">
 </head>
 <body>
-	
 	<div id="selezione-pratica">
 		<div class="form">
             <h1>Calcolo CC e OU<span id="info-pratica"></span></h1>
@@ -67,43 +68,68 @@
           </div>
 	</div>
 	
-	<div id="main-div">
-	<h1>Oneri di urbanizzazione</h1>
-	<?php 
-	if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero'])){ 
-	    include_once '../lib/oneriEcosti/oneriEcosti.php';
-	    OneriECosti::generaQuestionarioOU();
-	}
-	?>
+	<div>
+	<div id="container">
+		<div id="ou">
+        	<h1 id="titolo-ou">Oneri di urbanizzazione</h1>
+        	<div id="coefficienti">
+        	<?php 
+        	if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero']))
+        	    OneriECosti::generaQuestionarioOU();
+        	?>
+    		</div>
+    		<form id="form" method="post">
+    		
+        	<div id="inserimento-imponibile">
+        		<h1>Imponibile</h1>
+        		<input name="imponibileOU" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" >
+        	</div>
+		</div>
+    	
+    	<div id="cc">
+    			<h1>Costo di costuzione</h1>
+        		<h2>Destinazione uso</h2>
+        		<select name="destUsoCC" onchange="switch (this.selectedIndex) { case 0: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').hide(); break; case 1: $('#cc-residenza').show(); $('#cc-turistico-direzionale').hide(); break; default: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').show(); break;}">
+        			<option></option>
+        			<option>Residenza</option>
+        			<option>Turistica</option>
+        			<option>Commerciale</option>
+        			<option>Direzionale</option>
+        		</select>
+        		<div id="cc-residenza">
+        			<h2>Superifici utili abitabili</h2>
+            		<div id="fields-alloggi"></div>
+            		<button type="button" onclick="addFieldAlloggio();">Aggiungi alloggio</button>
+            		<h2>Superificie totale servizi e accessori</h2>
+            		<input name="snr" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
+            		<h2>Caratteristiche particolari</h2>
+            		<ol>
+            			<li><input type="checkbox" name="aumento0" class="aumento">Pi&ugrave; di un ascensore per ogni scala se questa serve meno di sei piani sopraelevati</li>
+            			<li><input type="checkbox" name="aumento1" class="aumento">Scala di servizio non prescritta da leggi o regolamenti o imposta da necessità di prevenzione di infortuni o incendi</li>
+            			<li><input type="checkbox" name="aumento2" class="aumento">Altezza netta libera di piano superiore a m. 3,00 a quella minima prescritta da norme regolamentari. Per ambienti con altezze diverse si fa riferimento all'altezza media ponderale</li>
+            			<li><input type="checkbox" name="aumento3" class="aumento">Piscina coperta o scoperta quando sia a servizio di uno o pi&egrave; edifici comprendenti meno di 15 unit&agrave; immobiliari</li>
+            			<li><input type="checkbox" name="aumento4" class="aumento">Alloggi di custodia a servizio di uno o pi&egrave; edifici comprendenti meno di 15 unit&agrave; immobiliari</li>
+        			</ol>
+        			<h2>Incremento costo di costruzione</h2>
+        			<?php 
+                    	if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero']))
+                    	    OneriECosti::generaQuestionarioIncrementoCC();
+                    	?>
+        		</div>
+        		<div id="cc-turistico-direzionale">
+        			<h2>Superficie calpestabile</h2>
+            		<input name="sn" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
+            		<h2>Superficie accessori</h2>
+            		<input name="sa" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
+        		</div>
+        		
+        		
+    		</form>
+		</div>
+		</div>
+		<button id="calcola" type="button" onclick="checkANDsubmit();">Calcola</button>
 	</div>
 	
-	<div id="inserimento-imponibile">
-		<h1 id="titolo-imponibile">Imponibile</h1>
-		<input id="imponibile" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" >
-		<button id="btnBloccaOneri" type="button">Conferma</button>
-	</div>
-	
-	<div id="cc">
-		<h1>Costo di costuzione</h1>
-		<select onchange="switch (this.selectedIndex) { case 0: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').hide(); break; case 1: $('#cc-residenza').show(); $('#cc-turistico-direzionale').hide(); break; case 2: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').show(); break;}">
-			<option></option>
-			<option>Residenza</option>
-			<option>Turistica, commerciale o direzionale</option>
-		</select>
-		<div id="cc-residenza">
-			<h2>Superifici utili abitabili</h2>
-    		<div id="fields-alloggi"></div>
-    		<button onclick="addFieldAlloggio();">Aggiungi alloggio</button>
-    		<button onclick="fineInserimentoAlloggi();">Prosegui</button>
-    		<input id="snr" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. servizi e accessori...">
-		</div>
-		<div id="cc-turistico-direzionale">
-    		<input id="sn" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. calpestabile...">
-    		<input id="sa" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Su. accessori...">
-    		<button onclick="fineInserimentoAlloggi();">Prosegui</button>
-		</div>
-	</div>
-
 	<script src="../js/inserimento_oneriEcosti.js"></script>
 </body>
 </html>

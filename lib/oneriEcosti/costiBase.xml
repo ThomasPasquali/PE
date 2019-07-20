@@ -57,58 +57,68 @@
 			
 			<Tipo_di_intervento value="Ristrutturazione">
 
-				<!-- AGGIUNGERE CASO SCONTO (prezzi di vendita predeterminati sconto del 4%) -->
 				<Zona value="A" description="Centro_storico">
-					<OU1>0.13789</OU1>
-					<OU2>0.20710</OU2>
-					<UM>metri quadrati</UM>
+					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
+						<OU1>0.13237</OU1>
+						<OU2>0.19882</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
+					<Prezzo_convenzionato value="No">
+						<OU1>0.13789</OU1>
+						<OU2>0.20710</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
 				</Zona>
-				<Zona value="B1" description="di_completamento">
-					<OU1>0.23602</OU1>
-					<OU2>0.24842</OU2>
-					<UM>metri quadrati</UM>
-				</Zona>
-				<Zona value="B2" description="di_completamento">
-					<OU1>0.23602</OU1>
-					<OU2>0.24842</OU2>
-					<UM>metri quadrati</UM>
-				</Zona>
-				
-				<!-- CORREGGERE (eventualmente) ZONE C -->
-				<Zona value="C1.1" description="di_espansione">
-					<OU1>0.39354</OU1>
-					<OU2>0.41420</OU2>
-					<UM>metri quadrati</UM>
-				</Zona>
-				
-				<Zona value="C1.2" description="di_espansione">
-					<OU1>0.39354</OU1>
-					<OU2>0.41420</OU2>
-					<UM>metri quadrati</UM>
+				<Zona value="B" description="di_completamento">
+					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
+						<OU1>0.22658</OU1>
+						<OU2>0.23848</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
+					<Prezzo_convenzionato value="No">
+						<OU1>0.23602</OU1>
+						<OU2>0.24842</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
 				</Zona>
 				
-				<Zona value="C2.1" description="di_espansione">
-					<OU1>0.39354</OU1>
-					<OU2>0.41420</OU2>
-					<UM>metri quadrati</UM>
-				</Zona>
-				
-				<Zona value="C2.2" description="di_espansione">
-					<OU1>0.39354</OU1>
-					<OU2>0.41420</OU2>
-					<UM>metri quadrati</UM>
+				<Zona value="C" description="di_espansione">
+					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
+						<OU1>0.37780</OU1>
+						<OU2>0.397632</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
+					<Prezzo_convenzionato value="No">
+						<OU1>0.39354</OU1>
+						<OU2>0.41420</OU2>
+						<UM>metri quadrati</UM>
+					</Prezzo_convenzionato>
 				</Zona>
 				
 				<Zona value="E" description="Agricola">
 					<Imprenditore value="Imprenditore_agricolo_a_titolo_principale">
-						<OU1>1.65679</OU1>
-						<OU2>0.82840</OU2>
-						<UM>metri quadrati</UM>
+						<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
+							<OU1>1.590518</OU1>
+							<OU2>0.79526</OU2>
+							<UM>metri quadrati</UM>
+						</Prezzo_convenzionato>
+						<Prezzo_convenzionato value="No">
+							<OU1>1.65679</OU1>
+							<OU2>0.82840</OU2>
+							<UM>metri quadrati</UM>
+						</Prezzo_convenzionato>
 					</Imprenditore>
 					<Imprenditore value="Imprenditore_agricolo_NON_a_titolo_principale">
-						<OU1>0.82840</OU1>
-						<OU2>0.41420</OU2>
-						<UM>metri quadrati</UM>
+						<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
+							<OU1>0.79526</OU1>
+							<OU2>0.39763</OU2>
+							<UM>metri quadrati</UM>
+						</Prezzo_convenzionato>
+						<Prezzo_convenzionato value="No">
+							<OU1>0.82840</OU1>
+							<OU2>0.41420</OU2>
+							<UM>metri quadrati</UM>
+						</Prezzo_convenzionato>
 					</Imprenditore>
 				</Zona>
 				
@@ -390,5 +400,46 @@
 		</Destinazione_uso>
 		
 	</OU>
+	
+	<CC>
+		<Caratteristiche_edificio value="Economiche">
+			<Incremento>1</Incremento>
+		</Caratteristiche_edificio>
+		<Caratteristiche_edificio value="Medie">
+			<Incremento>2.5</Incremento>
+		</Caratteristiche_edificio>
+		<Caratteristiche_edificio value="Lusso">
+			<Incremento>4</Incremento>
+		</Caratteristiche_edificio>
+		
+		<Tipologia_edificio value="A_blocco_con_piu_di_due_alloggi">
+			<Incremento>2</Incremento>
+		</Tipologia_edificio>
+		<Tipologia_edificio value="A_schiera_con_piu_di_due_alloggi">
+			<Incremento>2</Incremento>
+		</Tipologia_edificio>
+		<Tipologia_edificio value="Fino_a_due_alloggi">
+			<Incremento>3</Incremento>
+		</Tipologia_edificio>
+		
+		<Zona value="A">
+			<Incremento>2</Incremento>
+		</Zona>
+		<Zona value="B">
+			<Incremento>2</Incremento>
+		</Zona>
+		<Zona value="C">
+			<Incremento>2.5</Incremento>
+		</Zona>
+		<Zona value="D">
+			<Incremento>4</Incremento>
+		</Zona>
+		<Zona value="E">
+			<Incremento>4</Incremento>
+		</Zona>
+		<Zona value="F">
+			<Incremento>4</Incremento>
+		</Zona>
+	</CC>
 	
 </COSTI_E_ONERI>

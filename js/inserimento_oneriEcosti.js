@@ -1,31 +1,83 @@
 /****************VARIABLES*****************/
-var pratica, ou1, ou2, um, formOneri, imponibile;
-
-/****************HANDLERS*****************/
-$('#btnBloccaOneri').click(function() {
-	if($('#imponibile').val()<=0)
-		alert('L\'imponibile dev\'essere una quantità possitiva è maggiore di 0');
-	else{
-		imponibile = $('#imponibile').val();
-		$('#inserimento-imponibile').show();
-		$('#cc').show();
-	}
-});
+var pratica, ou1, ou2, um, formOneri;
 
 /****************FUNCTIONS*****************/
 function selectPratica(el) {
 	pratica = el.firstChild.innerHTML;
 	$('#selezione-pratica').hide();
-	$('#main-div').show();
+	$('#container').css('display', 'grid');
+	$('#calcola').show();
+	$('#container').show();
 };
 
+var countAlloggi = 0;
 function addFieldAlloggio() {
-	$('#fields-alloggi').append($('<input>').attr('type', 'number').attr('placeholder', 'Superficie in mq...').addClass('fieldAlloggio'));
+	let field = $('<input>');
+	field.attr('type', 'number');
+	field.attr('name', 'alloggio'+(countAlloggi++));
+	field.attr('placeholder', 'Superficie in mq...');
+	field.addClass('fieldAlloggio');
+	$('#fields-alloggi').append(field);
 }
 addFieldAlloggio();
 
-function fineInserimentoAlloggi() {
-	
+function checkANDsubmit() {
+	let alloggi = [];
+	//OU
+	if(!ou1 || !ou2){
+		alert('Inserire i dati inerenti agli oneri di urbanizzazione');
+		return;
+	}
+	if($('input[name=imponibileOU]').val()<=0){
+		alert('L\'imponibile dev\'essere una quantità possitiva è maggiore di 0');
+		return;
+	}
+	//CC
+	if(!$('select[name=destUsoCC]').val()){
+		alert('Selezionare la destinazione d\'uso per il costo di costruzione');
+		return;
+	}
+	if($('select[name=destUsoCC]').val() == 'Residenza'){
+		for (let alloggio of document.getElementsByClassName('fieldAlloggio'))
+			if(alloggio.value && alloggio.value > 1)
+				alloggi.push(alloggio.value);
+		if(alloggi.length <= 0){
+			alert('Inserire almeno la superficie di un alloggio');
+			return;
+		}
+		
+		if(!$('input[name=snr]').val()){
+			alert('La superficie totale servizi e accessore dev\'essere una quantità possitiva è maggiore di 0');
+			return;
+		}
+		if(!$('select[name=Caratteristiche_edificio]').val()){
+			alert('Selezionare tra le caratteristiche edificio');
+			return;
+		}
+		if(!$('select[name=Tipologia_edificio]').val()){
+			alert('Selezionare la tipologia edificio');
+			return;
+		}
+		if(!$('select[name=Zona]').val()){
+			alert('Selezionare la zona dell\'edificio');
+			return;
+		}
+	}else{
+		if(!$('input[name=sn]').val()){
+			alert('La superficie calpestabile dev\'essere una quantità possitiva è maggiore di 0');
+			return;
+		}
+		if(!$('input[name=sa]').val()){
+			alert('La superficie accessori dev\'essere una quantità possitiva è maggiore di 0');
+			return;
+		}
+	}
+	$('#form').append($('<input>').attr('name', 'alloggi').val(alloggi.join(',')));
+	$('#form').append($('<input>').attr('name', 'OU1').val(ou1));
+	$('#form').append($('<input>').attr('name', 'pratica').val(pratica));
+	$('#form').append($('<input>').attr('name', 'OU2').val(ou2));
+	$('#form').append($('<textarea></textarea>').attr('name', 'formOneri').val(JSON.stringify(formOneri).replace(/\s/, '_')));
+	$('#form').submit();
 }
 
 function showOnlyThatDiv(divCommonClasses, divClass) {
@@ -51,17 +103,17 @@ function setCoefficenti(OU1, OU2, UM) {
 	ou2=OU2;
 	um=UM;
 	formOneri = serializeByClass('.selezionato');
-	$('#main-div').hide();
-	$('#imponibile').attr('placeholder', 'Imponibile in '+um);
+	$('#coefficienti').hide();
+	$('input[name=imponibileOU]').attr('placeholder', 'Imponibile in '+um);
 	let div = $('<div></div>');
 	for (let k in formOneri)
 		div.append($('<p></p>').text(k+': ').append($('<span></span>').text(formOneri[k].replace( /_/, " " ))));
-	div.insertAfter($('#titolo-imponibile'));
+	div.insertAfter($('#titolo-ou'));
 	$('#inserimento-imponibile').show();
 }
 
 function serializeByClass(selector) {
-	arr = [];
+	arr = {};
 	$(selector).each(function() {
 			arr[$(this).parent().children('h2').html()] = $(this).attr('class').split(' ')[2];
 	});
