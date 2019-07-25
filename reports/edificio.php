@@ -182,8 +182,7 @@
        <div id="titoli">
             <h1>Comune di Canale d'Agordo</h1>
             <h2>Ufficio tecnico</h2>
-            <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
-            <h4>Edificio n: <?= $datiGenericiEdificio['ID'] ?> </h4>
+            <h3>Interrogazione edificio n.<?= $datiGenericiEdificio['ID'] ?> all'archivio pratiche edilizie</h3>
        </div>
        <img src="..\imgs\logo.jpg" id="logo" alt="logo"></img>
     </div>

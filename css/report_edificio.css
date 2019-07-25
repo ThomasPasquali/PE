@@ -3,7 +3,7 @@ body{
 }
 
 p{
-  font-size: 1.3em;
+  font-size: 1.15em;
   margin: 0px;
   padding: 0px;
   word-wrap: break-word;
@@ -24,6 +24,10 @@ a, a:visited{
   grid-template-columns: 4fr 1fr;
   padding: 1% 10% 0px 10%;
 }
+
+#intestazione h3 {
+	font-size: 98%;
+ }
 
 #titoli{
   text-align: center;
@@ -50,7 +54,6 @@ a, a:visited{
 
 #intestatari, #pe, #tec, #condoni, #rubriche, #intestatari{
     padding: 10px 5% 0px 5%;
-    margin-bottom: 10px;
 }
 
 #pe > div, #tec > div, #condoni > div, #rubriche > div, #intestatari > div{
