@@ -6,6 +6,9 @@
 <head>
 	<title>Report pratiche</title>
 	<style type="text/css">
+	h1 {
+	   font-size: 1.8em;
+	}
 	form {
 	   text-align: center;
 	}
@@ -47,7 +50,7 @@
 	if($c->check(['start', 'end'], $_REQUEST)){
 	    ?>
 	    <h1>Comune di Canale d'Agordo (BL) - Ufficio Tecnico</h1>
-	    <h2>Elenco pratiche edilizie dal <?= $_REQUEST['start'] ?> al <?= $_REQUEST['end'] ?></h2>
+	    <h2>Elenco pratiche edilizie dal <?= (new DateTime($_REQUEST['start']))->format('d/m/Y') ?> al <?= (new DateTime($_REQUEST['end']))->format('d/m/Y') ?></h2>
     <?php 
         $pratiche = $c->db->ql(
             'SELECT *
