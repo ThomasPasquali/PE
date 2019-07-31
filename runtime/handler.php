@@ -11,6 +11,9 @@
         switch ($_POST['action']) {
             case 'hint':
                 switch ($_POST['type']) {
+                    case 'get':
+                        sendHints($_POST['table'], $_POST['column'], $_POST['search'], $c);
+                        exit();
                     case 'tecnico':
                         sendTecnicoHints($_POST['search'], $c->db);
                         exit();
@@ -82,6 +85,17 @@
                 exit();
         }
 
+    function sendHints($table, $column, $search, $c) {
+        $description = $c->getParsedTableDescription($table, $column);
+        header('Content-type: application/json');
+        echo  json_encode(
+                        $c->db->ql("SELECT $description[Value] Value, $description[Description] Description
+                                            FROM $table
+                                            WHERE $description[Description] LIKE ?
+                                            LIMIT 50",
+                                            ["%$search%"]), TRUE);
+    }
+    
     function sendTecnicoHints($search, $db) {
         $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
                                 FROM tecnici
@@ -115,7 +129,7 @@
     function sendIntestatarioPersonaHints($search, $db) {
         $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
                                 FROM intestatari_persone
-                                WHERE Cognome LIKE ?
+                                WHERE CONCAT(Cognome, \' \', Nome) LIKE ?
                                 ORDER BY Cognome, Nome
                                 LIMIT 20',
             ["$search%"]);

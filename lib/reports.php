@@ -213,7 +213,7 @@
      *
      * @param DB $db
      */
-    public static function pratichePE($db, $tipo = '', $anno = '', $numero = '', $barrato = '', $foglio = '', $mappale = ''){
+    public static function pratiche($db, $tipo = '', $anno = '', $numero = '', $barrato = '', $foglio = '', $mappale = '', $pe_o_tec = 'pe'){
         $where = [];
         $params = [];
         if(!empty($tipo)){
@@ -243,13 +243,12 @@
         $where = implode(' AND ', $where);
 
         $sql = 'SELECT ID, Sigla, TIPO, Anno, Numero, FogliMappali, Intestatari_persone, Intestatari_societa
-                FROM pe_pratiche_view
+                FROM '.$pe_o_tec.'_pratiche_view
                 WHERE ID IN (
                   SELECT DISTINCT p.ID
-                  FROM pe_pratiche p
-                  JOIN pe_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
-                  ((!empty($where))?('WHERE '.$where):'')
-                .')
+                  FROM '.$pe_o_tec.'_pratiche p
+                  JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
+                  ((!empty($where))?('WHERE '.$where):'') .')
                 ORDER BY Anno, Numero';
 
         $rs = $db->ql($sql, $params);
@@ -264,7 +263,7 @@
             <p><span class="title">Fogli-mappali:</span> <?= $row['FogliMappali'] ?></p>
             <p><span class="title">Intestatari persone:</span> <?= $row['Intestatari_persone'] ?></p>
             <p><span class="title">Intestatari societ&aacute;:</span> <?= $row['Intestatari_societa'] ?></p>
-            <form action="reports/praticaPE.php" method="post">
+            <form action="reports/pratica<?= strtoupper($pe_o_tec) ?>.php" method="post">
                 <button name="id" class="formBtn" value="<?= $row['ID'] ?>">Visualizza</button>
             </form>
           </div>

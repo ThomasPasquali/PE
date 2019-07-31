@@ -132,25 +132,24 @@
                               [$edificioID]);
 
             foreach ($res as $pratica){
-                $tipo = substr($pratica['ID'], 0, 1);
-                switch ($tipo) {
-                    case 'A':
+                switch ($pratica['TIPO']) {
+                    case 'Autorizzazione':
                         $aut[] = $pratica;
                         break;
 
-                    case 'S':
+                    case 'Sanatoria':
                         $san[] = $pratica;
                         break;
 
-                    case 'P':
+                    case 'Permesso':
                         $perm[] = $pratica;
                         break;
 
-                    case 'C':
+                    case 'Concessione':
                         $conc[] = $pratica;
                         break;
 
-                    case 'I':
+                    case 'Opera_interna':
                         $opere[] = $pratica;
                         break;
 
@@ -184,7 +183,7 @@
             <h2>Ufficio tecnico</h2>
             <h3>Interrogazione edificio n.<?= $datiGenericiEdificio['ID'] ?> all'archivio pratiche edilizie</h3>
        </div>
-       <img src="..\imgs\logo.jpg" id="logo" alt="logo"></img>
+       <a href="../"><img src="../imgs/logo.jpg" id="logo" alt="logo"></a>
     </div>
     
     <div id="generalita">
@@ -297,7 +296,7 @@
         <p id="autorizzazioni"><?php
             $temp = [];
             foreach ($aut as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(' - ', $temp)
         ?></p>
       </div>
@@ -307,7 +306,7 @@
         <p id="permessi"><?php
             $temp = [];
             foreach ($perm as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(' - ', $temp)
         ?></p>
       </div>
@@ -317,7 +316,7 @@
         <p id="concessioni"><?php
             $temp = [];
             foreach ($conc as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
       </div>
@@ -327,7 +326,7 @@
         <p id="sanatorie"><?php
             $temp = [];
             foreach ($san as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
       </div>
@@ -337,7 +336,7 @@
         <p id="opereInterne"><?php
             $temp = [];
             foreach ($opere as $pra)
-                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[ID]</a>";
+                $temp[] = "<a href=\"praticaTEC.php?id=$pra[ID]\" target=\"_blank\">$pra[Numero]/$pra[Anno]$pra[Barrato]</a>";
             echo implode(', ', $temp)
         ?></p>
       </div>

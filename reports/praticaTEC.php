@@ -1,5 +1,4 @@
 <?php
-    //TODO tutto è solo una copia del pe
     include_once '../controls.php';
     $c = new Controls();
 
@@ -12,16 +11,14 @@
 
         $datiGenericiPraticaID = $_REQUEST['id']??'';
         if(!$datiGenericiPraticaID)
-            $datiGenericiPraticaID = $c->getPraticaID($_REQUEST['tipo']??'', $_REQUEST['anno']??'', $_REQUEST['numero']??'', $_REQUEST['barrato']??'');
+            $datiGenericiPraticaID = $c->getPraticaID($_REQUEST['tipo']??'', $_REQUEST['anno']??'', $_REQUEST['numero']??'', $_REQUEST['barrato']??'', 'tec');
 
             $datiGenericiPratica = NULL;
             if($datiGenericiPraticaID)
-                $datiGenericiPratica = $c->db->ql('SELECT * FROM pe_pratiche_view WHERE ID = ?',[$datiGenericiPraticaID])[0];
+                $datiGenericiPratica = $c->db->ql('SELECT * FROM tec_pratiche_view WHERE ID = ?',[$datiGenericiPraticaID])[0];
 
                 if($datiGenericiPratica !== NULL){
 
-                    //print_r($datiGenericiPratica);
-                    //TODO edifici
                     $edifici = $c->db->ql(
                         'SELECT e.ID, e.Mappali
                         FROM pe_edifici_pratiche ep
@@ -63,94 +60,110 @@
     <link rel="stylesheet" type="text/css" href="../css/report_pratica.css">
   </head>
   <body>
-     <div id="intestazione">
-       <img src="../imgs/logo.jpg" id="logo" alt="logo" align="right">
-       <div id="titoli">
-            <h1>Comune di Canale d'Agordo</h1>
-            <h2>Ufficio tecnico</h2>
-            <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
-       		<h4>ID pratica: <?= $datiGenericiPratica['ID'] ?><br>Sigla: <?= $datiGenericiPratica['Sigla'] ?></h4>
-       </div>
-    </div>
-    <p class="sottotitolo">Informazioni generali:</p>
-    <div id="generalita">
-    		<p>Anno: <?= $datiGenericiPratica['Anno'] ?></p>
-            <p>Numero: <?= $datiGenericiPratica['Numero'] ?></p>
-            <p>Barrato: <?= $datiGenericiPratica['Barrato'] ?></p>
-            <p>Protocollo: <?= $datiGenericiPratica['Protocollo'] ?></p>
+    	<div id="intestazione">
+           <div id="titoli">
+                <h1>Comune di Canale d'Agordo</h1>
+                <h2>Ufficio tecnico</h2>
+                <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
+           		<h4>ID pratica: <?= $datiGenericiPratica['ID'] ?><br>Sigla: <?= $datiGenericiPratica['Sigla'] ?></h4>
+           </div>
+            <a href="../"><img src="../imgs/logo.jpg" id="logo" alt="logo"></a>
+        </div>
+        
+        <p class="sottotitolo">Informazioni generali:</p>
+        <div id="generalita">
+        	<div id="anno-numero-barrato">
+        		<p><span>Anno:</span> <?= $datiGenericiPratica['Anno'] ?></p>
+                <p><span>Numero:</span> <?= $datiGenericiPratica['Numero'] ?></p>
+                <p><span>Barrato:</span> <?= $datiGenericiPratica['Barrato'] ?></p>
+        	</div>
+        	
+    		<div id="localita-protocollo">
+    			<p><span>Localit&aacute;:</span> <?= $datiGenericiPratica['Stradario'] ?></p>
+                <p><span>Protocollo:</span> <?= $datiGenericiPratica['Protocollo'] ?></p>
+    		</div>
+            
+            <p><span>Intervento:</span> <?= $datiGenericiPratica['Intervento'] ?></p>
+            
+            <p><span>Fogli-mappali: </span>
             <?php
-            if(count($edifici) > 0){
-                echo '<p>Edifici: ';
-                $i = 0;
-                foreach ($edifici as $edificio){
-                  $sep = $i > 0 ? ', ' : '';
-                  echo "$sep<a href=\"edificio.php?edificio=$edificio[ID]\">$edificio[ID]($edificio[Mappali])</a>";
-                  $i++;
-                }
-                echo '</p>';
+            $i = 0;
+            foreach ($edifici as $edificio){
+              $sep = $i > 0 ? ' - ' : '';
+              echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\">(Ed. $edificio[ID])</a>";
+              $i++;
             }
             ?>
-            <p>Fogli-mappali: <?= $datiGenericiPratica['FogliMappali'] ?></p>
-            <p id="subalterno">Subalterni: <?= $datiGenericiPratica['Subalterni'] ?></p>
-            <p id="localita">Localit&aacute;: <?= $datiGenericiPratica['Stradario'] ?></p>
-            <p id="intervento">Intervento: <?= $datiGenericiPratica['Intervento'] ?></p>
-    </div>
-    <p class="sottotitolo">Persone:</p>
-    <div id="persone">
-        <?php
-        if(count($intestatariPersone) > 0){
-            echo '<p>Intestatari persone: ';
+            </p>
+            
+            <p><span>Subalterni:</span> <?= $datiGenericiPratica['Subalterni'] ?></p>
+        </div>
+        <p class="sottotitolo">Persone:</p>
+        <div id="persone">
+        	<p><span>Intestatari persone:</span>
+            <?php
             $i = 0;
             foreach ($intestatariPersone as $intestatario){
-              $sep = $i > 0 ? ', ' : '';
+              $sep = $i > 0 ? ' - ' : '';
               echo "$sep<a href=\"anagrafica.php?persona=$intestatario[ID]\">$intestatario[Cognome] $intestatario[Nome]</a>";
               $i++;
             }
-            echo '</p>';
-        }
-        if(count($intestatariSocieta) > 0){
-            echo '<p>Intestatari societ&aacute: ';
+            ?>
+            </p>
+            
+            <p><span>Intestatari societ&aacute;:</span>
+            <?php
             $i = 0;
             foreach ($intestatariSocieta as $intestatario){
-              $sep = $i > 0 ? ', ' : '';
+              $sep = $i > 0 ? ' - ' : '';
               echo "$sep<a href=\"anagrafica.php?societa=$intestatario[ID]\">$intestatario[Intestazione]</a>";
               $i++;
             }
-            echo '</p>';
-        }
-        ?>
-        <p>Tecnico:
-          <?php
-            $tecnico = $c->getDatiTecnico($datiGenericiPratica['Tecnico']);
-            if($tecnico)
-              echo "<a href=\"anagrafica.php?tecnico=$tecnico[ID]\">$tecnico[Cognome] $tecnico[Nome] ($tecnico[Codice_fiscale] - $tecnico[Partita_iva])</a>"
-          ?>
-        </p>
-        <p>Direttore lavori:
-        <?php
-          $direttoreLavori = $c->getDatiTecnico($datiGenericiPratica['Direzione_lavori']);
-          if($direttoreLavori)
-            echo "<a href=\"anagrafica.php?tecnico=$direttoreLavori[ID]\">$direttoreLavori[Cognome] $direttoreLavori[Nome] ($direttoreLavori[Codice_fiscale] - $direttoreLavori[Partita_iva])</a>"
-        ?>
-        </p>
-        <p id="impresa">Impresa:
-        <?php
-          $impresa = $c->getDatiImpresa($datiGenericiPratica['Impresa']);
-          if($impresa)
-            echo "<a href=\"anagrafica.php?impresa=$impresa[ID]\">$impresa[Intestazione] ($impresa[Codice_fiscale] - $impresa[Partita_iva])</a>"
-        ?>
-        </p>
-    </div>
-    <p class="sottotitolo">Date:</p>
-    <div id="date">
-        <p>Data presentazione: <?= $datiGenericiPratica['Data'] ?></p>
-        <p>Data inizio lavori: <?= $datiGenericiPratica['Data_inizio_lavori'] ?></p>
-    </div>
-    <p class="sottotitolo">Ulteriori informazioni:</p>
-    <div id="ultInfo">
-    	<p id="docElettronico">Documento elettronico: <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
-    	<p id="note">Intervento: <?= $datiGenericiPratica['Intervento'] ?></p>
-        <p id="note">Note: <?= $datiGenericiPratica['Note'] ?></p>
-    </div>
+            ?>
+            </p>
+            
+            <p><span>Tecnico:</span>
+              <?php
+                $tecnico = $c->getDatiTecnico($datiGenericiPratica['Tecnico']);
+                if($tecnico)
+                  echo "<a href=\"anagrafica.php?tecnico=$tecnico[ID]\">$tecnico[Cognome] $tecnico[Nome] ($tecnico[Codice_fiscale] - $tecnico[Partita_iva])</a>"
+              ?>
+            </p>
+            <p><span>Direttore lavori:</span>
+            <?php
+              $direttoreLavori = $c->getDatiTecnico($datiGenericiPratica['Direzione_lavori']);
+              if($direttoreLavori)
+                echo "<a href=\"anagrafica.php?tecnico=$direttoreLavori[ID]\">$direttoreLavori[Cognome] $direttoreLavori[Nome] ($direttoreLavori[Codice_fiscale] - $direttoreLavori[Partita_iva])</a>"
+            ?>
+            </p>
+            <p><span>Impresa:</span>
+            <?php
+              $impresa = $c->getDatiImpresa($datiGenericiPratica['Impresa']);
+              if($impresa)
+                echo "<a href=\"anagrafica.php?impresa=$impresa[ID]\">$impresa[Intestazione] ($impresa[Codice_fiscale] - $impresa[Partita_iva])</a>"
+            ?>
+            </p>
+        </div>
+        <p class="sottotitolo">Date:</p>
+        <div id="date" style="display: grid; grid-template-columns: auto auto auto;">
+			<?php 
+			$pratica = $c->db->ql('SELECT * FROM tec_pratiche WHERE ID = ?', [$datiGenericiPratica['ID']])[0];
+			foreach ($pratica as $key => $value)
+			    if(substr($key, 0, 5) == 'Data_')
+			        echo '<p><span>'.str_replace('_', ' ', $key).":</span> $value</p>";
+			?>
+        </div>
+        <p class="sottotitolo">Ulteriori informazioni:</p>
+        <div id="ultInfo">
+            <p><span>Approvata:</span> <?= $pratica['Approvata'] ?></p>
+            <p><span>Onerosa:</span> <?= $pratica['Onerosa'] ?></p>
+            <p><span>Beni ambientali:</span> <?= $pratica['Beni_Ambientali'] ?></p>
+            <p><span>Verbale:</span> <?= $pratica['Verbale'] ?></p>
+            <p><span>Prescrizioni:</span> <?= $pratica['Prescrizioni'] ?></p>
+            <p><span>Parere:</span> <?= $pratica['Parere'] ?></p>
+            <p><span>Note parere:</span> <?= $pratica['Parere_Note'] ?></p>
+            <p><span>Note pratica:</span> <?= $pratica['Note_pratica'] ?></p>
+            <p><span>Note pagamenti:</span> <?= $pratica['Note_pagamenti'] ?></p>
+        </div>
   </body>
 </html>

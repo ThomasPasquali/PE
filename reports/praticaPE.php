@@ -19,8 +19,6 @@
 
                 if($datiGenericiPratica !== NULL){
 
-                    //print_r($datiGenericiPratica);
-                    //TODO edifici
                     $edifici = $c->db->ql(
                         'SELECT e.ID, e.Mappali
                         FROM pe_edifici_pratiche ep
@@ -69,7 +67,7 @@
             <h3>Interrogazione edificio all'archivio pratiche edilizie</h3>
        		<h4>ID pratica: <?= $datiGenericiPratica['ID'] ?><br>Sigla: <?= $datiGenericiPratica['Sigla'] ?></h4>
        </div>
-        <img src="../imgs/logo.jpg" id="logo" alt="logo">
+        <a href="../"><img src="../imgs/logo.jpg" id="logo" alt="logo"></a>
     </div>
     
     <p class="sottotitolo">Informazioni generali:</p>

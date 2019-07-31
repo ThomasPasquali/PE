@@ -36,6 +36,40 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
 			}});
 }
 
+function getHints(table, column, searchFieldID, hintBoxID, targetFieldID) {
+	var request = $.ajax({
+        url: "/runtime/handler.php",
+        type: "POST",
+        data: {	"action" : "hint",
+	      			"type" : "get",
+	      			"table" : table,
+	      			"column" : column,
+	      			"search" : $(searchFieldID).val()},
+      });
+		request.error = function(msg) {
+          alert( "Errore: " + msg);
+    };
+	    request.fail(function(jqXHR, textStatus) {
+	         request.error(textStatus);
+      });
+
+	    request.done(function(hints) {
+			if(hints){
+				$(hintBoxID).empty();
+				$(hintBoxID).css("display", "block");
+				for (let hint of hints) {
+					let a = $('<a></a>');
+					a.html(hint.Description);
+					a.click(function() {
+						$(searchFieldID).val(hint.Description);
+						$(targetFieldID).val(hint.Value);
+						$(hintBoxID).css("display", "none");
+					});
+					$(hintBoxID).append(a);
+				}
+			}
+	    });
+}
 
 function setValue(elID, newValue) {
 	$(elID).val(newValue);

@@ -215,6 +215,14 @@
                 </div>
             </div>
 
+			<div class="dropdown active">
+            	<button class="dropbtn">Modifiche<i class="fas fa-caret-down"></i></button>
+                <div class="dropdown-content">
+                	<a href="gestione/praticaPE.php">Pratica pe</a>
+                	<a href="gestione/praticaTEC.php">Pratica tec</a>
+                </div>
+            </div>
+
  			<div class="dropdown active">
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
@@ -328,25 +336,26 @@
             		<input type="hidden" name="tipo" value="pratica">
             		<div class="inner-wrap">
                   <label>Tipologia di pratica</label>
-                  <input type="radio" name="tipologia" value="pe" checked onclick="$('#tipo-pratica-tec-reports').hide(); $('#tipo-pratica-pe-reports').show();"> PE
-                  <input type="radio" name="tipologia" value="tec" onclick="$('#tipo-pratica-pe-reports').hide(); $('#tipo-pratica-tec-reports').show();"> TEC
+                  <input type="radio" name="tipologia" value="pe"  <?= ($_REQUEST['tipologia']??'') == 'pe'?'checked':'' ?> onclick="$('#tipo-pratica-tec-reports').hide(); $('#tipo-pratica-pe-reports').show();"> PE
+                  <?php 
+                  $tmp = '';
+                  if(($_REQUEST['tipologia']??'') == 'tec') {
+                      $tmp = 'checked';
+                      echo '<script>$(\'#tipo-pratica-pe-reports\').hide(); $(\'#tipo-pratica-tec-reports\').show();</script>';
+                  }
+                  ?>
+                  <input type="radio" name="tipologia" value="tec" <?= $tmp ?> onclick="$('#tipo-pratica-pe-reports').hide(); $('#tipo-pratica-tec-reports').show();"> TEC
                   <?php //TODO condoni e rubriche ?>
                   <label>Tipo</label>
                   <select id="tipo-pratica-pe-reports" name="tipo_pratica_pe">
-                    <option value="SCIA">SCIA</option>
-                    <option value="CILA">CILA</option>
-                    <option value="DIA">DIA</option>
-                    <option value="CIL">CIL</option>
-                    <option value="PERMESSI">Permessi</option>
-                    <option value="VARIE">Varie</option>
+                    <?php 
+                    foreach ($GLOBALS['c']->getEnumValues('pe_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
+                    ?>
                   </select>
                   <select id="tipo-pratica-tec-reports" name="tipo_pratica_tec" style="display:none;">
-                    <option value="A">Asseverazioni</option>
-                    <option value="P">Permessi</option>
-                    <option value="C">Concessioni</option>
-                    <option value="S">Sanatorie</option>
-                    <option value="I">Opere iterne</option>
-                    <?php //TODO vdere se sono tutte ?>
+                    <?php 
+                    foreach ($GLOBALS['c']->getEnumValues('tec_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
+                    ?>
                   </select>
                   <input type="checkbox" name="considerTipo" checked> Considera tipo
 		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
@@ -479,12 +488,12 @@
                 case 'pratica':
                     switch ($_POST['tipologia']) {
                       case 'pe':
-                        Reports::pratichePE($GLOBALS['c']->db, isset($_POST['considerTipo'])?$_POST['tipo_pratica_pe']:'', $_POST['anno'], $_POST['numero'], $_POST['barrato'], $_POST['foglio'], $_POST['mappale']);
+                        Reports::pratiche($GLOBALS['c']->db, isset($_POST['considerTipo'])?$_POST['tipo_pratica_pe']:'', $_POST['anno'], $_POST['numero'], $_POST['barrato'], $_POST['foglio'], $_POST['mappale']);
                         break;
 
                       case 'tec':
-                        // TODO code...
-                        break;
+                          Reports::pratiche($GLOBALS['c']->db, isset($_POST['considerTipo'])?$_POST['tipo_pratica_tec']:'', $_POST['anno'], $_POST['numero'], $_POST['barrato'], $_POST['foglio'], $_POST['mappale'], 'tec');
+                          break;
 
                       default:
                         break;

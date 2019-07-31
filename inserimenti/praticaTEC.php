@@ -1,40 +1,31 @@
 <?php
-  include_once '../controls.php';
-  $c = new Controls();
-
-  if(!$c->logged()){
+    //TODO tipologia fabb e cod int
+    include_once '../controls.php';
+    $c = new Controls();
+    
+    if(!$c->logged()){
       header('Location: ../index.php?err=Utente non loggato');
       exit();
-  }
-
-  print_r($_POST);
+    }
+    
+    print_r($_POST);
 
     $infos = [];
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         
-        
-
-        /*$res = $c->db->dml(
-            'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
-              VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
-            [':tipo' => $_POST['tipo'],
-            ':anno' => $_POST['anno'],
-            ':numero' => $_POST['numero'],
-            ':barr' => $_POST['barrato'],
-
-            ':strad' => ifEmptyGet($_POST['stradario']),
-
-            ':tecnico' => ifEmptyGet($_POST['tecnico']),
-            ':imp' => ifEmptyGet($_POST['impresa']),
-            ':dl' => ifEmptyGet($_POST['direzione_lavori']),
-
-            ':data' => ifEmptyGet($_POST['data']),
-            ':prot' => ifEmptyGet($_POST['protocollo']),
-            ':interv' => ifEmptyGet($_POST['intervento']),
-            ':data_il' => ifEmptyGet($_POST['data_inizio_lavori']),
-            ':doc_el' => ifEmptyGet($_POST['documento_elettronico']),
-            ':note' => ifEmptyGet($_POST['note'])]);
+        $keys = ['tipo', 'anno', 'numero', 'barrato', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
+        $cols = [];
+        $params = [];
+        foreach ($_POST as $key => $value) 
+            if(in_array($key, $keys)||substr($key, 0, 5) == 'Data_') {
+                $cols[] = $key;
+                $params[] = ifEmptyGet($_POST[$key]);
+            }
+        $res = $c->db->dml(
+            'INSERT INTO tec_pratiche ('.implode(',', $cols).')
+              VALUES (?'.str_repeat(',?', (count($cols)-1)).')',
+            $params);
 
         if($res->errorCode() == 0){
             $infos[] = 'Pratica inserita correttamente';
@@ -48,7 +39,7 @@
             //inserimento edifici
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('edificio')) == 'edificio'&&$value){
-                    $res = $c->db->dml('INSERT INTO pe_edifici_pratiche (Pratica, Edificio)
+                    $res = $c->db->dml('INSERT INTO tec_edifici_pratiche (Pratica, Edificio)
                                                     VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata all'edificio N° $value";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'edificio N° $value: ".$res->errorInfo()[2];
@@ -63,7 +54,7 @@
                     $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
 
                     if($edificio){
-                        $res = $c->db->dml('INSERT INTO pe_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
+                        $res = $c->db->dml('INSERT INTO tec_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale)
                                                             VALUES(?, ?, ?, ?)', [$idPratica, $edificio, $foglio, $mappale]);
 
                         if($res->errorCode() == 0) $infos[] = "F.$foglio m.$mappale associato alla pratica";
@@ -82,7 +73,7 @@
                     $edificio = $c->getEdificioID($foglio, $mappale, $c->db);
 
                     if($edificio){
-                        $res = $c->db->dml('INSERT INTO pe_subalterni_pratiche (Pratica, Edificio, Foglio, Mappale, Subalterno)
+                        $res = $c->db->dml('INSERT INTO tec_subalterni_pratiche (Pratica, Edificio, Foglio, Mappale, Subalterno)
                                                     VALUES(?, ?, ?, ?, ?)',
                             [$idPratica, $edificio, $foglio, $mappale, $subalterno]);
                         if($res->errorCode() == 0) $infos[] = "Subalterno $subalterno del F.$foglio m.$mappale associato alla pratica";
@@ -95,20 +86,20 @@
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'&&$value){
 
-                    $res = $c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona)
+                    $res = $c->db->dml('INSERT INTO tec_intestatari_persone_pratiche (Pratica, Persona)
                                                         VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario persona ($value)";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario persona $value: ".$res->errorInfo()[2];
             }else if(substr($key, 0, strlen('intestatarioSocieta')) == 'intestatarioSocieta'&&$value){
 
-                    $res = $c->db->dml('INSERT INTO pe_intestatari_societa_pratiche (Pratica, Societa)
+                    $res = $c->db->dml('INSERT INTO tec_intestatari_societa_pratiche (Pratica, Societa)
                                                         VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario societ&agrave; ($value)";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario societ&agrave; $value: ".$res->errorInfo()[2];
             }
 
         }else
-          $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];*/
+          $errors[] = 'Impossibile inserire la pratica: '.$res->errorInfo()[2];
     }
 
 
@@ -259,7 +250,7 @@
 
              <div class="field">
               <label>N. protocollo</label>
-              <input type="number" name="protocollo">
+              <input type="number" name="n_protocollo">
             </div>
             
             <div class="field">
@@ -279,12 +270,12 @@
             
             <div class="field">
               <label>Parere</label>
-              <textarea rows="3" name="Parere"></textarea>
+              <textarea rows="3" name="parere"></textarea>
             </div>
             
             <div class="field">
               <label>Note parere</label>
-              <textarea rows="3" name="note_parere"></textarea>
+              <textarea rows="3" name="parere_note"></textarea>
             </div>
             
             <div class="field">

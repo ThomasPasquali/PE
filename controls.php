@@ -132,9 +132,9 @@
          * @param string $barrato
          * @return int|NULL se esiste l'ID della pratica altrimenti NULL
          */
-        public function getPraticaID($tipo, $anno, $numero, $barrato) {
+        public function getPraticaID($tipo, $anno, $numero, $barrato, $pe_o_tec = 'pe') {
             $res = $this->db->ql('SELECT ID
-                                            FROM pe_pratiche
+                                            FROM '.$pe_o_tec.'_pratiche
                                             WHERE TIPO = ? AND Anno = ? AND Numero = ? AND Barrato = ?',
                                             [$tipo, $anno, $numero, $barrato]);
             return (count($res) === 1)?$res[0]['ID']:NULL;
@@ -170,6 +170,16 @@
             preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
             $enum = explode("','", $matches[1]);
             return $enum;
+        }
+        
+        public function getParsedTableDescription($table, $defaultColumn = 'ID'){
+            $description = $this->db->ql("SELECT table_comment
+                                                    FROM INFORMATION_SCHEMA.TABLES
+                                                    WHERE table_schema = (SELECT DATABASE())
+                                                        AND table_name = '$table'")[0]['table_comment'];
+            $matches = [];
+            preg_match("/INFO({.*})ENDINFO/", $description, $matches);
+            return (count($matches) > 1) ? json_decode($matches[1], TRUE) : ['Value' => $defaultColumn, 'Description' => $defaultColumn];
         }
 
     }
