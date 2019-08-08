@@ -174,12 +174,12 @@
         
         public function getParsedTableDescription($table, $defaultColumn = 'ID'){
             $description = $this->db->ql("SELECT table_comment
-                                                    FROM INFORMATION_SCHEMA.TABLES
-                                                    WHERE table_schema = (SELECT DATABASE())
-                                                        AND table_name = '$table'")[0]['table_comment'];
+                                                            FROM INFORMATION_SCHEMA.TABLES
+                                                            WHERE table_schema = (SELECT DATABASE())
+                                                                AND table_name = '$table'")[0]['table_comment'];
             $matches = [];
             preg_match("/INFO({.*})ENDINFO/", $description, $matches);
-            return (count($matches) > 1) ? json_decode($matches[1], TRUE) : ['Value' => $defaultColumn, 'Description' => $defaultColumn];
+            return (count($matches) > 1) ? json_decode((get_magic_quotes_gpc() ? stripslashes($matches[1]) : $matches[1]), TRUE) : ['Value' => $defaultColumn, 'Description' => $defaultColumn];
         }
 
     }

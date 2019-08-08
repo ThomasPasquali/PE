@@ -1,5 +1,4 @@
 <?php
-    //TODO tipologia fabb e cod int
     include_once '../controls.php';
     $c = new Controls();
     

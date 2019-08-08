@@ -1,6 +1,11 @@
 <html>
 <head>
 	<link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
+	<style type="text/css">
+	   input, label{
+	       display: block;
+	   }
+	</style>
 </head>
 <body style="padding-top: 60px;">
 <?php

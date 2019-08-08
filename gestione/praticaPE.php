@@ -2,11 +2,37 @@
 include_once '../controls.php';
 include_once '../lib/dbTableFormGenerator.php';
 $c = new Controls();
+$table = 'pe_pratiche';
 
 if(!$c->logged()){
     header('Location: ../index.php?err=Utente non loggato');
     exit();
 }
+
+$id = $_REQUEST['id'];
+
+if($c->check(['update'], $_REQUEST)) {
+    unset($_REQUEST['id']);
+    unset($_REQUEST['update']);
+    $res = DbTableFormGenerator::updateRecord($c->db, $table, $_REQUEST);
+    if($res === TRUE) {
+        header('Location: ../home.php?succ=Pratica modificata');
+        exit();
+    }else
+        $err = $res;
+}
+
+if(!$id){
+    header('Location: ../home.php?err=Richiesta errata');
+    exit();
+}
+
+$res = $c->db->ql("SELECT * FROM $table WHERE ID = ?", [$id]);
+if(count($res) < 0){
+    header('Location: ../home.php?err=Pratica non trovata');
+    exit();
+}
+else $pratica = $res[0];
 ?>
 <html>
 <head>
@@ -19,12 +45,34 @@ if(!$c->logged()){
         }
     </style>
     <script src="../lib/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
 	<?php 
-	DbTableFormGenerator::generate($c->db, 'tec_pratiche', FALSE, ['ID', 'IDold']);
+	$c->includeHTML('../htmlUtils/utils_bar.html');
+	if(isset($err))
+        echo "<h1>Errore durante la modifica: $err</h1>";
 	?>
-	
+    <form method="post">
+    	<input type="hidden" name="id" value="<?= $id ?>">
+    	<?php
+    	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'IDold', 'Documento_elettronico'], ['Barrato']);
+    	DbTableFormGenerator::generateManyToMany($c->db,
+	    [
+        	'pe_fogli_mappali_pratiche' => [
+        		//OK
+        	    'title' => 'Fogli-mappali',
+        		'name' => 'fm',
+        	    'optionsFilter' => ['Edificio' => 493],
+        		'initValuesFilter' => ['Pratica' => 1589],
+        		'value' => ['Edificio', 'Pratica', 'Foglio', 'Mappale'],
+        		//TODO Da gestire tabella esterna
+        	    'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
+        	]
+    	]);
+    	?>
+    	<input type="submit" name="update">
+    </form>
 	<script type="text/javascript" src="../js/hints.js"></script>
 </body>
 </html>

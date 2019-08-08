@@ -273,4 +273,71 @@
         }
         echo '</div>';
       }
+      
+      /**
+       *
+       * @param DB $db
+       */
+      public static function modificaPratiche($db, $tipo = '', $anno = '', $numero = '', $barrato = '', $foglio = '', $mappale = '', $pe_o_tec = 'pe'){
+          $where = [];
+          $params = [];
+          if(!empty($tipo)){
+              $where[] = 'p.Tipo = :tipo';
+              $params[':tipo'] = $tipo;
+          }
+          if(!empty($anno)){
+              $where[] = 'p.Anno = :anno';
+              $params[':anno'] = $anno;
+          }
+          if(!empty($numero)){
+              $where[] = 'p.Numero = :numero';
+              $params[':numero'] = $numero;
+          }
+          if(!empty($barrato)){
+              $where[] = 'p.Barrato = :barrato';
+              $params[':barrato'] = $barrato;
+          }
+          if(!empty($foglio)){
+              $where[] = 'fm.Foglio = :foglio';
+              $params[':foglio'] = $foglio;
+          }
+          if(!empty($mappale)){
+              $where[] = 'fm.Mappale = :mappale';
+              $params[':mappale'] = $mappale;
+          }
+          $where = implode(' AND ', $where);
+          
+          $sql = 'SELECT ID, Sigla, TIPO, Anno, Numero, FogliMappali, Intestatari_persone, Intestatari_societa
+                FROM '.$pe_o_tec.'_pratiche_view
+                WHERE ID IN (
+                  SELECT DISTINCT p.ID
+                  FROM '.$pe_o_tec.'_pratiche p
+                  JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
+                  ((!empty($where))?('WHERE '.$where):'') .')
+                ORDER BY Anno, Numero';
+                  
+                  $rs = $db->ql($sql, $params);
+                  
+                  echo '<div class="wrapper">';
+                  
+                  foreach ($rs as $row){ ?>
+
+        <div class="content">
+        <h1><?= $row['Sigla'] ?></h1>
+          <div class="inner-wrap">
+            <p><span class="title">Fogli-mappali:</span> <?= $row['FogliMappali'] ?></p>
+            <p><span class="title">Intestatari persone:</span> <?= $row['Intestatari_persone'] ?></p>
+            <p><span class="title">Intestatari societ&aacute;:</span> <?= $row['Intestatari_societa'] ?></p>
+            <form action="gestione/pratica<?= strtoupper($pe_o_tec) ?>.php" method="post">
+                <button name="id" class="formBtn" value="<?= $row['ID'] ?>">Modifica</button>
+            </form>
+          </div>
+        </div>
+
+      <?php
+        }
+        echo '</div>';
+      }
+      
+      
   }

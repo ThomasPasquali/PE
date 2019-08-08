@@ -1,7 +1,6 @@
 <?php
     include_once 'controls.php';
     $GLOBALS['c'] = new Controls();
-    $err = $_GET['err']??'';
 
     if(!$GLOBALS['c']->logged()){
         header('Location: index.php?err=Utente non loggato');
@@ -9,8 +8,6 @@
     }
 
    //$GLOBALS['c']->echoCode($_POST);
-
-   $esitoGestMapp = '';
 
     if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)){
         switch ($_POST['btn']) {
@@ -46,10 +43,6 @@
                 ;
             break;
         }
-    }
-
-    function inserisciPraticaTEC() {
-        ;//TODO
     }
 
     function inserisciPersona() {
@@ -218,8 +211,7 @@
 			<div class="dropdown active">
             	<button class="dropbtn">Modifiche<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
-                	<a href="gestione/praticaPE.php">Pratica pe</a>
-                	<a href="gestione/praticaTEC.php">Pratica tec</a>
+                	<a onclick="changeContent('modPra');">Pratica</a>
                 </div>
             </div>
 
@@ -252,8 +244,10 @@
         <?php
         if(isset($GLOBALS['err'])&&!empty($GLOBALS['err']))
                  echo "<pre style=\"border-left-color: red;\" class=\"info\">$GLOBALS[err]</pre>";
-         if(isset($GLOBALS['succ'])&&!empty($GLOBALS['succ']))
+         if($GLOBALS['c']->check(['succ'], $GLOBALS))
                 echo "<pre class=\"info\">$GLOBALS[succ]</pre>";
+            else if($GLOBALS['c']->check(['succ'], $_GET))
+                echo "<pre class=\"info\">$_GET[succ]</pre>";
         ?>
 
         <div id="intAnag" class="content">
@@ -339,10 +333,8 @@
                   <input type="radio" name="tipologia" value="pe"  <?= ($_REQUEST['tipologia']??'') == 'pe'?'checked':'' ?> onclick="$('#tipo-pratica-tec-reports').hide(); $('#tipo-pratica-pe-reports').show();"> PE
                   <?php 
                   $tmp = '';
-                  if(($_REQUEST['tipologia']??'') == 'tec') {
+                  if(($_REQUEST['tipologia']??'') == 'tec')
                       $tmp = 'checked';
-                      echo '<script>$(\'#tipo-pratica-pe-reports\').hide(); $(\'#tipo-pratica-tec-reports\').show();</script>';
-                  }
                   ?>
                   <input type="radio" name="tipologia" value="tec" <?= $tmp ?> onclick="$('#tipo-pratica-pe-reports').hide(); $('#tipo-pratica-tec-reports').show();"> TEC
                   <?php //TODO condoni e rubriche ?>
@@ -357,6 +349,10 @@
                     foreach ($GLOBALS['c']->getEnumValues('tec_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
                     ?>
                   </select>
+                  <?php 
+                  if(($_REQUEST['tipologia']??'') == 'tec')
+                    echo '<script>$(\'#tipo-pratica-pe-reports\').hide(); $(\'#tipo-pratica-tec-reports\').show();</script>';
+                  ?>
                   <input type="checkbox" name="considerTipo" checked> Considera tipo
 		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
    	   				     <label>Numero<input type="number" name="numero" value="<?= $_POST['numero']??'' ?>"></label>
@@ -464,8 +460,55 @@
 				</form>
 			</div>
         </div>
+        
+        <div id="modPra" class="content">
+        	<div class="form">
+            	<h1>Mdifica pratiche</h1>
+
+            	<form action="" method="post">
+            		<input type="hidden" name="tipo" value="pratica">
+            		<div class="inner-wrap">
+                  <label>Tipologia di pratica</label>
+                  <input type="radio" name="tipologia" value="pe"  <?= ($_REQUEST['tipologia']??'') == 'tec'?'':'checked' ?> onclick="$('#tipo-pratica-tec-modifiche').hide(); $('#tipo-pratica-pe-modifiche').show();"> PE
+                  <?php 
+                  $tmp = '';
+                  if(($_REQUEST['tipologia']??'') == 'tec')
+                      $tmp = 'checked';
+                  ?>
+                  <input type="radio" name="tipologia" value="tec" <?= $tmp ?> onclick="$('#tipo-pratica-pe-modifiche').hide(); $('#tipo-pratica-tec-modifiche').show();"> TEC
+                  <label>Tipo</label>
+                  <select id="tipo-pratica-pe-modifiche" name="tipo_pratica_pe">
+                    <?php 
+                    foreach ($GLOBALS['c']->getEnumValues('pe_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
+                    ?>
+                  </select>
+                  <select id="tipo-pratica-tec-modifiche" name="tipo_pratica_tec" style="display:none;">
+                    <?php 
+                    foreach ($GLOBALS['c']->getEnumValues('tec_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
+                    ?>
+                  </select>
+                  <?php 
+                  if(($_REQUEST['tipologia']??'') == 'tec')
+                    echo '<script>$(\'#tipo-pratica-pe-modifiche\').hide(); $(\'#tipo-pratica-tec-modifiche\').show();</script>';
+                  ?>
+                  <input type="checkbox" name="considerTipo" checked> Considera tipo
+		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
+   	   				     <label>Numero<input type="number" name="numero" value="<?= $_POST['numero']??'' ?>"></label>
+                   <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
+                   <label>Foglio<input type="text" maxlength="4" name="foglio" value="<?= $_POST['foglio']??'' ?>"></label>
+                   <label>Mappale<input type="text" maxlength="6" name="mappale" value="<?= $_POST['mappale']??'' ?>"></label>
+            		</div>
+            		<input type="hidden" name="display" value="modPra">
+            		<button type="submit" name="btn" value="modifica">Cerca</button>
+            	</form>
+        	</div>
+        </div>
 
         <?php
+        if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)&&$_POST['btn'] == 'modifica'){
+            include_once 'lib/reports.php';
+            Reports::modificaPratiche($GLOBALS['c']->db, isset($_POST['considerTipo'])?$_POST['tipo_pratica_'.$_POST['tipologia']]:'', $_POST['anno'], $_POST['numero'], $_POST['barrato'], $_POST['foglio'], $_POST['mappale'], $_POST['tipologia']);
+        }
         if($GLOBALS['c']->check(['btn', 'tipo'], $_POST)&&$_POST['btn'] == 'report'){
             include_once 'lib/reports.php';
             switch ($_POST['tipo']) {

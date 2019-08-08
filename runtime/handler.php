@@ -92,6 +92,7 @@
                         $c->db->ql("SELECT $description[Value] Value, $description[Description] Description
                                             FROM $table
                                             WHERE $description[Description] LIKE ?
+                                            ORDER BY $description[Description]
                                             LIMIT 50",
                                             ["%$search%"]), TRUE);
     }

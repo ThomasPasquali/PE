@@ -54,6 +54,7 @@ function getHints(table, column, searchFieldID, hintBoxID, targetFieldID) {
       });
 
 	    request.done(function(hints) {
+	    	//console.log(hints);
 			if(hints){
 				$(hintBoxID).empty();
 				$(hintBoxID).css("display", "block");
