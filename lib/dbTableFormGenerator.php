@@ -1,6 +1,6 @@
-<?php 
+<?php
 class DbTableFormGenerator {
-    
+
     public static function generate($c, $table, $initArray = [], $isWhitList = TRUE, $columnsList = [], $notRequiredColumns = []) {
         $tableDecription = $c->db->ql('DESCRIBE '.$table);
         //print_r($initArray);
@@ -9,14 +9,14 @@ class DbTableFormGenerator {
             $columnName = $column['Field'];
             echo "<input type=\"hidden\" name=\"old_$columnName\" value=\"$initArray[$columnName]\">";
             if(!($isWhitList^in_array($columnName, $columnsList))){
-                
+
                 $parsedType = [];
                 preg_match("/(.*)\((.*)\)/", $column['Type'], $parsedType);
                 $type = $parsedType[1]??$column['Type'];
                 $length = $parsedType[2]??NULL;
-                
+
                 $required = in_array($columnName, $notRequiredColumns) ? FALSE : $column['Null'] == 'NO';
-                
+
                 if($column['Key'] != 'MUL') {
                     switch ($type) {
                         case 'int':
@@ -25,50 +25,50 @@ class DbTableFormGenerator {
                         case 'double':
                             DbTableFormGenerator::generateInput($columnName, 'number', $initArray[$columnName], $required, $length);
                             break;
-                            
+
                         case 'char':
                         case 'varchar':
                             if(is_numeric($length) && $length > 50)
                                 DbTableFormGenerator::generateTextarea($columnName, $initArray[$columnName], $required, $length);
-                            else 
+                            else
                         DbTableFormGenerator::generateInput($columnName, 'text', $initArray[$columnName], $required, $length);
                             break;
-                            
+
                         case 'date':
                             DbTableFormGenerator::generateInput($columnName, 'date', $initArray[$columnName], $required, NULL);
                             break;
-                            
+
                         case 'text':
                             DbTableFormGenerator::generateTextarea($columnName, $initArray[$columnName], $required, $length);
                             break;
-                            
+
                        case 'enum':
                            $options = [];
                            preg_match("/^enum\(\'(.*)\'\)$/", $column['Type'], $options);
                            DbTableFormGenerator::generateSelect($columnName, explode("','", $options[1]), $initArray[$columnName], $required);
                            break;
-                            
+
                         default:
                             echo "<pre style=\"color:red;\">Tipo $type non gestito</pre>";
                             break;
                     }
-                    
+
                 }else
                 DbTableFormGenerator::generateForeingKey($table, $columnName, $c, $initArray[$columnName], $required, $length);
             }
         }
     }
-    
+
     private static function generateInput($name, $type, $value, $required, $length) {
         echo "<label>$name</label>";
         echo "<input type=\"$type\" name=\"$name\" value=\"".($value??'')."\"".(is_numeric($length)?" length=\"$length\"":'').($required ? ' required="required"' : '').'>';
     }
-    
+
     private static function generateTextarea($name, $value, $required, $length) {
         echo "<label>$name</label>";
         echo "<textarea name=\"$name\"".(is_numeric($length)?" length=\"$length\"":'').($required ? ' required="required"' : '').' rows="5" cols="50">'.($value??'').'</textarea>';
     }
-    
+
     private static function generateSelect($name, $options, $value, $required) {
         echo "<label>$name</label>";
         echo "<select name=\"$name\">";
@@ -77,7 +77,7 @@ class DbTableFormGenerator {
             echo "<option value=\"$option\"".($option == $value ? ' selected="selected"' : '').">$option</option>";
         echo '</select>';
     }
-    
+
     private function generateForeingKey($table, $column, $c, $value, $required, $length) {
         $fks = $c->db->ql("SELECT `referenced_table_name` AS tab, `referenced_column_name`  AS col
                                 FROM `information_schema`.`KEY_COLUMN_USAGE`
@@ -92,19 +92,19 @@ class DbTableFormGenerator {
             $description = (count($value) > 0) ? $value[0]['Description'] : '';
             $value = (count($value) > 0) ? $value[0]['Value'] : '';
         }
-        
+
         DbTableFormGenerator::generateForeingKeyField($column, $description??'', $value, $fks['tab'], $fks['col'], $required, $length);
     }
-    
+
     private static function generateForeingKeyField($title, $description, $value, $extTab, $extCol, $required, $length) {
         echo "<label>$title</label>";
         echo "<input id=\"".$title."SearchField\" type=\"text\" value=\"".($description??'')."\" onfocusin=\"this.select();\" onkeyup=\"getHints('$extTab', '$extCol', '#".$title."SearchField', '#".$title."Hints', 'input[name=$title]')\"".(is_numeric($length)?" length=\"$length\"":'').'>';
         echo '<input type="hidden" name="'.$title.'" value="'.($value??'').'" '.($required ? ' required="required"' : '').'>';
         echo '<div id="'.$title.'Hints" class="hintDiv"></div>';
     }
-    
+
     /**
-     * 
+     *
      * @param DB $db
      * @param string $table
      * @param array $request
@@ -116,12 +116,12 @@ class DbTableFormGenerator {
         foreach ($tableDescription as $column)
             if($column['Key'] == 'PRI')
                 $pks[] = $column['Field'];
-        
+
         $count = 0;
         $where = [];
         $values = [];
         $set = [];
-        
+
         foreach ($request as $name => $value) {
             if(substr($name, 0, 4) == 'old_'){
                 if(in_array(substr($name, 4, strlen($name)), $pks)){
@@ -131,7 +131,7 @@ class DbTableFormGenerator {
             }else{
                 $set[] = "$name = :$count";
                 if(!$value)
-                    foreach ($tableDescription as $column) 
+                    foreach ($tableDescription as $column)
                         if($column['Field'] == $name){
                             $value = ($column['Null'] == 'YES') ? NULL : '';
                             break;
@@ -145,7 +145,7 @@ class DbTableFormGenerator {
 
         return ($db->dml($sql, $values)->rowCount() > 0) ? TRUE : $db->lastErrorInfo[2];
     }
-    
+
     /**
      *
      * @param DB $db
@@ -154,18 +154,23 @@ class DbTableFormGenerator {
     public static function generateManyToMany($db, $map) {
     	//echo '<pre>'; print_r($map); echo '</pre>';
         foreach ($map as $table => $arr) {
-        	echo '<div id="'.$arr['title'].'" class="manyTOmany">';
+        	echo '<div id="'.$arr['name'].'" class="manyTOmany">';
             echo "<label>$arr[title]</label>";
-            
+
             $where = [];
             $values = [];
             foreach ($arr['optionsFilter'] as $col => $value) {
-            	$where[] = $col.' = ?';
-            	$values[] = $value;
+              if(is_array($value) && count($value) > 0) {
+                $where[] = $col.' IN (?'.str_repeat(', ?', count($value)-1).')';
+                foreach ($value as $val) $values[] = $val;
+              }else {
+                $where[] = $col.' = ?';
+                $values[] = $value;
+              }
             }
-            $options = $db->ql("SELECT ".implode(', ', $arr['value']).", $arr[description] Description FROM $table WHERE ".implode(' AND ', $where), $values);
+            $options = $db->ql("SELECT $arr[description] Description, CONCAT_WS('-', ".implode(', ', $arr['value']).") Value FROM $table WHERE ".implode(' AND ', $where)." GROUP BY $arr[description]", $values);
             echo '<script>'.$arr['name'].' = '.json_encode($options).'; </script>';
-            
+
             $where = [];
             $values = [];
             foreach ($arr['initValuesFilter'] as $col => $value) {
@@ -173,26 +178,22 @@ class DbTableFormGenerator {
                 $values[] = $value;
             }
             foreach ($arr['optionsFilter'] as $col => $value) {
-            	$where[] = $col.' = ?';
-            	$values[] = $value;
+              if(is_array($value) && count($value) > 0) {
+                $where[] = $col.' IN (?'.str_repeat(', ?', count($value)-1).')';
+                foreach ($value as $val) $values[] = $val;
+              }else {
+                $where[] = $col.' = ?';
+                $values[] = $value;
+              }
             }
             $initRecors = $db->ql("SELECT ".implode(', ', $arr['value'])." FROM $table WHERE ".implode(' AND ', $where), $values);
-            
-            foreach ($initRecors as $record) {
-            	echo '<script>1addManyTOManyField($(this).parent(), '.$arr['name'].');"
-            	/*echo '<select disabled name="'.$arr['name'].($i++).'">';
-            	$desc = $record['Description'];
-            	unset($record['Description']);
-            	echo '<option vaule="'.implode('-', $record)."\">$desc</option>";
-            	echo '</select>';
-            	echo '<button type="button" onclick="$(this).parent().remove();">Elimina</button>';*/
-            }
-            
+            foreach ($initRecors as $record)
+            	echo "<script>addManyTOManyField($('#$arr[name]'), $arr[name], '".implode('-', $record).'\');</script>';
+
             echo '<button type="button" onclick="addManyTOManyField($(this).parent(), '.$arr['name'].');">Aggiungi</button>';
-            
-            echo '<pre>'; print_r($initRecors); echo '</pre>';
+
             echo '</div>';
         }
     }
-    
+
 }

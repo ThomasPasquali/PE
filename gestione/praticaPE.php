@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once '../controls.php';
 include_once '../lib/dbTableFormGenerator.php';
 $c = new Controls();
@@ -45,10 +45,11 @@ else $pratica = $res[0];
         }
     </style>
     <script src="../lib/jquery-3.3.1.min.js"></script>
+    <script src="../js/gestione_pratiche.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
-	<?php 
+	<?php
 	$c->includeHTML('../htmlUtils/utils_bar.html');
 	if(isset($err))
         echo "<h1>Errore durante la modifica: $err</h1>";
@@ -57,17 +58,21 @@ else $pratica = $res[0];
     	<input type="hidden" name="id" value="<?= $id ?>">
     	<?php
     	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'IDold', 'Documento_elettronico'], ['Barrato']);
-    	DbTableFormGenerator::generateManyToMany($c->db,
+
+      $res = $c->db->ql('SELECT Edificio FROM pe_edifici_pratiche WHERE Pratica = ?', [$pratica['ID']]);
+      $edificiPratica = [];
+      foreach ($res as $value)
+        $edificiPratica[] = $value['Edificio'];
+      DbTableFormGenerator::generateManyToMany($c->db,
 	    [
         	'pe_fogli_mappali_pratiche' => [
-        		//OK
-        	    'title' => 'Fogli-mappali',
+      	    'title' => 'Fogli-mappali',
         		'name' => 'fm',
-        	    'optionsFilter' => ['Edificio' => 493],
-        		'initValuesFilter' => ['Pratica' => 1589],
+        	  'optionsFilter' => ['Edificio' => $edificiPratica],
+        		'initValuesFilter' => ['Pratica' => $pratica['ID']],
         		'value' => ['Edificio', 'Pratica', 'Foglio', 'Mappale'],
         		//TODO Da gestire tabella esterna
-        	    'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
+        	   'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
         	]
     	]);
     	?>
