@@ -179,7 +179,7 @@ class DbTableFormGenerator {
             $initRecors = $db->ql("SELECT ".implode(', ', $arr['value'])." FROM $table WHERE ".implode(' AND ', $where), $values);
             
             foreach ($initRecors as $record) {
-            	echo '<script>addManyTOManyField($(this).parent(), '.$arr['name'].');"
+            	echo '<script>1addManyTOManyField($(this).parent(), '.$arr['name'].');"
             	/*echo '<select disabled name="'.$arr['name'].($i++).'">';
             	$desc = $record['Description'];
             	unset($record['Description']);
