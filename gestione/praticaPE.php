@@ -57,24 +57,24 @@ else $pratica = $res[0];
     <form method="post">
     	<input type="hidden" name="id" value="<?= $id ?>">
     	<?php
-    	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'IDold', 'Documento_elettronico'], ['Barrato']);
+    	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'Documento_elettronico'], ['Barrato']);
 
-      $res = $c->db->ql('SELECT Edificio FROM pe_edifici_pratiche WHERE Pratica = ?', [$pratica['ID']]);
+      /*$res = $c->db->ql('SELECT Edificio FROM pe_edifici_pratiche WHERE Pratica = ?', [$pratica['ID']]);
       $edificiPratica = [];
       foreach ($res as $value)
         $edificiPratica[] = $value['Edificio'];
       DbTableFormGenerator::generateManyToMany($c->db,
 	    [
         	'pe_fogli_mappali_pratiche' => [
-      	    'title' => 'Fogli-mappali',
-        		'name' => 'fm',
-        	  'optionsFilter' => ['Edificio' => $edificiPratica],
+	      	    'title' => 'Fogli-mappali',
+	        	'name' => 'fm',
+        	  	'optionsFilter' => ['Edificio' => $edificiPratica],
         		'initValuesFilter' => ['Pratica' => $pratica['ID']],
         		'value' => ['Edificio', 'Pratica', 'Foglio', 'Mappale'],
         		//TODO Da gestire tabella esterna
         	   'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
         	]
-    	]);
+    	]);*/
     	?>
     	<input type="submit" name="update">
     </form>

@@ -1,8 +1,8 @@
 <?php 
     include_once 'controls.php';
+    include_once 'lib/dbTableFormGenerator.php';
     $c = new Controls();
-    
-    $xml = json_decode(json_encode(simplexml_load_file('lib/oneriEcosti/costiBase.xml')), true);
+    /*$xml = json_decode(json_encode(simplexml_load_file('lib/oneriEcosti/costiBase.xml')), true);
     $cc = $xml['CC'];
     $ou = $xml['OU'];
     
@@ -51,7 +51,7 @@
                 return false;
                 return true;
     }
-    /*$res = $c->db->ql('SELECT Pratica p, Superfici_alloggi s FROM oneri');
+    $res = $c->db->ql('SELECT Pratica p, Superfici_alloggi s FROM oneri');
     
     foreach ($res as $tmp) {
     $superfici = preg_split("/ +/", $tmp['s']);
@@ -126,5 +126,43 @@
         }
         
     }*/
-    
+?>
+
+<html>
+<head>
+	<script src="../lib/jquery-3.3.1.min.js"></script>
+    <script src="../js/gestione_pratiche.js"></script>
+</head>
+<body>
+	<form method="post">
+	<?php 
+	$c->echoCode($_POST);
+	$pratica = $c->db->ql("SELECT * FROM pe_pratiche WHERE ID = ?", [1491])[0];
+	$res = $c->db->ql('SELECT Edificio FROM pe_edifici_pratiche WHERE Pratica = ?', [$pratica['ID']]);
+	$edificiPratica = [];
+	foreach ($res as $value)
+		$edificiPratica[] = $value['Edificio'];
+		DbTableFormGenerator::generateManyToMany($c->db,
+			[
+					'pe_fogli_mappali_pratiche' => [
+							'title' => 'Fogli-mappali',
+							'name' => 'fm',
+							'optionsFilter' => ['Edificio' => $edificiPratica],
+							'initValuesFilter' => ['Pratica' => $pratica['ID']],
+							'value' => ['Edificio', 'Pratica', 'Foglio', 'Mappale'],
+							'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
+					],
+					'pe_intestatari_persone_pratiche' => [
+							'title' => 'Intestatari persone',
+							'name' => 'ip',
+							'initValuesFilter' => ['Pratica' => $pratica['ID']],
+							'value' => ['Persona', 'Pratica'],
+							'description' => ['table' => 'intestatari_persone', 'description' => "CONCAT('F.',Foglio,'m.',Mappale)"]
+					]
+			]);
+	?>
+    	<input type="submit" name="update">
+    </form>
+</body>
+</html>
     

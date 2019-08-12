@@ -11,7 +11,7 @@ class DbTableFormGenerator {
             if(!($isWhitList^in_array($columnName, $columnsList))){
 
                 $parsedType = [];
-                preg_match("/(.*)\((.*)\)/", $column['Type'], $parsedType);
+                preg_match("/(\w*)\((.*)\)/", $column['Type'], $parsedType);
                 $type = $parsedType[1]??$column['Type'];
                 $length = $parsedType[2]??NULL;
 
@@ -156,6 +156,7 @@ class DbTableFormGenerator {
         foreach ($map as $table => $arr) {
         	echo '<div id="'.$arr['name'].'" class="manyTOmany">';
             echo "<label>$arr[title]</label>";
+            echo '<div id="'.$arr['name'].'Sub">';
 
             $where = [];
             $values = [];
@@ -169,7 +170,10 @@ class DbTableFormGenerator {
               }
             }
             $options = $db->ql("SELECT $arr[description] Description, CONCAT_WS('-', ".implode(', ', $arr['value']).") Value FROM $table WHERE ".implode(' AND ', $where)." GROUP BY $arr[description]", $values);
-            echo '<script>'.$arr['name'].' = '.json_encode($options).'; </script>';
+            echo '<script>'
+            			.$arr['name'].' = '.json_encode($options).';'
+            			.$arr['name'].'Count = 0',
+					'</script>';
 
             $where = [];
             $values = [];
@@ -188,10 +192,9 @@ class DbTableFormGenerator {
             }
             $initRecors = $db->ql("SELECT ".implode(', ', $arr['value'])." FROM $table WHERE ".implode(' AND ', $where), $values);
             foreach ($initRecors as $record)
-            	echo "<script>addManyTOManyField($('#$arr[name]'), $arr[name], '".implode('-', $record).'\');</script>';
-
-            echo '<button type="button" onclick="addManyTOManyField($(this).parent(), '.$arr['name'].');">Aggiungi</button>';
-
+            	echo "<script>addManyTOManyField($('#$arr[name]Sub'), $arr[name], '$arr[name]', '".implode('-', $record).'\');</script>';
+			echo '</div>';
+			echo '<button type="button" onclick="addManyTOManyField($(\'#'.$arr['name'].'Sub\'), '.$arr['name'].', \''.$arr['name'].'\');">Aggiungi</button>';
             echo '</div>';
         }
     }
