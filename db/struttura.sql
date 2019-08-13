@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versione server:              10.3.10-MariaDB - mariadb.org binary distribution
+-- Versione server:              10.3.16-MariaDB - mariadb.org binary distribution
 -- S.O. server:                  Win64
--- HeidiSQL Versione:            10.1.0.5532
+-- HeidiSQL Versione:            10.2.0.5599
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS `edifici` (
   CONSTRAINT `Denominazione.1` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`identificativo_nazionale`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1040 DEFAULT CHARSET=utf8 COMMENT='Il valore 0 di foglio ne indica la molteplicità';
 
+-- L’esportazione dei dati non era selezionata.
+
+-- Creazione di una tabella temporanea per risolvere gli errori di dipendenza della vista
 -- Dump della struttura di tabella pe.fogli_mappali_edifici
 CREATE TABLE IF NOT EXISTS `fogli_mappali_edifici` (
   `Edificio` int(10) unsigned NOT NULL,
@@ -62,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `imprese` (
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Intestazione`),
   UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=379 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=379 DEFAULT CHARSET=utf8 COMMENT='INFO{"Value":"ID", "Description":"Intestazione"}ENDINFO';
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -356,7 +359,7 @@ CREATE TABLE IF NOT EXISTS `stradario` (
   `Denominazione` char(60) NOT NULL,
   PRIMARY KEY (`Identificativo_nazionale`,`Denominazione`),
   UNIQUE KEY `Identificativo_nazionale` (`Identificativo_nazionale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='INFO{"Value":"Identificativo_nazionale", "Description":"Denominazione"}ENDINFO';
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -390,7 +393,7 @@ CREATE TABLE IF NOT EXISTS `tecnici` (
   PRIMARY KEY (`Codice_fiscale`),
   UNIQUE KEY `Tec-ID` (`ID`),
   KEY `Cognome` (`Cognome`,`Nome`)
-) ENGINE=InnoDB AUTO_INCREMENT=292 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=292 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='INFO{"Value":"ID", "Description":"CONCAT(Cognome, '' '', Nome)"}ENDINFO';
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -519,8 +522,8 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `Numero` int(4) NOT NULL,
   `Barrato` char(12) NOT NULL,
   `Oggetto` varchar(300) DEFAULT NULL,
-  `Tipologia_fabbricato` int(11) DEFAULT NULL,
-  `COD_INT` int(11) DEFAULT NULL,
+  `Tipologia_fabbricato` enum('Scuole','Residenziale','Artigianato','Agricoltura','Industria','Direzionale','Accessorio-agricoltura','Altro','Uffici-pubblici','Sportivo-ricreativo','Accessorio-commerciale','Accessorio-residenziale','Turistico-ricettivo','Commerciale','Accessorio-turistico-ricettivo') DEFAULT NULL,
+  `COD_INT` enum('Ampliamento','Altro','Opere-interne(art.26)','Demolizione','Nuova-costruzione','Ricostruzione','Costruzione','Manutenzione-straordinaria','Restauro','Risanamento-conservativo','Ristrutturazione','Consolidamento-statico') DEFAULT NULL,
   `Stradario` int(6) unsigned NOT NULL,
   `Civico` varchar(6) DEFAULT NULL,
   `Data_domanda` date DEFAULT NULL,
@@ -557,7 +560,9 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   UNIQUE KEY `ID` (`IDold`),
   KEY `FK_tec_pratiche_stradario` (`Stradario`),
   CONSTRAINT `FK_tec_pratiche_stradario` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`Identificativo_nazionale`)
-) ENGINE=InnoDB AUTO_INCREMENT=1779 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1782 DEFAULT CHARSET=utf8;
+
+-- L’esportazione dei dati non era selezionata
 
 -- Dump della struttura di tabella pe.tec_subalterni_pratiche
 CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
@@ -585,6 +590,53 @@ CREATE TABLE IF NOT EXISTS `tec_tecnici_pratiche` (
   CONSTRAINT `FK_tec_tecnici_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`),
   CONSTRAINT `FK_tec_tecnici_pratiche_tecnici` FOREIGN KEY (`Tecnico`) REFERENCES `tecnici` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CAPIRE COSA METTERE AL POSTO DELLA COLONNA TIPO';
+
+-- L’esportazione dei dati non era selezionata.
+
+-- Dump della struttura di tabella pe.tmp
+CREATE TABLE IF NOT EXISTS `tmp` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `IDold` char(10) DEFAULT NULL,
+  `TIPO` enum('Autorizzazione','Permesso','Concessione','Sanatoria','Opera_interna','Condono') NOT NULL,
+  `Anno` int(4) NOT NULL,
+  `Numero` int(4) NOT NULL,
+  `Barrato` char(12) NOT NULL,
+  `Oggetto` varchar(300) DEFAULT NULL,
+  `Tipologia_fabbricato` int(11) DEFAULT NULL,
+  `COD_INT` int(11) DEFAULT NULL,
+  `Stradario` int(6) unsigned NOT NULL,
+  `Civico` varchar(6) DEFAULT NULL,
+  `Data_domanda` date DEFAULT NULL,
+  `N_protocollo` varchar(6) DEFAULT NULL,
+  `N_verbale` varchar(6) DEFAULT NULL,
+  `Verbale` text DEFAULT NULL,
+  `Prescrizioni` text DEFAULT NULL,
+  `Parere` text DEFAULT NULL,
+  `Parere_Note` text DEFAULT NULL,
+  `Approvata` varchar(1) DEFAULT NULL,
+  `Onerosa` varchar(1) DEFAULT NULL,
+  `Beni_Ambientali` varchar(3) DEFAULT NULL,
+  `Pratica_Note` text DEFAULT NULL,
+  `Pagamenti_Note` varchar(112) DEFAULT NULL,
+  `Data_RichiestaDocAgg` date DEFAULT NULL,
+  `Data_ScadenzaPresentazDocAgg` date DEFAULT NULL,
+  `Data_ParereTecnico` date DEFAULT NULL,
+  `Data_ParereUfficialeSanitario` date DEFAULT NULL,
+  `Data_CommissioneEdilizia` date DEFAULT NULL,
+  `Data_Concessione` date DEFAULT NULL,
+  `Data_ComunicazioneDecisione` date DEFAULT NULL,
+  `Data_RitiroPratica` date DEFAULT NULL,
+  `Data_ScadenzaRitiroPratica` date DEFAULT NULL,
+  `Data_InizioLavori` date DEFAULT NULL,
+  `Data_FineLavori` date DEFAULT NULL,
+  `Data_InizioLavoriConcess.` date DEFAULT NULL,
+  `Data_FineLavoriConcess.` date DEFAULT NULL,
+  `Data_RichiestaAgibilitaAbitabilita` date DEFAULT NULL,
+  `Data_SopralluogoTecnico` date DEFAULT NULL,
+  `Data_AbitabilitaAgibilita` date DEFAULT NULL,
+  `Data_ArchiviazionePratica` date DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3557 DEFAULT CHARSET=utf8;
 
 -- L’esportazione dei dati non era selezionata.
 
@@ -698,7 +750,7 @@ LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
 -- Dump della struttura di vista pe.tec_pratiche_view
 -- Rimozione temporanea di tabella e creazione della struttura finale della vista
-CREATE  VIEW `tec_pratiche_view` AS SELECT  p.ID,
+CREATE VIEW `tec_pratiche_view` AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
 		p.Numero,
