@@ -15,6 +15,7 @@ function addFieldAlloggio() {
 	let field = $('<input>');
 	field.attr('type', 'number');
 	field.attr('name', 'alloggio'+(countAlloggi++));
+	field.attr('min', '1');
 	field.attr('placeholder', 'Superficie in mq...');
 	field.addClass('fieldAlloggio');
 	$('#fields-alloggi').append(field);
@@ -107,7 +108,7 @@ function setCoefficenti(OU1, OU2, UM) {
 	$('input[name=imponibileOU]').attr('placeholder', 'Imponibile in '+um);
 	let div = $('<div></div>');
 	for (let k in formOneri)
-		div.append($('<p></p>').text(k+': ').append($('<span></span>').text(formOneri[k].replace( /_/, " " ))));
+		div.append($('<p></p>').text(k+': ').append($('<span></span>').text(formOneri[k].replace( /_/, " "))));
 	div.insertAfter($('#titolo-ou'));
 	$('#inserimento-imponibile').show();
 }
@@ -115,7 +116,7 @@ function setCoefficenti(OU1, OU2, UM) {
 function serializeByClass(selector) {
 	arr = {};
 	$(selector).each(function() {
-			arr[$(this).parent().children('h2').html()] = $(this).attr('class').split(' ')[2];
+			arr[$(this).parent().children('h2').html().replace( /\s/, "_")] = $(this).attr('class').split(' ')[2];
 	});
 	return arr;
 }

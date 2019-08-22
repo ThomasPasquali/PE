@@ -69,6 +69,8 @@
 	</div>
 	
 	<div>
+	
+	<form id="form" action="" method="post">
 	<div id="container">
 		<div id="ou">
         	<h1 id="titolo-ou">Oneri di urbanizzazione</h1>
@@ -78,7 +80,6 @@
         	    OneriECosti::generaQuestionarioOU();
         	?>
     		</div>
-    		<form id="form" method="post">
     		
         	<div id="inserimento-imponibile">
         		<h1>Imponibile</h1>
@@ -123,11 +124,11 @@
             		<input name="sa" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
         		</div>
         		
-        		
-    		</form>
 		</div>
 		</div>
+		</form>
 		<button id="calcola" type="button" onclick="checkANDsubmit();">Calcola</button>
+		
 	</div>
 	
 	<script src="../js/inserimento_oneriEcosti.js"></script>

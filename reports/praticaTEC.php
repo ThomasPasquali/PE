@@ -39,6 +39,13 @@
                         JOIN intestatari_societa i ON i.ID = isp.Societa
                         WHERE isp.Pratica = ?',
                         [$datiGenericiPratica['ID']]);
+                    
+                    $tecnici = $c->db->ql(
+                    	'SELECT t.ID, t.Nome, t.Cognome, t.Codice_fiscale, t.Partita_iva
+                        FROM tec_tecnici_pratiche tp
+                        JOIN tecnici t ON t.ID = tp.Tecnico
+                        WHERE tp.Pratica = ?',
+                    		[$datiGenericiPratica['ID']]);
 
                 }else{
                     echo '<span class="errorTitle">Nessun risultato con parametri:
@@ -122,27 +129,23 @@
             ?>
             </p>
             
-            <p><span>Tecnico:</span>
+            <p><span>Tecnici:</span>
               <?php
-                $tecnico = $c->getDatiTecnico($datiGenericiPratica['Tecnico']);
-                if($tecnico)
-                  echo "<a href=\"anagrafica.php?tecnico=$tecnico[ID]\">$tecnico[Cognome] $tecnico[Nome] ($tecnico[Codice_fiscale] - $tecnico[Partita_iva])</a>"
+              $i = 0;
+              foreach ($tecnici as $tecnico) {
+              	  $sep = $i > 0 ? ' - ' : '';
+                  echo "$sep<a href=\"anagrafica.php?tecnico=$tecnico[ID]\">$tecnico[Cognome] $tecnico[Nome] ($tecnico[Codice_fiscale] - $tecnico[Partita_iva])</a>";
+                  $i++;
+              }
               ?>
             </p>
-            <p><span>Direttore lavori:</span>
+            <!-- TODO <p><span>Direttore lavori:</span>
             <?php
               $direttoreLavori = $c->getDatiTecnico($datiGenericiPratica['Direzione_lavori']);
               if($direttoreLavori)
                 echo "<a href=\"anagrafica.php?tecnico=$direttoreLavori[ID]\">$direttoreLavori[Cognome] $direttoreLavori[Nome] ($direttoreLavori[Codice_fiscale] - $direttoreLavori[Partita_iva])</a>"
             ?>
-            </p>
-            <p><span>Impresa:</span>
-            <?php
-              $impresa = $c->getDatiImpresa($datiGenericiPratica['Impresa']);
-              if($impresa)
-                echo "<a href=\"anagrafica.php?impresa=$impresa[ID]\">$impresa[Intestazione] ($impresa[Codice_fiscale] - $impresa[Partita_iva])</a>"
-            ?>
-            </p>
+            </p> -->
         </div>
         <p class="sottotitolo">Date:</p>
         <div id="date" style="display: grid; grid-template-columns: auto auto auto;">

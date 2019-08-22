@@ -10,7 +10,7 @@
         }
         
         public static function calcola($dati) {
-            print_r($dati);
+            echo '<pre>';print_r($dati);
             //OU
             $ou1 = $dati['imponibileOU'] * $dati['OU1'];
             $ou2 = $dati['imponibileOU'] * $dati['OU2'];
@@ -35,7 +35,6 @@
                         
                         $su = $su + $sup;
                 }
-                print_r($rangesSuperfici);
                 $i = 0;
                 $ccTab1 = 0;
                 foreach ($rangesSuperfici as $sup)
@@ -68,7 +67,7 @@
                 $cc = (205.04992 * $maggiorazione) * ($su + ($dati['snr'] * 0.6));
                 
                 $percTassaCC = 0;
-                if($ou['Tipo di intervento'] == 'Nuova_costruzione') {
+                if($ou['Tipo_di_intervento'] == 'Nuova_costruzione') {
                     switch($dati['Caratteristiche_edificio']){
                         case 'Lusso': $percTassaCC = $percTassaCC + 0.04; break;
                         case 'Medie': $percTassaCC = $percTassaCC + 0.025; break;
@@ -90,7 +89,6 @@
                 }else
                 $cc = (205.04992 * ($su + ($dati['snr'] * 0.6))) * 0.03;
                 
-                echo $cc;
             }
             
             
@@ -98,12 +96,18 @@
             $cols = [];
             $cols['OU1'] = $ou1;
             $cols['OU2'] = $ou2;
+            $cols['CC'] = $cc;
             foreach ($ou as $key => $value) $cols[$key] = $value;
+            //TODO
+            foreach ($dati as $key => $value) $cols[$key] = $value;
+            
+            print_r($cols);
                 
             
-            /*$sql = 'INSERT INTO tec_ou_cc ('.implode(', ', $colsNames).')
-                        VALUES ('.implode(', ', $colsValues).')';
-            echo $sql;*/
+            $sql = "INSERT INTO tec_ou_cc ('".implode("', '", array_keys($cols))."')
+                        VALUES (?".str_repeat(', ?', (count($cols)-1)).')';
+            echo $sql;
+            echo '</pre>';
         }
         
         public static function generaQuestionarioOU() {

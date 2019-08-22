@@ -298,6 +298,48 @@ function addFieldIntestatarioSocieta() {
   intestatariSocietaCount++;
 }
 
+var tecniciCount = 1;
+function addFieldTecnico() {
+  let searchField = $('<input>');
+  searchField.attr('id', 'tecnico'+tecniciCount);
+  searchField.attr('type', 'text');
+  searchField.attr('autocomplete', 'off');
+  searchField.addClass('tecnico');
+  searchField.click(function () {
+    $(this).select();
+  });
+  let tmp = tecniciCount;
+  searchField.keyup(function () {
+    updateHints('tecnico', $(this), '#hintsTecnici'+tmp, '#tecnico'+tmp+'ID');
+  });
+
+  let idField = $('<input>');
+  idField.attr('id', 'tecnico'+intestatariSocietaCount+'ID');
+  idField.attr('name', 'tecnico'+intestatariSocietaCount);
+  idField.attr('type', 'hidden');
+
+  let hintsDiv = $('<div></div>')
+  hintsDiv.addClass('hintBox');
+  hintsDiv.attr('id', 'hintsTecnici'+tecniciCount);
+
+  let div = $('<div></div>');
+
+  let delBtn = $('<button></button>');
+  delBtn.click(function () {
+    div.remove();
+  });
+  delBtn.html('Elimina tecnico');
+  delBtn.addClass('delete-button');
+
+  div.append(searchField);
+  div.append(delBtn);
+  div.append(idField);
+  div.append(hintsDiv);
+  
+  $('#fieldsTecnici').append(div);
+  tecniciCount++;
+}
+
 function refreshMappaliESubalterni() {
 	$.ajax({
 	    url: "../runtime/handler.php",

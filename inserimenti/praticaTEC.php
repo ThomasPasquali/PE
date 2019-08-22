@@ -7,7 +7,7 @@
       exit();
     }
     
-    print_r($_POST);
+    //print_r($_POST);
 
     $infos = [];
     $errors = [];
@@ -81,7 +81,7 @@
                         $errors[] = "Impossibile trovare F.$foglio m.$mappale: ".$res->errorInfo()[2];
                 }
 
-            //inserimento intestatari
+            //inserimento intestatari e tecnici
             foreach ($_POST as $key => $value)
                 if(substr($key, 0, strlen('intestatarioPersona')) == 'intestatarioPersona'&&$value){
 
@@ -95,6 +95,12 @@
                                                         VALUES(?, ?)', [$idPratica, $value]);
                     if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un intestatario societ&agrave; ($value)";
                     else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] all'intestatario societ&agrave; $value: ".$res->errorInfo()[2];
+            }else if(substr($key, 0, strlen('tecnico')) == 'tecnico'&&$value){
+            	
+            	$res = $c->db->dml('INSERT INTO tec_tecnici_pratiche (Pratica, Tecnico)
+                                                        VALUES(?, ?)', [$idPratica, $value]);
+            	if($res->errorCode() == 0) $infos[] = "Pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] associata ad un tecnico ($value)";
+            	else                         $errors[] = "Impossibile associare la pratica $_POST[tipo]$_POST[anno]/$_POST[numero]$_POST[barrato] al tecnico $value: ".$res->errorInfo()[2];
             }
 
         }else
@@ -219,10 +225,9 @@
             </div>
 
             <div class="field">
-              <label>Tecnici DA FARE</label>
-              <input id="tecnico" type="text" onkeyup="updateHints('tecnico', this, '#hintsTecnici', '#tecnicoID');" onclick="this.select();">
-              <input id="tecnicoID" name="tecnico" type="hidden">
-              <div id="hintsTecnici" class="hintBox"></div>
+              <label>Tecnici</label>
+              <div id="fieldsTecnici"></div>
+			  <button type="button" onclick="addFieldTecnico();">Aggiungi tecnico</button>
             </div>
 
           </div>
