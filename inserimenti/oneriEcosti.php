@@ -89,14 +89,35 @@
     	
     	<div id="cc">
     			<h1>Costo di costuzione</h1>
-        		<h2>Destinazione uso</h2>
-        		<select name="destUsoCC" onchange="switch (this.selectedIndex) { case 0: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').hide(); break; case 1: $('#cc-residenza').show(); $('#cc-turistico-direzionale').hide(); break; default: $('#cc-residenza').hide(); $('#cc-turistico-direzionale').show(); break;}">
-        			<option></option>
-        			<option>Residenza</option>
-        			<option>Turistica</option>
-        			<option>Commerciale</option>
-        			<option>Direzionale</option>
-        		</select>
+    			<script type="text/javascript">
+    				document.getElementsByClassName("branch0 level0")[0].childNodes[1].addEventListener("click", function () {
+        				switch (this.selectedIndex) {
+    						case 0: 
+        						$('#cc-residenza').hide(); 
+        						$('#cc-turistico-direzionale').hide();
+        						$('#cc-attivita-produttiva').hide();
+        						break;
+        						
+    						case 1: 
+            					$('#cc-residenza').show(); 
+            					$('#cc-turistico-direzionale').hide();
+            					$('#cc-attivita-produttiva').hide();
+            					break;
+            					
+        					case 2: 
+            					$('#cc-residenza').hide(); 
+            					$('#cc-turistico-direzionale').hide();
+            					$('#cc-attivita-produttiva').show();
+            					break; 
+
+            				default: 
+                				$('#cc-residenza').hide(); 
+            					$('#cc-turistico-direzionale').show();
+            					$('#cc-attivita-produttiva').hide();
+            					break;
+    					}
+					});
+    			</script>
         		<div id="cc-residenza">
         			<h2>Superifici utili abitabili</h2>
             		<div id="fields-alloggi"></div>
@@ -122,6 +143,9 @@
             		<input name="sn" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
             		<h2>Superficie accessori</h2>
             		<input name="sa" type="number" onclick="this.select();" onchange="this.value = parseFloat(this.value).toFixed(3);" min="1" step="0.5" placeholder="Superficie in mq...">
+        		</div>
+        		<div id="cc-attivita-produttiva">
+        			<p>Nessun costo di costruzione per le attivit&agrave; produttive</p>
         		</div>
         		
 		</div>

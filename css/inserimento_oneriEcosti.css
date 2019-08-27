@@ -16,7 +16,7 @@ button, input, #fields-alloggi {
 	cursor: crosshair;
 }
 
-.hidden, #calcola, #container, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza {
+.hidden, #calcola, #container, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza, #cc-attivita-produttiva {
 	display: none;
 }
 

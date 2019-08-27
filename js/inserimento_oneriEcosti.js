@@ -34,11 +34,7 @@ function checkANDsubmit() {
 		return;
 	}
 	//CC
-	if(!$('select[name=destUsoCC]').val()){
-		alert('Selezionare la destinazione d\'uso per il costo di costruzione');
-		return;
-	}
-	if($('select[name=destUsoCC]').val() == 'Residenza'){
+	if($('.branch0.level0 select').val() == 'Residenza'){
 		for (let alloggio of document.getElementsByClassName('fieldAlloggio'))
 			if(alloggio.value && alloggio.value > 1)
 				alloggi.push(alloggio.value);
@@ -63,7 +59,7 @@ function checkANDsubmit() {
 			alert('Selezionare la zona dell\'edificio');
 			return;
 		}
-	}else{
+	}else if($('.branch0.level0 select').val() != 'Attività_produttiva'){
 		if(!$('input[name=sn]').val()){
 			alert('La superficie calpestabile dev\'essere una quantità possitiva è maggiore di 0');
 			return;
