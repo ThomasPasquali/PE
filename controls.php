@@ -156,6 +156,14 @@
                                             [$id]);
             return (count($res) === 1)?$res[0]:NULL;
         }
+        
+        public function getDatiPraticaTEC($id) {
+        	$res = $this->db->ql('SELECT *
+                                            FROM tec_pratiche_view
+                                            WHERE ID = ?',
+        			[$id]);
+        	return (count($res) === 1)?$res[0]:NULL;
+        }
 
         /**
          *

@@ -7,49 +7,49 @@
 				<Zona value="A" description="Centro_storico">
 					<OU1>0.68999</OU1>
 					<OU2>1.03550</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="B1" description="di_completamento">
 					<OU1>1.17959</OU1>
 					<OU2>1.24260</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="B2" description="di_completamento">
 					<OU1>1.17959</OU1>
 					<OU2>1.24260</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<!-- CORREGGERE (eventualmente) ZONE C -->
 				<Zona value="C1.1" description="di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="C1.2" description="di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="C2.1" description="di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="C2.2" description="di_espansione">
 					<OU1>1.96667</OU1>
 					<OU2>2.07099</OU2>
-					<UM>metri cubi</UM>
+					<UM>mc</UM>
 				</Zona>
 				<Zona value="E" description="Agricola">
-					<Imprenditore value="Imprenditore_agricolo_a_titolo_principale">
+					<Imprenditore value="A_titolo_principale">
 						<OU1>8.28294</OU1>
 						<OU2>4.14198</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Imprenditore>
-					<Imprenditore value="Imprenditore_agricolo_NON_a_titolo_principale">
+					<Imprenditore value="Non_a_titolo_principale">
 						<OU1>4.14147</OU1>
 						<OU2>2.07099</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Imprenditore>
 				</Zona>
 				
@@ -61,24 +61,24 @@
 					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
 						<OU1>0.13237</OU1>
 						<OU2>0.19882</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 					<Prezzo_convenzionato value="No">
 						<OU1>0.13789</OU1>
 						<OU2>0.20710</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 				</Zona>
 				<Zona value="B" description="di_completamento">
 					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
 						<OU1>0.22658</OU1>
 						<OU2>0.23848</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 					<Prezzo_convenzionato value="No">
 						<OU1>0.23602</OU1>
 						<OU2>0.24842</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 				</Zona>
 				
@@ -86,38 +86,38 @@
 					<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
 						<OU1>0.37780</OU1>
 						<OU2>0.397632</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 					<Prezzo_convenzionato value="No">
 						<OU1>0.39354</OU1>
 						<OU2>0.41420</OU2>
-						<UM>metri cubi</UM>
+						<UM>mc</UM>
 					</Prezzo_convenzionato>
 				</Zona>
 				
 				<Zona value="E" description="Agricola">
-					<Imprenditore value="Imprenditore_agricolo_a_titolo_principale">
+					<Imprenditore value="A_titolo_principale">
 						<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
 							<OU1>1.590518</OU1>
 							<OU2>0.79526</OU2>
-							<UM>metri cubi</UM>
+							<UM>mc</UM>
 						</Prezzo_convenzionato>
 						<Prezzo_convenzionato value="No">
 							<OU1>1.65679</OU1>
 							<OU2>0.82840</OU2>
-							<UM>metri cubi</UM>
+							<UM>mc</UM>
 						</Prezzo_convenzionato>
 					</Imprenditore>
-					<Imprenditore value="Imprenditore_agricolo_NON_a_titolo_principale">
+					<Imprenditore value="Non_a_titolo_principale">
 						<Prezzo_convenzionato value="Si" description="e_nessun_aumento_della_sperficie_utile_di_calpestivo">
 							<OU1>0.79526</OU1>
 							<OU2>0.39763</OU2>
-							<UM>metri cubi</UM>
+							<UM>mc</UM>
 						</Prezzo_convenzionato>
 						<Prezzo_convenzionato value="No">
 							<OU1>0.82840</OU1>
 							<OU2>0.41420</OU2>
-							<UM>metri cubi</UM>
+							<UM>mc</UM>
 						</Prezzo_convenzionato>
 					</Imprenditore>
 				</Zona>
@@ -128,18 +128,6 @@
 		
 		<Destinazione_uso value="Attività_produttiva">
 			
-			<!-- <Zona value="A" description="Centro_storico">
-				
-			</Zona>
-			
-			<Zona value="B" description="di_completamento">
-			
-			</Zona>
-			
-			<Zona value="C" description="di_espansione">
-			
-			</Zona> -->
-			
 			<Zona value="D" description="Insediamenti_produttivi">
 			
 				<Settore value="Agricolutra">
@@ -147,63 +135,63 @@
 						<Imprenditore value="Nessuna_nota">
 							<OU1>5.24927</OU1>
 							<OU2>0.65642</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5a2" description="Imprenditore_agricolo_a_titolo_principale_non_fruizione_fondo">
+						<Imprenditore value="Nota_5a2" description="Imprenditore_a_titolo_principale_non_fruizione_fondo">
 							<OU1>1.57416</OU1>
 							<OU2>0.19677</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5b1" description="Imprenditore_agricolo_diverso_in_fruizione_fondo">
+						<Imprenditore value="Nota_5b1" description="Imprenditore_diverso_in_fruizione_fondo">
 							<OU1>3.14832</OU1>
 							<OU2>0.39354</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5b2" description="Imprenditore_agricolo_diverso_non_fruizione_fondo">
+						<Imprenditore value="Nota_5b2" description="Imprenditore_diverso_non_fruizione_fondo">
 							<OU1>5.24927</OU1>
 							<OU2>0.65642</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
 						<Imprenditore value="Nota_7" description="Intervento_agro-industriale_zone_di_completamento">
 							<OU1>2.62773</OU1>
 							<OU2>0.32847</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
 					
 				</Settore>
 					
 				<Settore value="Artigianato">
 				
-						<Option value="Nessuna_nota">
+						<Opzione value="Nessuna_nota">
 							<OU1>4.77206</OU1>
 							<OU2>1.78952</OU2>
-							<UM>metri cubi</UM>
-						</Option>
-						<Option value="Nota_6" description="Artistico_e_di_servizio">
+							<UM>mq</UM>
+						</Opzione>
+						<Opzione value="Nota_6" description="Artistico_e_di_servizio">
 							<OU1>2.38603</OU1>
 							<OU2>0.89502</OU2>
-							<UM>metri cubi</UM>
-						</Option>
-						<Option value="Nota_7" description="Artigianale_in_zone_di_completamento">
+							<UM>mq</UM>
+						</Opzione>
+						<Opzione value="Nota_7" description="Artigianale_in_zone_di_completamento">
 							<OU1>2.38603</OU1>
 							<OU2>0.89502</OU2>
-							<UM>metri cubi</UM>
-						</Option>
+							<UM>mq</UM>
+						</Opzione>
 					
 				</Settore>
 				
 				<Settore value="Industria">
 
-						<Nota value="Nessuna_nota">
+						<Opzione value="Nessuna_nota">
 							<OU1>5.96508</OU1>
 							<OU2>4.77206</OU2>
-							<UM>metri cubi</UM>
-						</Nota>
-						<Nota value="In_zone_di_completamento">
+							<UM>mq</UM>
+						</Opzione>
+						<Opzione value="In_zone_di_completamento">
 							<OU1>2.98254</OU1>
 							<OU2>2.38603</OU2>
-							<UM>metri cubi</UM>
-						</Nota>
+							<UM>mq</UM>
+						</Opzione>
 					
 				</Settore>
 				
@@ -216,45 +204,45 @@
 						<Imprenditore value="Nessuna_nota">
 							<OU1>4.77206</OU1>
 							<OU2>0.59651</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5a2" description="Imprenditore_agricolo_a_titolo_principale_non_fruizione_fondo">
+						<Imprenditore value="Nota_5a2" description="Imprenditore_a_titolo_principale_non_fruizione_fondo">
 							<OU1>1.43162</OU1>
 							<OU2>0.17921</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5b1" description="Imprenditore_agricolo_diverso_in_fruizione_fondo">
+						<Imprenditore value="Nota_5b1" description="Imprenditore_diverso_in_fruizione_fondo">
 							<OU1>2.86324</OU1>
 							<OU2>0.35790</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
-						<Imprenditore value="Nota_5b2" description="Imprenditore_agricolo_diverso_non_fruizione_fondo">
+						<Imprenditore value="Nota_5b2" description="Imprenditore_diverso_non_fruizione_fondo">
 							<OU1>4.77206</OU1>
 							<OU2>0.59651</OU2>
-							<UM>metri cubi</UM>
+							<UM>mq</UM>
 						</Imprenditore>
 					
 				</Settore>
 				
 				<Settore value="Artigianato">
 				
-						<Nota value="Nessuna_nota">
+						<Opzione value="Nessuna_nota">
 							<OU1>4.77206</OU1>
 							<OU2>1.78952</OU2>
-							<UM>metri cubi</UM>
-						</Nota>
-						<Nota value="Nota_6" description="Artistico_e_di_servizio">
+							<UM>mq</UM>
+						</Opzione>
+						<Opzione value="Nota_6" description="Artistico_e_di_servizio">
 							<OU1>2.38603</OU1>
 							<OU2>0.89502</OU2>
-							<UM>metri cubi</UM>
-						</Nota>
+							<UM>mq</UM>
+						</Opzione>
 					
 				</Settore>
 				
 				<Settore value="Industria">
 					<OU1>5.96508</OU1>
 					<OU2>4.77206</OU2>
-					<UM>metri cubi</UM>
+					<UM>mq</UM>
 				</Settore>
 				
 			</Zona>
@@ -266,43 +254,43 @@
 			<Zona value="A" description="Centro_storico">
 				<OU1>3.03677</OU1>
 				<OU2>6.16650</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="B" description="di_completamento">
 				<OU1>3.90183</OU1>
 				<OU2>4.93320</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="C1" description="di_espansione">
 				<OU1>5.85301</OU1>
 				<OU2>7.39979</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="C2" description="di_espansione">
 				<OU1>10.27026</OU1>
 				<OU2>6.16598</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>4.87794</OU1>
 				<OU2>4.93320</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="E" description="Agricola">
 				<OU1>6.84667</OU1>
 				<OU2>5.54933</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 			<Zona value="F" description="Attrezzatura">
 				<OU1>2.73361</OU1>
 				<OU2>9.30397</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 		
 		</Destinazione_uso>
@@ -312,43 +300,43 @@
 			<Zona value="A" description="Centro_storico">
 				<OU1>6.84667</OU1>
 				<OU2>8.18119</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="B" description="di_completamento">
 				<OU1>12.04739</OU1>
 				<OU2>9.35045</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="C1" description="di_espansione">
 				<OU1>13.76874</OU1>
 				<OU2>9.35045</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="C2" description="di_espansione">
 				<OU1>22.60377</OU1>
 				<OU2>11.68794</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>17.21041</OU1>
 				<OU2>14.02594</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="E" description="Agricola">
 				<OU1>33.90488</OU1>
 				<OU2>10.51868</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="F" description="Attrezzatura">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-				<UM>metri cubi</UM>
+				<UM>mc</UM>
 			</Zona>
 			
 		</Destinazione_uso>
@@ -358,43 +346,43 @@
 			<Zona value="A" description="Centro_storico">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="B" description="di_completamento">
 				<OU1>13.76874</OU1>
 				<OU2>9.35045</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="C1" description="di_espansione">
 				<OU1>20.65156</OU1>
 				<OU2>14.02594</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="C2" description="di_espansione">
 				<OU1>33.90488</OU1>
 				<OU2>14.02594</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="D" description="Insediamenti_produttivi">
 				<OU1>17.21041</OU1>
 				<OU2>11.68794</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="E" description="Agricola">
 				<OU1>33.90488</OU1>
 				<OU2>14.02594</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 			<Zona value="F" description="Attrezzatura">
 				<OU1>7.70347</OU1>
 				<OU2>10.51868</OU2>
-				<UM>metri cubi</UM>
+				<UM>mq</UM>
 			</Zona>
 			
 		</Destinazione_uso>
@@ -412,17 +400,17 @@
 			<Incremento>4</Incremento>
 		</Caratteristiche_edificio>
 		
-		<Tipologia_edificio value="A_blocco_con_piu_di_due_alloggi">
+		<Tipologia_edificio value="Blocco_>_di_2_alloggi">
 			<Incremento>2</Incremento>
 		</Tipologia_edificio>
-		<Tipologia_edificio value="A_schiera_con_piu_di_due_alloggi">
+		<Tipologia_edificio value="Schiera_>_di_2_alloggi">
 			<Incremento>2</Incremento>
 		</Tipologia_edificio>
-		<Tipologia_edificio value="Fino_a_due_alloggi">
+		<Tipologia_edificio value="Fino_a_2_alloggi">
 			<Incremento>3</Incremento>
 		</Tipologia_edificio>
 		
-		<Zona value="A">
+		<!-- <Zona value="A">
 			<Incremento>2</Incremento>
 		</Zona>
 		<Zona value="B">
@@ -439,7 +427,7 @@
 		</Zona>
 		<Zona value="F">
 			<Incremento>4</Incremento>
-		</Zona>
+		</Zona>  -->
 	</CC>
 	
 </COSTI_E_ONERI>

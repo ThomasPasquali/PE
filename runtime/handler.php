@@ -78,6 +78,31 @@
             case 'getPraticaTECNumberForTipoAnno':
                 getPraticaNumberForTipoAnno($_POST['tipo'], $_POST['anno'], 'tec', $c->db);
                 exit();
+                
+            case 'activatePagamenti':
+            	activatePagamenti($_POST['calcolo'], $c->db);
+            	exit();
+            	
+            case 'deactivatePagamenti':
+            	deactivatePagamenti($_POST['calcolo'], $c->db);
+            	exit();
+            	
+            case 'aggiungiPagamentoOU':
+            	aggiungiPagamentoOU($_POST['importo'], $_POST['data'], $_POST['calcolo'], $c->db);
+            	exit();
+            	
+            case 'aggiungiPagamentoCC':
+            	aggiungiPagamentoCC($_POST['importo'], $_POST['data'], $_POST['calcolo'], $c->db);
+            	exit();
+            	
+            case 'eliminaPagamentoOU':
+            	eliminaPagamentoOU($_POST['pagamento'], $c->db);
+            	exit();
+            	
+            case 'eliminaPagamentoCC':
+            	eliminaPagamentoCC($_POST['pagamento'], $c->db);
+            	exit();
+            	
 
             default:
                 header('Content-type: text/plain');
@@ -255,3 +280,36 @@
       header('Content-type: text/plain');
       echo ($res?$res[0]['n']:'');
     }
+    
+    function activatePagamenti($calcolo, $db) {
+    	$db->dml('UPDATE tec_ou_cc SET Attivo = \'S\' WHERE ID = ?', [$calcolo]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    function deactivatePagamenti($calcolo, $db) {
+    	$db->dml('UPDATE tec_ou_cc SET Attivo = \'N\' WHERE ID = ?', [$calcolo]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    function aggiungiPagamentoOU($importo, $data, $calcolo, $db) {
+    	$db->dml('INSERT INTO tec_pagamenti_ou (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    function aggiungiPagamentoCC($importo, $data, $calcolo, $db) {
+    	$db->dml('INSERT INTO tec_pagamenti_cc (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    function eliminaPagamentoOU($pagamento, $db) {
+    	$db->dml('DELETE FROM tec_pagamenti_ou WHERE ID = ?', [$pagamento]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    function eliminaPagamentoCC($pagamento, $db) {
+    	$db->dml('DELETE FROM tec_pagamenti_cc WHERE ID = ?', [$pagamento]);
+    	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
+    }
+    
+    
+    

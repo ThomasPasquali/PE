@@ -55,10 +55,6 @@ function checkANDsubmit() {
 			alert('Selezionare la tipologia edificio');
 			return;
 		}
-		if(!$('select[name=Zona]').val()){
-			alert('Selezionare la zona dell\'edificio');
-			return;
-		}
 	}else if($('.branch0.level0 select').val() != 'Attività_produttiva'){
 		if(!$('input[name=sn]').val()){
 			alert('La superficie calpestabile dev\'essere una quantità possitiva è maggiore di 0');
@@ -73,6 +69,7 @@ function checkANDsubmit() {
 	$('#form').append($('<input>').attr('name', 'OU1').val(ou1));
 	$('#form').append($('<input>').attr('name', 'pratica').val(pratica));
 	$('#form').append($('<input>').attr('name', 'OU2').val(ou2));
+	$('#form').append($('<input>').attr('name', 'UM').val(um));
 	$('#form').append($('<textarea></textarea>').attr('name', 'formOneri').val(JSON.stringify(formOneri).replace(/\s/, '_')));
 	$('#form').submit();
 }

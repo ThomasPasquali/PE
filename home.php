@@ -219,6 +219,7 @@
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
                 	<a href="/gestione/edifici.php">Gestione edifici</a>
+                	<a href="/gestione/pagamentiOneriEcosti.php">Gestione pagamenti CC e OU</a>
             	</div>
  			</div>
 

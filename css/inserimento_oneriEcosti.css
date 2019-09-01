@@ -2,6 +2,14 @@ body {
 	text-align: center;
 }
 
+pre {
+	font-size: 1.4em;
+}
+
+pre span {
+	font-weight: bold;
+}
+
 button, input, #fields-alloggi {
 	margin-left: auto;
 	margin-right: auto;
@@ -46,4 +54,17 @@ button, input, #fields-alloggi {
 #calcola {
 	margin-top: 50px;
 	font-size: 1.5em;
+}
+
+#ou, #cc {
+	padding: 20px;
+	border-bottom: solid 1px black;
+}
+
+#ou {
+	border-right: solid 1px black;
+}
+
+#cc {
+	border-left: solid 1px black;
 }

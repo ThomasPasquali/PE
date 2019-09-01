@@ -8,9 +8,6 @@
         exit();
     }
     
-    if($c->check(['OU1', 'OU2', 'imponibileOU', 'formOneri'], $_POST))
-        OneriECosti::calcola($_POST);
-    
     if(isset($_POST['tipo'])&&isset($_POST['anno'])&&isset($_POST['numero'])){
         $where = [];
         $params = [];
@@ -38,8 +35,34 @@
     <script src="../lib/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/form.css">
     <link rel="stylesheet" type="text/css" href="../css/inserimento_oneriEcosti.css">
+    <script type="text/javascript">
+    
+    </script>
 </head>
 <body>
+	<?php 
+	if($c->check(['OU1', 'OU2', 'imponibileOU', 'formOneri'], $_POST)) {
+		$db = (isset($_REQUEST['conferma']) ? $c->db : NULL);
+		OneriECosti::calcola($_POST, $db);
+		if(!$db){
+	?>		
+			<form id="form" method="post">
+				<script type="text/javascript">
+				<?php 
+				foreach ($_POST as $key => $value)
+					echo "i = $('<input>').attr('type', 'hidden').attr('name', '$key').val('$value'); $('#form').append(i);";
+				?>
+				</script>
+				<button type="submit" name="conferma">Conferma il calcolo</button>
+			</form>
+	<?php 
+			exit();
+		}else {
+			header('Location: ../gestione/pagamentiOneriEcosti.php?p='.$_POST['pratica']);
+			exit();
+		}
+	} 
+	?>
 	<div id="selezione-pratica">
 		<div class="form">
             <h1>Calcolo CC e OU<span id="info-pratica"></span></h1>
@@ -150,6 +173,7 @@
         		
 		</div>
 		</div>
+		<textarea style="margin-top: 50px;" rows="5" cols="50" name="note" placeholder="Note..."></textarea>
 		</form>
 		<button id="calcola" type="button" onclick="checkANDsubmit();">Calcola</button>
 		
