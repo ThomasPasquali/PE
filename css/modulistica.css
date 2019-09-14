@@ -1,0 +1,50 @@
+body{
+  padding: 0px 2% 0px 2%;
+}
+
+p{
+  font-size: 1.3em;
+  margin: 0px 0px 15px 0px;
+  padding: 0px;
+  word-wrap: break-word;
+  border-bottom: dotted black 1px;
+}
+
+a, a:visited{
+	font-style: italic;
+	text-decoration: none;
+	color: black;
+}
+
+.sottotitolo{
+	text-decoration: underline;
+    margin-bottom: 0px;
+    margin-top: 25px;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    border: 0;
+}
+
+p > span{
+  font-weight: bold;
+}
+
+#intestazione{
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  padding: 1% 10% 0px 10%;
+}
+
+#titoli{
+  text-align: center;
+}
+
+#titoli *{
+  margin: 0px;
+  padding-top: 10px;
+}
+
+#logo{
+    height: 100%;
+    width: 100%;
+}

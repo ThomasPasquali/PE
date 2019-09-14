@@ -220,6 +220,7 @@
                 <div class="dropdown-content">
                 	<a href="/gestione/edifici.php">Gestione edifici</a>
                 	<a href="/gestione/pagamentiOneriEcosti.php">Gestione pagamenti CC e OU</a>
+                	<a href="/modulistica/">Modulistica</a>
             	</div>
  			</div>
 
