@@ -19,6 +19,8 @@
         if(count($matches) > 1)
             foreach ($matches[1] as $var)
                 $file = str_replace("<VAR>$var</VAR>", $pratica[$var]??'<strong>N/A</strong>', $file);
+        $file = str_replace("<AUTO>Data</AUTO>", date('d/m/Y'), $file);
+        $file = str_replace("<AUTO>Manual</AUTO>", '<p class="manual"><textarea></textarea><button onclick="bloccaTesto($(this));">Blocca testo</button></p>', $file);
         echo $file;
         exit();
     }

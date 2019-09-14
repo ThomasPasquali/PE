@@ -1,13 +1,22 @@
-body{
+body {
   padding: 0px 2% 0px 2%;
 }
 
-p{
+p {
   font-size: 1.3em;
   margin: 0px 0px 15px 0px;
   padding: 0px;
   word-wrap: break-word;
   border-bottom: dotted black 1px;
+}
+
+.testo-normale, .manual{
+	font-family: Times New Roman;
+	text-align: justify;
+	font-weight: normal;
+	font-size: 1.2em;
+	border-bottom-width: 0px;
+	white-space: pre-line;
 }
 
 a, a:visited{
