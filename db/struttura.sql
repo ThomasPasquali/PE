@@ -781,7 +781,7 @@ CREATE VIEW `pe_pratiche_view` AS SELECT  p.ID,
 FROM pe_pratiche p
 LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
-CREATE  VIEW `tec_pratiche_view` AS SELECT  p.ID,
+CREATE VIEW tec_pratiche_view AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
 		p.Numero,
@@ -798,6 +798,9 @@ CREATE  VIEW `tec_pratiche_view` AS SELECT  p.ID,
 		Oggetto Intervento,
 		Data_inizio_lavori,
 		Note_pratica Note,
+		(SELECT GROUP_CONCAT(oc.OU1 SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) OU1,
+		(SELECT GROUP_CONCAT(oc.OU2 SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) OU2,
+		(SELECT GROUP_CONCAT(oc.CC SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) CC,
 
 		CONCAT(p.TIPO, p.Anno, '/', p.Numero, p.Barrato) Sigla,
 		IF(s.Denominazione IS NULL, '', s.Denominazione) Stradario,
@@ -840,7 +843,7 @@ CREATE  VIEW `tec_pratiche_view` AS SELECT  p.ID,
 		WHERE isp.Pratica = p.ID) Intestatari_societa
 
 FROM tec_pratiche p
-LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
+LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
