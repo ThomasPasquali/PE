@@ -21,21 +21,21 @@
 
                     $edifici = $c->db->ql(
                         'SELECT e.ID, e.Mappali
-                        FROM pe_edifici_pratiche ep
+                        FROM tec_edifici_pratiche ep
                         JOIN edifici_view e ON e.ID = ep.Edificio
                         WHERE Pratica = ?',
                         [$datiGenericiPratica['ID']]);
 
                     $intestatariPersone = $c->db->ql(
                         'SELECT ip.ID, ip.Nome, ip.Cognome
-                        FROM pe_intestatari_persone_pratiche ipp
+                        FROM tec_intestatari_persone_pratiche ipp
                         JOIN intestatari_persone ip ON ip.ID = ipp.Persona
                         WHERE ipp.Pratica = ?',
                         [$datiGenericiPratica['ID']]);
 
                     $intestatariSocieta = $c->db->ql(
                         'SELECT i.ID, i.Intestazione
-                        FROM pe_intestatari_societa_pratiche isp
+                        FROM tec_intestatari_societa_pratiche isp
                         JOIN intestatari_societa i ON i.ID = isp.Societa
                         WHERE isp.Pratica = ?',
                         [$datiGenericiPratica['ID']]);
