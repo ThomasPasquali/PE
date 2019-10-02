@@ -101,10 +101,11 @@
 
             /*----------------------------------------------*/
 
-            $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, i.Cognome, i.Nome
+            $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, GROUP_CONCAT(CONCAT(i.Cognome, \' \' i.Nome) SEPARATOR \' - \') Intestatari
                                                 FROM pe_rubrica r
                                                 JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
-                                                WHERE Edificio = ?',
+                                                WHERE Edificio = ?
+GROUP BY r.ID',
                                                 [$edificioID]);
 
             /*----------------------------------------------*/
@@ -232,7 +233,7 @@
         <p id="pratiche"><?php
             $temp = [];
             foreach ($rubriche as $pra)
-                $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Nome] $pra[Cognome])";
+                $temp[] = "$pra[Numero]/$pra[Anno]$pra[Barrato] ($pra[Intestatari])";
             echo implode(' - ', $temp)
         ?></p>
       </div>
