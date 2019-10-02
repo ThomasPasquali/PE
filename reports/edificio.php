@@ -101,7 +101,7 @@
 
             /*----------------------------------------------*/
 
-            $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, GROUP_CONCAT(CONCAT(i.Cognome, \' \' i.Nome) SEPARATOR \' - \') Intestatari
+            $rubriche = $c->db->ql('SELECT r.ID, r.Anno, r.Numero, r.Barrato, GROUP_CONCAT(CONCAT(i.Cognome, \' \', i.Nome) SEPARATOR \' - \') Intestatari
                                                 FROM pe_rubrica r
                                                 JOIN pe_intestatari_rubrica i ON r.ID = i.Rubrica
                                                 WHERE Edificio = ?
