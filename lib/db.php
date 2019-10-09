@@ -4,8 +4,13 @@
         private const DB_FILE = 'DB.ini';
         public $lastErrorInfo;
 
-        public function __construct() {
-            $ini = parse_ini_file(INI_DIR.DB::DB_FILE);
+        /**
+         * $ini[db]:host=$ini[host];dbname=$ini[dbName];port=$ini[port]
+         * $ini['user']
+         * $ini['pass']
+         */
+        public function __construct($ini = NULL) {
+            $ini = $ini??parse_ini_file(INI_DIR.DB::DB_FILE);
             parent::__construct("$ini[db]:host=$ini[host];dbname=$ini[dbName];port=$ini[port]", $ini['user'], $ini['pass']);
         }
 
@@ -56,7 +61,7 @@
             if($arr != NULL)
                 foreach ($arr as $key => $value)
                     if($value != NULL)
-                        $arr[$key] = iconv(mb_detect_encoding($value, mb_detect_order(), true), $newEnc, $value);
+                        $arr[$key] = utf8_encode($value);//iconv(mb_detect_encoding($value, mb_detect_order(), true), $newEnc, $value);
             return $arr;
         }
     }
