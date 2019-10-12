@@ -1,7 +1,8 @@
 <?php
-    include_once '../lib/db.php';
-    $db = new DB(['db'=>'mysql', 'host'=>'127.0.0.1', 'dbName'=>'timbrature', 'port'=>'3306', 'user'=>'pe-webapp', 'pass'=>'waa']);
-    if(isset($_POST['nome'])&&isset($_POST['cognome'])&&isset($_POST['da'])&&isset($_POST['a'])) {
+include_once '../lib/db.php';
+	//$db = new DB(['db'=>'mysql', 'host'=>'127.0.0.1', 'dbName'=>'timbrature', 'port'=>'3306', 'user'=>'pe-webapp', 'pass'=>'waa']);
+	$db = new DB(['db'=>'mysql', 'host'=>'127.0.0.1', 'dbName'=>'iaccess_ts', 'port'=>'3306', 'user'=>'root', 'pass'=>'']);
+	if(isset($_POST['nome'])&&isset($_POST['cognome'])&&isset($_POST['da'])&&isset($_POST['a'])) {
 
         $user = $db->ql(
             'SELECT *
@@ -21,16 +22,41 @@
                 WHERE   u.Name_First LIKE :n
                     AND u.Name_Last LIKE :c
                     AND r.logTime BETWEEN :da AND :a
+					AND r.valid = 1
                 ORDER BY r.logTime',
                 [':n'=>$_POST['nome'], ':c'=>$_POST['cognome'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
-
+            
+            $days = [];
+            $tot = (int)0;
+            for ($i = 0; $i < count($results); $i+=2) {
+            	
+            	$in = new DateTime($results[$i]['logTime']);
+            	$out = new DateTime($results[$i+1]['logTime']);
+            	$diff = $in->diff($out);
+            	$daysIndex = date_format($in, "d/m/Y");
+            	
+            	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo "Entrata ed uscita su giorni diversi";
+            	if($diff->d > 0) echo 'Piu\' di un giorno di differenza';
+            	
+            	if(!isset($days[$daysIndex]))
+            		$days[$daysIndex] = ['timbrature' => [], 'totSeconds' => (int)0];
+            	
+            	$days[$daysIndex]['timbrature'][] = ['in' => $in, 'out' => $out];
+            	$duration = (int)((($diff->h)*60*60) + (($diff->m)*60) + (($diff->s)));
+            	$days[$daysIndex]['totSeconds'] += $duration;
+            	$tot += $duration;
+            }
+            
         }else {
             echo '<pre>Utente non identificato:\n';
             print_r($user);
             echo '</pre>';
         }
 
-        
+        function secondsToHMS($seconds) {
+        	$seconds = round($seconds);
+        	return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m '.(int)($seconds % 60).'s';
+        }
     }
 ?>
 <!DOCTYPE html>
@@ -44,7 +70,12 @@
         table {
             width: 100%;
             font-size: 13px;
+			border-collapse:collapse;
+			border:1px solid #FF0000;
         }
+		table td{
+			border:1px solid #FF0000;
+		}
     </style>
 </head>
 <body>
@@ -62,30 +93,36 @@
 
     <?php }else { ?>
 
-        <h1>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_POST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_POST['a']),"d/m/Y"); ?><h1>
+        <h1>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_POST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_POST['a']),"d/m/Y"); ?></h1>
         <table>
             <tr>
                 <td>Data</td>
-                <td>Ora</td>
-                <td>Timbratore</td>
+                <td>Timbrature</td>
+                <td>Totale</td>
             </tr>
-    <?php 
-        foreach($results as $result) {
-            $datetime = date_create($result['logTime']); 
-            ?>
+    <?php foreach($days as $date => $day) { ?>
             <tr>
-                <td><?= date_format($datetime,"d/m/Y") ?></td>
-                <td><?= date_format($datetime,"H:i:s") ?></td>
-                <td><?= $result['devName'] ?></td>
+				<td><?= $date ?></td>
+            	<td>
+            		<?php foreach ($day['timbrature'] as $timbratura)
+		             	echo '<p>'.date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i").'</p>'; ?>
+            	</td>
+            	<td><?= secondsToHMS($day['totSeconds']) ?></td>
             </tr>
             <?php 
-        }
-        /*echo '<pre>';
-        print_r($_POST);
-        print_r($user);
-        print_r($results);
-        echo '</pre>';*/
+        	}
+        	
+        echo '<pre>';
+        //print_r($_POST);
+        //print_r($user);
+        //print_r($days);
+        echo '</pre>';
     ?>
+    		<tr>
+	        	<td>Tot. giorni: <?= count($days) ?></td>
+	        	<td></td>
+	        	<td>Tot. ore: <?= secondsToHMS($tot) ?></td>
+        	</tr>
         </table>
     <?php } ?>
 
