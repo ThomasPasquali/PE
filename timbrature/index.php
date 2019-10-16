@@ -1,62 +1,156 @@
 <?php
-include_once '../lib/db.php';
-	//$db = new DB(['db'=>'mysql', 'host'=>'127.0.0.1', 'dbName'=>'timbrature', 'port'=>'3306', 'user'=>'pe-webapp', 'pass'=>'waa']);
-	$db = new DB(['db'=>'mysql', 'host'=>'127.0.0.1', 'dbName'=>'iaccess_ts', 'port'=>'3306', 'user'=>'root', 'pass'=>'']);
-	if(isset($_POST['nome'])&&isset($_POST['cognome'])&&isset($_POST['da'])&&isset($_POST['a'])) {
+    include_once '../lib/db.php';
+    $ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
+    $db = new DB(
+        ['db'=>$ini['db'], 
+        'host'=>$ini['host'],
+        'dbName'=>$ini['dbName'],
+        'port'=>$ini['port'],
+        'user'=>$ini['user'],
+        'pass'=>$ini['pass']]);
+    
+    if(isset($_POST['user'])&&isset($_POST['da'])&&isset($_POST['a'])) {
 
         $user = $db->ql(
             'SELECT *
             FROM ts_users
-            WHERE   Name_First = ?
-                AND Name_Last = ?',
-            [$_POST['nome'], $_POST['cognome']]);
+            WHERE   Username = ?',
+            [$_POST['user']]);
 
         if(count($user) == 1) {
 
             $user = $user[0];
+
+            //orari settimanali
+            /**
+             * 044 00510        044 00510   044 00540   044 00300   044 00300   000 00000   000 00000
+             * cod min lavoro
+             */
+            //pause settimanali
+            /**
+             * 074 00070        074 00070    07400100   00000000000000000000000000000000
+             * cod min pausa
+             */
+            $orariSettimanali = [];
+            $res = $db->ql('SELECT weekTime FROM ts_timetables WHERE SUBSTR(timeName, 11) LIKE ?', [$user['Username'].'%'])[0]['weekTime'];
+            for($i = 8; $i < strlen($res); $i+=8)
+                $orariSettimanali[] = (int)substr($res, $i+4, 4);
+
+            $assenze = $db->ql(
+                'SELECT dayStart, exWhy
+                FROM ts_schedules_ex
+                WHERE   idDeptUser = :user
+                    AND dayStart BETWEEN :da AND :a
+                ORDER BY dayStart',
+                [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+
+            //Tabella numero assenze per tipo
+            $assenzeStats = $db->ql(
+                'SELECT exWhy reason, COUNT(*) tot
+                FROM ts_schedules_ex
+                WHERE   idDeptUser = :user
+                    AND dayStart BETWEEN :da AND :a
+                GROUP BY exWhy',
+                [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+
             $results = $db->ql(
                 'SELECT d.devName, r.*
                 FROM ts_records r
                 JOIN ts_users u ON u.idUser = r.idUser
                 LEFT JOIN ts_devices d ON d.devNum = r.deviceNum 
-                WHERE   u.Name_First LIKE :n
-                    AND u.Name_Last LIKE :c
-                    AND r.logTime BETWEEN :da AND :a
+                WHERE   u.Username LIKE :u
+                    AND DATE(r.logTime) BETWEEN :da AND :a
 					AND r.valid = 1
                 ORDER BY r.logTime',
-                [':n'=>$_POST['nome'], ':c'=>$_POST['cognome'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+                [':u'=>$_POST['user'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+
+            //Calcolo tot. ore teoriche
+            $totTeorico = (int)0;
+            $da = new DateTime($_POST['da']);
+            $a = new DateTime($_POST['a']);
+            while(date_format($da, "Y-m-d") < date_format($a, "Y-m-d")) {
+                $totTeorico += $orariSettimanali[dayOfWeek($da)]*60;
+                $da->modify('+1 day');
+            }
             
             $days = [];
             $tot = (int)0;
-            for ($i = 0; $i < count($results); $i+=2) {
-            	
+            $totAssenze = (int)0;
+            for ($i = 0, $iAssenze = 0; $i < count($results); $i+=2) {
+
             	$in = new DateTime($results[$i]['logTime']);
             	$out = new DateTime($results[$i+1]['logTime']);
             	$diff = $in->diff($out);
             	$daysIndex = date_format($in, "d/m/Y");
+                
+                //Controlli
+            	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo 'Entrata ed uscita su giorni diversi<br>';
+            	if($diff->d > 0) echo 'Piu\' di un giorno di differenza<br>';
             	
-            	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo "Entrata ed uscita su giorni diversi";
-            	if($diff->d > 0) echo 'Piu\' di un giorno di differenza';
+                //Inserimento assenze
+                do{
+                    $assenza = NULL;
+                    if($iAssenze < count($assenze)) {
+
+                        $assenza = $assenze[$iAssenze];
+                        $dataAssenza = new DateTime($assenza['dayStart']);
+
+                        if(date_format($dataAssenza, "Y-m-d") <= date_format($in, "Y-m-d")) {
+
+                            $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
+
+                            if(isset($days[date_format($dataAssenza, "m/d/Y")])) echo 'Segnalate multiple ferie per il giorno '.date_format($dataAssenza, "m/d/Y").': i risultati saranno errati<br>';
+                            
+                            $days[date_format($dataAssenza, "m/d/Y")] = ['timbrature' => [],
+                                                                        'totSeconds' => (int)0,
+                                                                        'totSecondsAssenza' => $secondiTeorici,
+                                                                        'giustificazione' => $assenza['exWhy']];
+                            $totAssenze += $secondiTeorici;
+                            $iAssenze++;
+
+                        }else
+                            $assenza = NULL;
+                    }
+                }while($assenza);
             	
-            	if(!isset($days[$daysIndex]))
-            		$days[$daysIndex] = ['timbrature' => [], 'totSeconds' => (int)0];
-            	
+                //Inserimento giornata
+                if(!isset($days[$daysIndex]))
+                    $days[$daysIndex] = ['timbrature' => [], 'totSeconds' => (int)0, 'totSecondsAssenza' => (int)0, 'giustificazione' => ''];
             	$days[$daysIndex]['timbrature'][] = ['in' => $in, 'out' => $out];
             	$duration = (int)((($diff->h)*60*60) + (($diff->m)*60) + (($diff->s)));
             	$days[$daysIndex]['totSeconds'] += $duration;
-            	$tot += $duration;
+                $tot += $duration;
             }
-            
+
+            //Inserimento eventuali ultime assenze
+            while($iAssenze < count($assenze)) {
+
+                $assenza = $assenze[$iAssenze];
+                $dataAssenza = new DateTime($assenza['dayStart']);
+                $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
+                $days[date_format($dataAssenza, "Y-m-d")] = ['timbrature' => [],
+                                                            'totSeconds' => (int)0,
+                                                            'totSecondsAssenza' => $secondiTeorici,
+                                                            'giustificazione' => $assenza['exWhy']];
+                $totAssenze += $secondiTeorici;
+                $iAssenze++;
+            }
+
         }else {
             echo '<pre>Utente non identificato:\n';
             print_r($user);
             echo '</pre>';
         }
 
-        function secondsToHMS($seconds) {
-        	$seconds = round($seconds);
-        	return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m '.(int)($seconds % 60).'s';
-        }
+    }
+
+    function secondsToHMS($seconds) {
+        $seconds = round($seconds);
+        return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m '.(int)($seconds % 60).'s';
+    }
+
+    function dayOfWeek(DateTime $date) {
+        return ((int)date('N', strtotime(date_format($date, "Y-m-d")))-1);
     }
 ?>
 <!DOCTYPE html>
@@ -82,8 +176,12 @@ include_once '../lib/db.php';
     <?php if(!isset($results)) { ?>
 
         <form action="" method="POST">
-            <input type="text" name="nome" placeholder="Nome...">
-            <input type="text" name="cognome" placeholder="Cognome...">
+            <select name="user">
+                <?php
+                $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
+                foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
+                ?>
+            </select>
             <label>Da: </label>
             <input type="date" name="da">
             <label>A: </label>
@@ -98,7 +196,9 @@ include_once '../lib/db.php';
             <tr>
                 <td>Data</td>
                 <td>Timbrature</td>
-                <td>Totale</td>
+                <td>Ore lavorate</td>
+                <td>Ore assenza giustificate</td>
+                <td>Giustificazione assenza</td>
             </tr>
     <?php foreach($days as $date => $day) { ?>
             <tr>
@@ -107,24 +207,54 @@ include_once '../lib/db.php';
             		<?php foreach ($day['timbrature'] as $timbratura)
 		             	echo '<p>'.date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i").'</p>'; ?>
             	</td>
-            	<td><?= secondsToHMS($day['totSeconds']) ?></td>
+                <td><?= secondsToHMS($day['totSeconds']) ?></td>
+                <td><?= secondsToHMS($day['totSecondsAssenza']) ?></td>
+                <td><?= $day['giustificazione'] ?></td>
+
             </tr>
             <?php 
         	}
         	
-        echo '<pre>';
-        //print_r($_POST);
-        //print_r($user);
-        //print_r($days);
-        echo '</pre>';
-    ?>
+            echo '<pre>';
+            //print_r($_POST);
+            //print_r($user);
+            echo '</pre>';
+            ?>
     		<tr>
-	        	<td>Tot. giorni: <?= count($days) ?></td>
+	        	<td>Tot.: <?= count($days) ?></td>
 	        	<td></td>
-	        	<td>Tot. ore: <?= secondsToHMS($tot) ?></td>
+                <td>Tot.: <?= secondsToHMS($tot) ?></td>
+                <td>Tot.: <?= secondsToHMS($totAssenze) ?></td>
+                <td>Tot.: <?= count($assenze) ?></td>
         	</tr>
         </table>
-    <?php } ?>
+        
+        <h2>Statistiche assenze</h2>
+        <table>
+        <?php 
+        foreach($assenzeStats as $stat) { ?>
+            <tr>
+                <td><?= $stat['reason'] ?></td>
+                <td><?= $stat['tot'] ?></td>
+            </tr>
+        <?php
+        }
+        ?>
+        </table>
+        
+        <p>Tot. ore lavorate: <?= secondsToHMS($tot) ?></p>
+        <p>Tot. ore assenza: <?= secondsToHMS($totAssenze) ?></p>
+        <p>Tot. ore teoriche: <?= secondsToHMS($totTeorico) ?></p>
+        <p>Bilancio: 
+            <?php 
+            $bilancio = ($tot + $totAssenze) - $totTeorico;
+            echo ($bilancio < 0?'-':'').secondsToHMS(abs($bilancio));
+            ?>
+        </p>
+
+    <?php 
+    } 
+    ?>
 
 </body>
 </html>

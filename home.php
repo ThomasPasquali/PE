@@ -237,7 +237,7 @@
  			        '<a target="_blank" href="/phpmyadmin/">Database<i class="fas fa-database"></i></a>'
                     :'';
  				?>
- 				
+ 				<a href="timbrature">Timbrature<i class="fas fa-clock"></i>  </a>
  			</form>
         </div>
 

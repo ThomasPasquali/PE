@@ -10,7 +10,7 @@
          * $ini['pass']
          */
         public function __construct($ini = NULL) {
-            $ini = $ini??parse_ini_file(INI_DIR.DB::DB_FILE);
+            $ini = $ini??parse_ini_file(INI_DIR.DB::DB_FILE, TRUE)['pe'];
             parent::__construct("$ini[db]:host=$ini[host];dbname=$ini[dbName];port=$ini[port]", $ini['user'], $ini['pass']);
         }
 
