@@ -33,14 +33,14 @@
              */
             $orariSettimanali = [];
             $res = $db->ql('SELECT weekTime FROM ts_timetables WHERE SUBSTR(timeName, 11) LIKE ?', [$user['Username'].'%'])[0]['weekTime'];
-            for($i = 8; $i < strlen($res); $i+=8)
+            for($i = 0; $i < strlen($res); $i+=8)
                 $orariSettimanali[] = (int)substr($res, $i+4, 4);
 
             $assenze = $db->ql(
                 'SELECT dayStart, exWhy
                 FROM ts_schedules_ex
                 WHERE   idDeptUser = :user
-                    AND dayStart BETWEEN :da AND :a
+                    AND DATE(dayStart) BETWEEN :da AND :a
                 ORDER BY dayStart',
                 [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
 
@@ -49,7 +49,7 @@
                 'SELECT exWhy reason, COUNT(*) tot
                 FROM ts_schedules_ex
                 WHERE   idDeptUser = :user
-                    AND dayStart BETWEEN :da AND :a
+                    AND DATE(dayStart) BETWEEN :da AND :a
                 GROUP BY exWhy',
                 [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
 
@@ -64,28 +64,33 @@
                 ORDER BY r.logTime',
                 [':u'=>$_POST['user'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
 
-            //Calcolo tot. ore teoriche
+            //Variabili "globali"
+            $days = [];
+            $tot = (int)0;
+            $totAssenze = (int)0;
             $totTeorico = (int)0;
+            $giorniSettimana = array('Lun','Mart','Merc','Giov','Ven','Sab','Dom');
+
+            //Calcolo tot. ore teoriche
             $da = new DateTime($_POST['da']);
             $a = new DateTime($_POST['a']);
-            while(date_format($da, "Y-m-d") < date_format($a, "Y-m-d")) {
+            
+            while(date_format($da, "Y-m-d") <= date_format($a, "Y-m-d")) {
+
+                $days[date_format($da, "d/m/Y")] = ['timbrature' => [], 'totSeconds' => (int)0, 'totSecondsAssenza' => (int)0, 'giustificazione' => ''];
                 $totTeorico += $orariSettimanali[dayOfWeek($da)]*60;
                 $da->modify('+1 day');
             }
             
-            $days = [];
-            $tot = (int)0;
-            $totAssenze = (int)0;
             for ($i = 0, $iAssenze = 0; $i < count($results); $i+=2) {
 
             	$in = new DateTime($results[$i]['logTime']);
             	$out = new DateTime($results[$i+1]['logTime']);
-            	$diff = $in->diff($out);
+                $diff = $out->getTimestamp() - $in->getTimestamp();
             	$daysIndex = date_format($in, "d/m/Y");
                 
                 //Controlli
             	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo 'Entrata ed uscita su giorni diversi<br>';
-            	if($diff->d > 0) echo 'Piu\' di un giorno di differenza<br>';
             	
                 //Inserimento assenze
                 do{
@@ -99,12 +104,10 @@
 
                             $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
 
-                            if(isset($days[date_format($dataAssenza, "m/d/Y")])) echo 'Segnalate multiple ferie per il giorno '.date_format($dataAssenza, "m/d/Y").': i risultati saranno errati<br>';
+                            if($days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] != 0) echo 'Segnalate multiple ferie per il giorno '.date_format($dataAssenza, "d/m/Y").': i risultati saranno errati<br>';
                             
-                            $days[date_format($dataAssenza, "m/d/Y")] = ['timbrature' => [],
-                                                                        'totSeconds' => (int)0,
-                                                                        'totSecondsAssenza' => $secondiTeorici,
-                                                                        'giustificazione' => $assenza['exWhy']];
+                            $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
+                            $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
                             $totAssenze += $secondiTeorici;
                             $iAssenze++;
 
@@ -114,12 +117,9 @@
                 }while($assenza);
             	
                 //Inserimento giornata
-                if(!isset($days[$daysIndex]))
-                    $days[$daysIndex] = ['timbrature' => [], 'totSeconds' => (int)0, 'totSecondsAssenza' => (int)0, 'giustificazione' => ''];
-            	$days[$daysIndex]['timbrature'][] = ['in' => $in, 'out' => $out];
-            	$duration = (int)((($diff->h)*60*60) + (($diff->m)*60) + (($diff->s)));
-            	$days[$daysIndex]['totSeconds'] += $duration;
-                $tot += $duration;
+                $days[$daysIndex]['timbrature'][] = ['in' => $in, 'out' => $out];
+            	$days[$daysIndex]['totSeconds'] += $diff;
+                $tot += $diff;
             }
 
             //Inserimento eventuali ultime assenze
@@ -128,10 +128,8 @@
                 $assenza = $assenze[$iAssenze];
                 $dataAssenza = new DateTime($assenza['dayStart']);
                 $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
-                $days[date_format($dataAssenza, "Y-m-d")] = ['timbrature' => [],
-                                                            'totSeconds' => (int)0,
-                                                            'totSecondsAssenza' => $secondiTeorici,
-                                                            'giustificazione' => $assenza['exWhy']];
+                $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
+                $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] += $assenza['exWhy'];
                 $totAssenze += $secondiTeorici;
                 $iAssenze++;
             }
@@ -146,7 +144,7 @@
 
     function secondsToHMS($seconds) {
         $seconds = round($seconds);
-        return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m '.(int)($seconds % 60).'s';
+        return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m';//.(int)($seconds % 60).'s';
     }
 
     function dayOfWeek(DateTime $date) {
@@ -197,17 +195,19 @@
                 <td>Data</td>
                 <td>Timbrature</td>
                 <td>Ore lavorate</td>
+                <td>Da orario</td>
                 <td>Ore assenza giustificate</td>
                 <td>Giustificazione assenza</td>
             </tr>
     <?php foreach($days as $date => $day) { ?>
             <tr>
-				<td><?= $date ?></td>
+				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
             	<td>
             		<?php foreach ($day['timbrature'] as $timbratura)
 		             	echo '<p>'.date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i").'</p>'; ?>
-            	</td>
+                </td>
                 <td><?= secondsToHMS($day['totSeconds']) ?></td>
+                <td><?= secondsToHMS($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60) ?></td>
                 <td><?= secondsToHMS($day['totSecondsAssenza']) ?></td>
                 <td><?= $day['giustificazione'] ?></td>
 
@@ -224,6 +224,7 @@
 	        	<td>Tot.: <?= count($days) ?></td>
 	        	<td></td>
                 <td>Tot.: <?= secondsToHMS($tot) ?></td>
+                <td>Tot.: <?= secondsToHMS($totTeorico) ?></td>
                 <td>Tot.: <?= secondsToHMS($totAssenze) ?></td>
                 <td>Tot.: <?= count($assenze) ?></td>
         	</tr>
@@ -242,6 +243,7 @@
         ?>
         </table>
         
+        <h2>Statistiche globali</h2>
         <p>Tot. ore lavorate: <?= secondsToHMS($tot) ?></p>
         <p>Tot. ore assenza: <?= secondsToHMS($totAssenze) ?></p>
         <p>Tot. ore teoriche: <?= secondsToHMS($totTeorico) ?></p>
