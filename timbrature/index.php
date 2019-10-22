@@ -161,10 +161,12 @@
                 //Statistiche sulle ore lavorate
                 $hIn = intval($in->format('H'));
                 $hOut = intval($out->format('H'));
+		$secondsDiurniFestivi = 0;
+                $secondsNotturniFestivi = 0;
+		$secondsDiurniFeriali = 0;
+                $secondsNotturniFeriali = 0;
                 //Se festivo
                 if(isFestivo($in)) {
-                    $secondsDiurniFestivi = 0;
-                    $secondsNotturniFestivi = 0;
                     //Se la prima timbratura è "diurna"
                     if($hIn >= DIURNO_START && $hIn < DIURNO_END){
                         //Se la prima e la seconda timbratura sono "diurne"
@@ -192,8 +194,6 @@
                     }
                 //Se feriale    
                 }else {
-                    $secondsDiurniFeriali = 0;
-                    $secondsNotturniFeriali = 0;
                     //Se la prima timbratura è "diurna"
                     if($hIn >= DIURNO_START && $hIn < DIURNO_END){
                         //Se la prima e la seconda timbratura sono "diurne"
