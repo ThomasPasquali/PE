@@ -3,6 +3,7 @@
     define('FESTE', ['01-01','01-06','04-25','05-01','06-02','06-24','08-15','11-01','12-08','12-25','12-26']);
     define('DIURNO_START', 6);
     define('DIURNO_END', 22);
+    define('CSV_SEP', ';');
 
     include_once '../lib/db.php';
     $ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
@@ -14,13 +15,13 @@
         'user'=>$ini['user'],
         'pass'=>$ini['pass']]);
     
-    if(isset($_POST['user'])&&isset($_POST['da'])&&isset($_POST['a'])) {
+    if(isset($_REQUEST['user'])&&isset($_REQUEST['da'])&&isset($_REQUEST['a'])) {
 
         $user = $db->ql(
             'SELECT *
             FROM ts_users
             WHERE   Username = ?',
-            [$_POST['user']]);
+            [$_REQUEST['user']]);
 
         if(count($user) == 1) {
 
@@ -45,6 +46,19 @@
             for($i = 0; $i < strlen($res); $i+=8)
                 $orariSettimanali[] = (int)substr($res, $i+4, 4);
 
+            //Tabella numero assenze per tipo
+            $assenzeStats = $db->ql(
+                'SELECT exWhy reason, (COUNT(*) * exLen_days) tot
+                FROM ts_schedules_ex
+                WHERE   idDeptUser = :user
+                    AND DATE(dayStart) BETWEEN :da AND :a
+                GROUP BY exWhy',
+                [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
+            $tmp = [];
+            foreach($assenzeStats as $stat)
+            	$tmp[$stat['reason']] = $stat['tot'];
+            $assenzeStats = $tmp;
+                
             //Assenze
             $assenze = $db->ql(
                 'SELECT dayStart, exWhy, exLen_days
@@ -52,7 +66,7 @@
                 WHERE   idDeptUser = :user
                     AND DATE(dayStart) BETWEEN :da AND :a
                 ORDER BY dayStart',
-                [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+                [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
 
             $tmp = [];
             foreach($assenze as $assenza) {
@@ -61,20 +75,16 @@
 
                 while($assenza['exLen_days'] > 0) {
                     $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy']];
-                    $day->modify('+1 day');
-                    $assenza['exLen_days']--;
+                    $c = 0;
+                    do{
+                    	if($c > 0) $assenzeStats[$stat['reason']]--;
+                    	$day->modify('+1 day');
+                    	$assenza['exLen_days']--;
+                    	$c++;
+                    }while(isFestivo($day) || dayOfWeek($day) == 5);
                 }
             }
             $assenze = $tmp;
-
-            //Tabella numero assenze per tipo
-            $assenzeStats = $db->ql(
-                'SELECT exWhy reason, COUNT(*) tot
-                FROM ts_schedules_ex
-                WHERE   idDeptUser = :user
-                    AND DATE(dayStart) BETWEEN :da AND :a
-                GROUP BY exWhy',
-                [':user' => $user['id'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
 
             //Timbrature
             $results = $db->ql(
@@ -86,10 +96,10 @@
                     AND DATE(r.logTime) BETWEEN :da AND :a
 					AND r.valid = 1
                 ORDER BY r.logTime',
-                [':u'=>$_POST['user'], ':da'=>$_POST['da'], ':a'=>$_POST['a']]);
+                [':u'=>$_REQUEST['user'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
             
             /*--------------FINE QUERY----------------*/
-
+            
             //Variabili globali
             $days = [];
             $tot = (int)0;
@@ -102,10 +112,10 @@
             $giorniSettimana = array('Lun','Mart','Merc','Giov','Ven','Sab','Dom');
 
             //Calcolo tot. ore teoriche ed inizializzazione giorni
-            $da = new DateTime($_POST['da']);
-            $a = new DateTime($_POST['a']);
+            //$da = new DateTime($_REQUEST['da']);
+            $a = new DateTime($_REQUEST['a']);
             
-            $da_cpy = new DateTime($_POST['da']);
+            $da_cpy = new DateTime($_REQUEST['da']);
             while(date_format($da_cpy, "Y-m-d") <= date_format($a, "Y-m-d")) {
                 $days[date_format($da_cpy, "d/m/Y")] = 
                     ['timbrature' => [],
@@ -123,7 +133,7 @@
             }
             
             //Iterazione su tutte le timbrature del periodo prese a coppie
-            for ($i = 0, $iAssenze = 0; $i < count($results); $i+=2) {
+            for ($i = 0; $i < count($results); $i+=2) {
 
             	$in = new DateTime($results[$i]['logTime']);
                 $out = new DateTime($results[$i+1]['logTime']);
@@ -132,38 +142,13 @@
                 
                 //Controlli
             	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo '<br>Entrata ed uscita su giorni diversi<br>';
-            	
-                //Inserimento assenze
-                do{
-                    $assenza = NULL;
-                    if($iAssenze < count($assenze)) {
-
-                        $assenza = $assenze[$iAssenze];
-                        $dataAssenza = new DateTime($assenza['dayStart']);
-
-                        if(date_format($dataAssenza, "Y-m-d") <= date_format($in, "Y-m-d")) {
-
-                            $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
-
-                            if($days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] != 0) echo 'Segnalate multiple ferie per il giorno '.date_format($dataAssenza, "d/m/Y").': i risultati saranno errati<br>';
-                            
-                            $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
-                            $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
-                            $totAssenze += $secondiTeorici;
-                            $iAssenze++;
-
-                        }else
-                            $assenza = NULL;
-                    }
-                //Finchè l'assenza non supera il giorno della timbratura
-                }while($assenza);
                 
                 //Statistiche sulle ore lavorate
                 $hIn = intval($in->format('H'));
                 $hOut = intval($out->format('H'));
-		$secondsDiurniFestivi = 0;
+				$secondsDiurniFestivi = 0;
                 $secondsNotturniFestivi = 0;
-		$secondsDiurniFeriali = 0;
+				$secondsDiurniFeriali = 0;
                 $secondsNotturniFeriali = 0;
                 //Se festivo
                 if(isFestivo($in)) {
@@ -236,16 +221,75 @@
                 $tot += $diff;
             }
 
-            //Inserimento eventuali ultime assenze
-            while($iAssenze < count($assenze)) {
-
-                $assenza = $assenze[$iAssenze];
+            //Inserimento assenze
+            foreach ($assenze as $assenza) {
                 $dataAssenza = new DateTime($assenza['dayStart']);
                 $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
                 $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
-                $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] += $assenza['exWhy'];
+                $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
                 $totAssenze += $secondiTeorici;
-                $iAssenze++;
+            }
+            
+            //Export
+            if($_REQUEST['export']??'' == 'csv') {
+            	header('Content-type: text/csv');
+            	header("Content-Disposition: attachment; filename=\"$_REQUEST[user]$_REQUEST[da] - $_REQUEST[a].csv\"");
+            	
+            	echo 'Data'.CSV_SEP.'Timbrature'.CSV_SEP.'Ore lavorate'.CSV_SEP.'Diurne feriali'.CSV_SEP.' Notturne feriali'.CSV_SEP.'Diurne festive'.CSV_SEP.'Notturne festive'.CSV_SEP.'Saldo giornaliero'.CSV_SEP.'Da orario'.CSV_SEP.'Ore assenza giustificate'.CSV_SEP.'Giustificazione assenza';
+            	echo "\r\n";
+            	foreach($days as $date => $day) {
+            		echo $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')';
+            		echo CSV_SEP;
+            		$tmp = [];
+            		foreach ($day['timbrature'] as $timbratura)
+            			$tmp[] = date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i");
+            			echo implode(', ', $tmp);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSeconds']);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSecondsDiurniFeriali']);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSecondsNotturniFeriali']);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSecondsDiurniFestivi']);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSecondsNotturniFestivi']);
+            			echo CSV_SEP;
+            			if(isFestivo(date_create_from_format('d/m/Y', $date))) $saldo = 0;
+            			else $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - ($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
+            			echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
+            			echo CSV_SEP;
+            			echo secondsToHMS($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
+            			echo CSV_SEP;
+            			echo secondsToHMS($day['totSecondsAssenza']);
+            			echo CSV_SEP;
+            			echo $day['giustificazione'];
+            			echo "\r\n";
+            	}
+            	
+            	echo 'Tot.: '.count($days);
+            	echo CSV_SEP;
+            	echo CSV_SEP;
+            	echo 'Tot.: '.secondsToHMS($tot);
+            	echo CSV_SEP;
+            	echo 'Tot.: '.secondsToHMS($totSecondsDiurniFeriali);
+            	echo CSV_SEP;
+            	echo 'Tot.: '.secondsToHMS($totSecondsNotturniFeriali);
+            	echo CSV_SEP;
+            	echo 'Tot.: '.secondsToHMS($totSecondsDiurniFestivi);
+            	echo CSV_SEP;
+            	echo 'Tot.: '.secondsToHMS($totSecondsNotturniFestivi);
+            	echo CSV_SEP;
+            	$saldo = ($tot + $totAssenze) - $totTeorico;
+            	echo 'Tot.:'.($saldo < 0?'-':'').secondsToHMS(abs($saldo));
+            	echo CSV_SEP;
+            	echo 'Tot.:'.secondsToHMS($totTeorico);
+            	echo CSV_SEP;
+            	echo 'Tot.:'.secondsToHMS($totAssenze);
+            	echo CSV_SEP;
+            	echo 'Tot.:'.count($assenze);
+            	
+            	exit();
             }
 
         }else {
@@ -274,7 +318,11 @@
      * @return int Differenza in secondi
      */
     function dateDiff(DateTime $from, DateTime $to) {
-        return $to->getTimestamp() - $from->getTimestamp();
+    	return (getTimeUnixTruncatedToMinute($to) - getTimeUnixTruncatedToMinute($from));
+    }
+    
+    function getTimeUnixTruncatedToMinute(DateTime $date) {
+    	return ($date->getTimestamp() - ($date->getTimestamp()%60));
     }
 
     /**
@@ -284,7 +332,11 @@
     function isFestivo(DateTime $day) {
         return ((dayOfWeek($day) == 6) || (in_array($day->format('m-d'), FESTE)));
     }
-    
+
+    echo '<pre>';
+   	//print_r($_REQUEST);
+    //print_r($user);
+    echo '</pre>';
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -295,6 +347,7 @@
     <title>Timbrature</title>
     <style>
         table {
+        	text-align: center;
             width: 100%;
             font-size: 13px;
 			border-collapse:collapse;
@@ -302,6 +355,12 @@
         }
 		table td{
 			border:1px solid #FF0000;
+		}
+		.festivo {
+			background-color: #DDDDDD;
+		}
+		table td:nth-child(even) {
+			background-color: #EEEEEE;
 		}
     </style>
 </head>
@@ -324,7 +383,13 @@
 
     <?php }else { ?>
 
-        <h1>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_POST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_POST['a']),"d/m/Y"); ?></h1>
+        <h3>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_REQUEST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_REQUEST['a']),"d/m/Y"); ?></h3>
+        <?php 
+        $url = '?export=csv';
+        foreach ($_REQUEST as $key => $val)
+        	$url .= "&$key=$val";
+        ?>
+        <a href="<?= $url ?>">Esporta in CSV</a>
         <table>
             <tr>
                 <td>Data</td>
@@ -339,8 +404,8 @@
                 <td>Ore assenza giustificate</td>
                 <td>Giustificazione assenza</td>
             </tr>
-    <?php foreach($days as $date => $day) { ?>
-            <tr>
+    <?php  foreach($days as $date => $day) { ?>
+            <tr <?= ((isFestivo(date_create_from_format('d/m/Y', $date)) || dayOfWeek(date_create_from_format('d/m/Y', $date)) == 5)?'class="festivo"':'') ?>>
 				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
                 
                 <td>
@@ -357,7 +422,8 @@
 
                 <td>
                     <?php
-                    $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - ($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
+                    if(isFestivo(date_create_from_format('d/m/Y', $date))) $saldo = 0;
+                    else $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - ($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
                     echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
                     ?>
                 </td>
@@ -373,7 +439,7 @@
         	}
         	
             echo '<pre>';
-            //print_r($_POST);
+            //print_r($_REQUEST);
             //print_r($user);
             echo '</pre>';
             ?>
@@ -399,10 +465,10 @@
         <h2>Statistiche assenze</h2>
         <table>
         <?php 
-        foreach($assenzeStats as $stat) { ?>
+        foreach($assenzeStats as $reason => $t) { ?>
             <tr>
-                <td><?= $stat['reason'] ?></td>
-                <td><?= $stat['tot'] ?></td>
+                <td><?= $reason ?></td>
+                <td><?= $t ?></td>
             </tr>
         <?php
         }
