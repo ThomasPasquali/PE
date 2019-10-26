@@ -1,6 +1,6 @@
 <?php
 
-    define('FESTE', ['01-01','01-06','04-25','05-01','06-02','06-24','08-15','11-01','12-08','12-25','12-26']);
+    define('FESTE', ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']);
     define('DIURNO_START', 6);
     define('DIURNO_END', 22);
     define('CSV_SEP', ';');
@@ -109,7 +109,8 @@
             $totSecondsNotturniFestivi = (int)0;
             $totSecondsDiurniFeriali = (int)0;
             $totSecondsNotturniFeriali = (int)0;
-            $giorniSettimana = array('Lun','Mart','Merc','Giov','Ven','Sab','Dom');
+            $giorniSettimana = array('Lun','Mar','Mer','Gio','Ven','Sab','Dom');
+            $giorniLavorati = (int)0;
 
             //Calcolo tot. ore teoriche ed inizializzazione giorni
             //$da = new DateTime($_REQUEST['da']);
@@ -127,7 +128,7 @@
                     'totSecondsDiurniFestivi' => (int)0,
                     'totSecondsNotturniFestivi' => (int)0,];
 
-                $totTeorico += $orariSettimanali[dayOfWeek($da_cpy)]*60;
+                    if(!isFestivo($da_cpy)) $totTeorico += $orariSettimanali[dayOfWeek($da_cpy)]*60;
 
                 $da_cpy->modify('+1 day');
             }
@@ -230,6 +231,11 @@
                 $totAssenze += $secondiTeorici;
             }
             
+            //Conteggio giorni lavoorati
+            foreach($days as $day)
+            	if(count($day['timbrature']) > 0)
+            		$giorniLavorati++;
+            
             //Export
             if($_REQUEST['export']??'' == 'csv') {
             	header('Content-type: text/csv');
@@ -243,51 +249,57 @@
             		$tmp = [];
             		foreach ($day['timbrature'] as $timbratura)
             			$tmp[] = date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i");
-            			echo implode(', ', $tmp);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSeconds']);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSecondsDiurniFeriali']);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSecondsNotturniFeriali']);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSecondsDiurniFestivi']);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSecondsNotturniFestivi']);
-            			echo CSV_SEP;
-            			if(isFestivo(date_create_from_format('d/m/Y', $date))) $saldo = 0;
-            			else $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - ($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
-            			echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
-            			echo CSV_SEP;
-            			echo secondsToHMS($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
-            			echo CSV_SEP;
-            			echo secondsToHMS($day['totSecondsAssenza']);
-            			echo CSV_SEP;
-            			echo $day['giustificazione'];
-            			echo "\r\n";
+            		echo implode(', ', $tmp);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSeconds']);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSecondsDiurniFeriali']);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSecondsNotturniFeriali']);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSecondsDiurniFestivi']);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSecondsNotturniFestivi']);
+            		echo CSV_SEP;
+            		$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
+            		$saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - $teorico;
+            		echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
+            		echo CSV_SEP;
+            		echo secondsToHMS($teorico);
+            		echo CSV_SEP;
+            		echo secondsToHMS($day['totSecondsAssenza']);
+            		echo CSV_SEP;
+            		echo $day['giustificazione'];
+            		echo "\r\n";
             	}
             	
-            	echo 'Tot.: '.count($days);
+            	echo count($days);
             	echo CSV_SEP;
+            	echo $giorniLavorati;
             	echo CSV_SEP;
-            	echo 'Tot.: '.secondsToHMS($tot);
+            	echo secondsToHMS($tot);
             	echo CSV_SEP;
-            	echo 'Tot.: '.secondsToHMS($totSecondsDiurniFeriali);
+            	echo secondsToHMS($totSecondsDiurniFeriali);
             	echo CSV_SEP;
-            	echo 'Tot.: '.secondsToHMS($totSecondsNotturniFeriali);
+            	echo secondsToHMS($totSecondsNotturniFeriali);
             	echo CSV_SEP;
-            	echo 'Tot.: '.secondsToHMS($totSecondsDiurniFestivi);
+            	echo secondsToHMS($totSecondsDiurniFestivi);
             	echo CSV_SEP;
-            	echo 'Tot.: '.secondsToHMS($totSecondsNotturniFestivi);
+            	echo secondsToHMS($totSecondsNotturniFestivi);
             	echo CSV_SEP;
             	$saldo = ($tot + $totAssenze) - $totTeorico;
-            	echo 'Tot.:'.($saldo < 0?'-':'').secondsToHMS(abs($saldo));
+            	echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
             	echo CSV_SEP;
-            	echo 'Tot.:'.secondsToHMS($totTeorico);
+            	echo secondsToHMS($totTeorico);
             	echo CSV_SEP;
-            	echo 'Tot.:'.secondsToHMS($totAssenze);
+            	echo secondsToHMS($totAssenze);
             	echo CSV_SEP;
-            	echo 'Tot.:'.count($assenze);
+            	echo count($assenze);
+            	
+            	echo "\r\n\r\n";
+            	echo 'Tipo di assenza'.CSV_SEP."Occorrenze\r\n";
+            	foreach($assenzeStats as $reason => $t)
+            		echo $reason.CSV_SEP.$t."\r\n";
             	
             	exit();
             }
@@ -302,7 +314,8 @@
 
     function secondsToHMS($seconds) {
         $seconds = round($seconds);
-        return (int)($seconds/ 3600).'h '.(int)($seconds/ 60 % 60).'m';//.(int)($seconds % 60).'s';
+        $s = (int)($seconds/ 60 % 60);
+        return (int)($seconds/ 3600).':'.(strlen($s) < 2?'0'.$s:$s);//.(int)($seconds % 60).'s';
     }
 
     /**
@@ -404,7 +417,9 @@
                 <td>Ore assenza giustificate</td>
                 <td>Giustificazione assenza</td>
             </tr>
-    <?php  foreach($days as $date => $day) { ?>
+    <?php  foreach($days as $date => $day) { 
+    				$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
+    		?>
             <tr <?= ((isFestivo(date_create_from_format('d/m/Y', $date)) || dayOfWeek(date_create_from_format('d/m/Y', $date)) == 5)?'class="festivo"':'') ?>>
 				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
                 
@@ -422,13 +437,12 @@
 
                 <td>
                     <?php
-                    if(isFestivo(date_create_from_format('d/m/Y', $date))) $saldo = 0;
-                    else $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - ($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60);
+                    $saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - $teorico;
                     echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
                     ?>
                 </td>
 
-                <td><?= secondsToHMS($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60) ?></td>
+                <td><?= secondsToHMS($teorico) ?></td>
                 
                 <td><?= secondsToHMS($day['totSecondsAssenza']) ?></td>
 
@@ -444,21 +458,21 @@
             echo '</pre>';
             ?>
     		<tr>
-	        	<td>Tot.: <?= count($days) ?></td>
-	        	<td></td>
-                <td>Tot.: <?= secondsToHMS($tot) ?></td>
-                <td>Tot.: <?= secondsToHMS($totSecondsDiurniFeriali) ?></td>
-                <td>Tot.: <?= secondsToHMS($totSecondsNotturniFeriali) ?></td>
-                <td>Tot.: <?= secondsToHMS($totSecondsDiurniFestivi) ?></td>
-                <td>Tot.: <?= secondsToHMS($totSecondsNotturniFestivi) ?></td>
-                <td>Tot.: <?php 
+	        	<td><?= count($days) ?></td>
+	        	<td><?= $giorniLavorati ?></td>
+                <td><?= secondsToHMS($tot) ?></td>
+                <td><?= secondsToHMS($totSecondsDiurniFeriali) ?></td>
+                <td><?= secondsToHMS($totSecondsNotturniFeriali) ?></td>
+                <td><?= secondsToHMS($totSecondsDiurniFestivi) ?></td>
+                <td><?= secondsToHMS($totSecondsNotturniFestivi) ?></td>
+                <td><?php 
                     $saldo = ($tot + $totAssenze) - $totTeorico;
                     echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
                     ?>
                 </td>
-                <td>Tot.: <?= secondsToHMS($totTeorico) ?></td>
-                <td>Tot.: <?= secondsToHMS($totAssenze) ?></td>
-                <td>Tot.: <?= count($assenze) ?></td>
+                <td><?= secondsToHMS($totTeorico) ?></td>
+                <td><?= secondsToHMS($totAssenze) ?></td>
+                <td><?= count($assenze) ?></td>
         	</tr>
         </table>
         
@@ -478,15 +492,7 @@
         <h2>Statistiche globali</h2>
 
         <h3>Conteggio giorni</h3>
-        <p>Lavorativi: 
-            <?php
-                $c = 0;
-                foreach($days as $day)
-                    if(count($day['timbrature']) > 0)
-                        $c++;
-                echo $c;
-            ?>
-        </p>
+        <p>Lavorativi: <?= $giorniLavorati ?></p>
         <p>Assenza: <?= count($assenze) ?></p>
         <p></p>
 
