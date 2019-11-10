@@ -1,5 +1,5 @@
 <?php
-    define("INI_DIR", $_SERVER['DOCUMENT_ROOT']."/../PE_ini/");
+    define("INI_DIR", __DIR__."/../PE_ini/");
 
     class Controls{
 

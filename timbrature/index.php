@@ -435,7 +435,7 @@
     <script src="../lib/jquery.qtip.min.js"></script>
     
     <script type="text/javascript">
-	    $('#tabellona td[title]').live('mouseover', function() {
+	    $('#tabellona').on('mouseover', 'td[title]', function() {
 	        var target = $(this);
 	        if (target.data('qtip')) { return false; }
 	
@@ -460,7 +460,7 @@
 	            textAlign : 'center',
 	            tip : true, 
 	            name : 'cream' 
-	        });
+	        }});
 	
 	        target.trigger('mouseover');
 	    });
@@ -560,7 +560,7 @@
                 			$tmp[] = 
                 				$workcodes[$workcode['workcode']].' - h'.
                 				secondsToHMS($workcode['diff']).
-                				' ('.date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i").')';
+                				' ('.date_format($workcode['in'],"H:i").' - '.date_format($workcode['out'],"H:i").')';
                 		echo implode('<br>', $tmp);
                 	  ?>
                 </td>
