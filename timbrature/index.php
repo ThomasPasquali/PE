@@ -17,6 +17,8 @@
         'pass'=>$ini['pass']]);
     
     if(isset($_REQUEST['user'])&&isset($_REQUEST['da'])&&isset($_REQUEST['a'])) {
+        
+        $a = new DateTime($_REQUEST['a']);
 
         $user = $db->ql(
             'SELECT *
@@ -53,19 +55,6 @@
            	foreach ($res as $workcode)
             	$workcodes[$workcode['WorkCode_Number']] = $workcode['WorkCode_Desc'];
 
-            //Tabella numero assenze per tipo
-            $assenzeIntereStats = $db->ql(
-                'SELECT exWhy reason, (COUNT(*) * exLen_days) tot
-                FROM ts_schedules_ex
-                WHERE   idDeptUser = :user
-                    AND DATE(dayStart) BETWEEN :da AND :a
-                GROUP BY exWhy',
-                [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
-            $tmp = [];
-            foreach($assenzeIntereStats as $stat)
-            	$tmp[$stat['reason']] = $stat['tot'];
-            $assenzeIntereStats = $tmp;
-                
             //Assenze
             $assenze = $db->ql(
                 'SELECT dayStart, exWhy, exLen_days
@@ -74,21 +63,29 @@
                     AND DATE(dayStart) BETWEEN :da AND :a
                 ORDER BY dayStart',
                 [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
-
+            
+            //Numero assenze per tipo
+            $assenzeIntereStats = [];
             $tmp = [];
             foreach($assenze as $assenza) {
-
                 $day = new DateTime($assenza['dayStart']);
 
-                while($assenza['exLen_days'] > 0) {
-                    $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy']];
-                    $c = 0;
-                    do{
-                    	if($c > 0) $assenzeIntereStats[$stat['reason']]--;
-                    	$day->modify('+1 day');
-                    	$assenza['exLen_days']--;
-                    	$c++;
-                    }while(isFestivo($day) || dayOfWeek($day) == 5);
+                //"Scompatto" i giorni di assenza multipli
+                while(dateDiff($day, $a) >= 0 && $assenza['exLen_days'] > 0) {
+                    //Controllo se il giorno è lavorativo
+                    if(!(isFestivo($day) || dayOfWeek($day) == 5)) {
+                        $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy']];
+                        
+                        if(!isset($assenzeIntereStats[$assenza['exWhy']]))
+                            $assenzeIntereStats[$assenza['exWhy']] = (int)0;
+                            
+                        //Statistiche sui giorni "scompattati"
+                        $assenzeIntereStats[$assenza['exWhy']]++;
+                        
+                        $assenza['exLen_days']--;
+                    }
+                    
+                    $day->modify('+1 day');
                 }
             }
             $assenze = $tmp;
@@ -155,8 +152,8 @@
 
             //Calcolo tot. ore teoriche ed inizializzazione giorni
             //$da = new DateTime($_REQUEST['da']);
-            $a = new DateTime($_REQUEST['a']);
             
+            //Inserimento date da prendere in considerazione
             $da_cpy = new DateTime($_REQUEST['da']);
             while(date_format($da_cpy, "Y-m-d") <= date_format($a, "Y-m-d")) {
                 $days[date_format($da_cpy, "d/m/Y")] = 
@@ -281,7 +278,7 @@
                 }
             }
 
-            //Inserimento assenze
+            //Inserimento assenze (giornate intere)
             foreach ($assenze as $assenza) {
                 $dataAssenza = new DateTime($assenza['dayStart']);
                 $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
