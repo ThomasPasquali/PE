@@ -182,7 +182,7 @@
 		<link rel="icon" type="image/ico" href="favicon.ico">
 	</head>
 	<body>
-		<script type="text/javascript" src="/js/home.js"></script>
+		<script type="text/javascript" src="js/home.js"></script>
 
 		<div id="navbar" class="navbar sticky">
             <div class="dropdown active">
@@ -218,9 +218,9 @@
  			<div class="dropdown active">
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
-                	<a href="/gestione/edifici.php">Gestione edifici</a>
-                	<a href="/gestione/pagamentiOneriEcosti.php">Gestione pagamenti CC e OU</a>
-                	<a href="/modulistica/">Modulistica</a>
+                	<a href="gestione/edifici.php">Gestione edifici</a>
+                	<a href="gestione/pagamentiOneriEcosti.php">Gestione pagamenti CC e OU</a>
+                	<a href="modulistica/">Modulistica</a>
             	</div>
  			</div>
 
@@ -228,7 +228,7 @@
  				<button type="submit"  name="destroy" class="secondary" >Logout<i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i></button>
  				<?=
  			        $GLOBALS['c']->isAdmin()?
- 			        '<a target="_blank" href="/gestione/utenti.php">Gestione utenti<i class="fas fa-cogs"></i></a>'
+ 			        '<a target="_blank" href="gestione/utenti.php">Gestione utenti<i class="fas fa-cogs"></i></a>'
                     :'';
  				?>
  				<a>Impostazioni<i class="fas fa-cogs"></i>	</a>

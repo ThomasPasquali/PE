@@ -241,17 +241,19 @@
             $params[':mappale'] = $mappale;
         }
         $where = implode(' AND ', $where);
-
+        
         $sql = 'SELECT ID, Sigla, TIPO, Anno, Numero, FogliMappali, Intestatari_persone, Intestatari_societa
                 FROM '.$pe_o_tec.'_pratiche_view
                 WHERE ID IN (
                   SELECT DISTINCT p.ID
                   FROM '.$pe_o_tec.'_pratiche p
-                  JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
+                  LEFT JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
                   ((!empty($where))?('WHERE '.$where):'') .')
                 ORDER BY Anno, Numero';
 
         $rs = $db->ql($sql, $params);
+        
+        if(!count($rs)) echo "<h2>Nessun risultato</h2>";
 
         echo '<div class="wrapper">';
 
@@ -312,7 +314,7 @@
                 WHERE ID IN (
                   SELECT DISTINCT p.ID
                   FROM '.$pe_o_tec.'_pratiche p
-                  JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
+                  LEFT JOIN '.$pe_o_tec.'_fogli_mappali_pratiche fm ON p.ID = fm.Pratica '.
                   ((!empty($where))?('WHERE '.$where):'') .')
                 ORDER BY Anno, Numero';
                   
