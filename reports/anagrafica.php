@@ -6,6 +6,7 @@
 	       display: block;
 	   }
 	</style>
+	<title>Report anagrafica</title>
 </head>
 <body style="padding-top: 60px;">
 <?php

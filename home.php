@@ -342,7 +342,7 @@
                   <label>Tipo</label>
                   <select id="tipo-pratica-pe-reports" name="tipo_pratica_pe">
                     <?php 
-                    foreach ($GLOBALS['c']->getEnumValues('pe_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
+                    foreach ($GLOBALS['c']->getEnumValues('pe_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\"".(($_REQUEST['tipo_pratica_pe']??NULL) == $tipo?' selected="selected"':'').">$tipo</option>";
                     ?>
                   </select>
                   <select id="tipo-pratica-tec-reports" name="tipo_pratica_tec" style="display:none;">
@@ -464,7 +464,7 @@
         
         <div id="modPra" class="content">
         	<div class="form">
-            	<h1>Mdifica pratiche</h1>
+            	<h1>Modifica pratiche</h1>
 
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="pratica">

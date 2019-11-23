@@ -37,7 +37,7 @@
                               'INSERT INTO fogli_mappali_edifici (Edificio, Foglio, Mappale, EX) VALUES(?,?,?,?)',
                             [$edID, $_REQUEST[$keyFoglio] ,$mappale, isset($_REQUEST["exnew$n"])?'EX':NULL]);
                         if($res->errorCode() != '0') $errors[] = $res->errorInfo()[2];
-                        print_r( $errors);
+                        if(count($errors) > 0) print_r( $errors);
                     }
                 }
         }
@@ -195,7 +195,7 @@
     </div>
 
     <!-- Page Content -->
-    <div id="pageContent" style="margin-left:17%;margin-top:50px;">
+    <div id="pageContent" style="margin-left:17%;">
 
         <div id="vis-mod" class="content active">
         	<div class="w3-container w3-teal"><h1>Visualizza/modifica edifci</h1></div>

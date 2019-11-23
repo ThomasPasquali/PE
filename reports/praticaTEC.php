@@ -97,7 +97,7 @@
             $i = 0;
             foreach ($edifici as $edificio){
               $sep = $i > 0 ? ' - ' : '';
-              echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\">(Ed. $edificio[ID])</a>";
+              echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\"> (Edficio $edificio[ID])</a>";
               $i++;
             }
             ?>
