@@ -55,9 +55,29 @@
     }
 
 ?>
+<html>
   <head>
     <title>Pratica <?= $datiGenericiPratica['Sigla'] ?></title>
     <link rel="stylesheet" type="text/css" href="../css/report_pratica.css">
+    <link rel="stylesheet" href="../lib/fontawesome/css/all.css">
+    <script type="text/javascript">
+    function copyStringToClipboard (str) {
+    	   // Create new element
+    	   var el = document.createElement('textarea');
+    	   // Set value (string to be copied)
+    	   el.value = str;
+    	   // Set non-editable to avoid focus and move outside of view
+    	   el.setAttribute('readonly', '');
+    	   el.style = {position: 'absolute', left: '-9999px'};
+    	   document.body.appendChild(el);
+    	   // Select text inside element
+    	   el.select();
+    	   // Copy text to clipboard
+    	   document.execCommand('copy');
+    	   // Remove temporary element
+    	   document.body.removeChild(el);
+    }
+    </script>
   </head>
   <body>
      <div id="intestazione">
@@ -85,16 +105,7 @@
         
         <p><span>Intervento:</span> <?= $datiGenericiPratica['Intervento'] ?></p>
         
-        <p><span>Fogli-mappali: </span>
-        <?php
-        $i = 0;
-        foreach ($edifici as $edificio){
-          $sep = $i > 0 ? ' - ' : '';
-          echo "$sep$edificio[Mappali]<a href=\"edificio.php?edificio=$edificio[ID]\"> (Edificio $edificio[ID])</a>";
-          $i++;
-        }
-        ?>
-        </p>
+        <p><span>Fogli-mappali: </span><?= $datiGenericiPratica['FogliMappali'] ?> </p>
         
         <p><span>Subalterni:</span> <?= $datiGenericiPratica['Subalterni'] ?></p>
     </div>
@@ -151,7 +162,7 @@
     </div>
     <p class="sottotitolo">Ulteriori informazioni:</p>
     <div id="ultInfo">
-    	<p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
+    	<p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?><i onclick="copyStringToClipboard('<?= $datiGenericiPratica['Documento_elettronico'] ?>');" style="margin-left:10px;" class="fas fa-clipboard"></i></p>
         <p><span>Note:</span> <?= $datiGenericiPratica['Note'] ?></p>
     </div>
   </body>

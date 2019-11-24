@@ -3,6 +3,13 @@
     include_once 'lib/dbTableFormGenerator.php';
     $c = new Controls();
     
+    $res = $c->db->ql('select Documento_elettronico from pe_pratiche where Documento_elettronico is not null');
+    foreach ($res as $path) {
+    	$str = $path['Documento_elettronico'];
+    	
+    	if(substr($str, 0, strlen('U:ARCHIVIO EDILIZIA PRIVATAPE-DOCUMENTI ELETTRONICI')) == 'U:ARCHIVIO EDILIZIA PRIVATAPE-DOCUMENTI ELETTRONICI')
+    		echo substr($str, strlen('U:ARCHIVIO EDILIZIA PRIVATAPE-DOCUMENTI ELETTRONICI'), strlen($str)-1).'<br>';
+    }
     /*$arr = [
     		'tec_ou_cc' => [
     				'Caratteristiche_intervento' => [
@@ -83,7 +90,7 @@
     						'L1' => 'Edicole Funerarie'
     				]
     		]
-    ];*/
+    ];
     
     $arr = [
     		'tec_ou_cc' => [
@@ -123,7 +130,7 @@
     						'I2' => 'Impianti Sportivi Privati NON convenzionati',
     						'L' => 'EDICOLE FUNERARIE',
     						'L1' => 'Edicole Funerarie'
-    				]*/
+    				]
     		]
     ];
     renewColumnValues($arr);
@@ -145,7 +152,7 @@
 	    		
     	
     }
-    
+    */
     /*
     $res = $c->db->ql('SELECT Pratica p, Superfici_alloggi s FROM oneri');
     

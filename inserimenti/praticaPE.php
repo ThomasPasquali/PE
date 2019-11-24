@@ -7,14 +7,14 @@
       exit();
   }
 
-  print_r($_POST);
+  //print_r($_POST);
 
     $infos = [];
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         if(isset($_POST['documento_elettronico'])){
-            $relPath = "$_POST[tipo]\\$_POST[anno]\\$_POST[numero]$_POST[barrato]";
-            $path = $c->doc_el_root_path."\\$relPath";
+        	$relPath = "$_POST[tipo]/$_POST[anno]/$_POST[numero]$_POST[barrato]";
+        	$path = $c->doc_el_root_path.'/'.$relPath;
             if(!file_exists($path))
                 mkdir($path, 0777, TRUE);
             $_POST['documento_elettronico'] = $relPath;

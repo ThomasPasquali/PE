@@ -7,6 +7,7 @@
 	   }
 	</style>
 	<title>Report anagrafica</title>
+	<meta charset="UTF-8">
 </head>
 <body style="padding-top: 60px;">
 <?php

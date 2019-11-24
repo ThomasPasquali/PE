@@ -26,7 +26,7 @@
 
                 $righe_estratte = [];
                 while ($riga = $stmt->fetch($fetchType))
-                    $righe_estratte[] = $this->changeEncoding($riga);
+                    $righe_estratte[] = $riga;//$this->changeEncoding($riga);
 
                 $this->commit();
                 return $righe_estratte;
@@ -47,7 +47,7 @@
             try {
                 $this->beginTransaction();
                 $stmt = $this->prepare($sql);
-                $stmt->execute($this->changeEncoding($params));
+                $stmt->execute($params);//$this->changeEncoding($params));
                 $this->lastErrorInfo = $stmt->errorInfo();
                 $this->commit();
                 return $stmt;

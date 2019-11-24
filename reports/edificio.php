@@ -1,4 +1,4 @@
-﻿<?php
+<?php
     include_once '../controls.php';
     $c = new Controls();
 
@@ -173,6 +173,7 @@ GROUP BY r.ID',
         exit();
     }
 ?>
+<html>
   <head>
     <title>Storico edificio</title>
     <link rel="stylesheet" type="text/css" href="../css/report_edificio.css">
@@ -199,7 +200,7 @@ GROUP BY r.ID',
         <p><?php
             $temp = [];
             foreach ($intest_persone as $pers)
-                $temp[] = "<a href=\"anagrafica.php?persona=$pers[ID]\" target=\"_blank\">$pers[Cognome] $pers[Nome]</a>";
+            	$temp[] = "<a href=\"anagrafica.php?persona=$pers[ID]\" target=\"_blank\">$pers[Cognome] $pers[Nome]</a>";
             echo implode(' - ', $temp)
         ?></p>
       </div>
