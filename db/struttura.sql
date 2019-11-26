@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versione server:              10.3.16-MariaDB - mariadb.org binary distribution
--- S.O. server:                  Win64
--- HeidiSQL Versione:            10.2.0.5599
+-- Server version:               10.4.8-MariaDB - mariadb.org binary distribution
+-- Server OS:                    Win64
+-- HeidiSQL Version:             10.2.0.5599
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- Dump della struttura del database pe
+-- Dumping database structure for pe
 CREATE DATABASE IF NOT EXISTS `pe` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `pe`;
 
--- Dump della struttura di tabella pe.belfiore
+-- Dumping structure for table pe.belfiore
 CREATE TABLE IF NOT EXISTS `belfiore` (
   `ISTAT` int(6) unsigned NOT NULL,
   `Nome` char(100) NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS `belfiore` (
   KEY `Nome` (`Nome`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.edifici
+-- Dumping structure for table pe.edifici
 CREATE TABLE IF NOT EXISTS `edifici` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Stradario` int(6) unsigned NOT NULL,
@@ -40,10 +40,20 @@ CREATE TABLE IF NOT EXISTS `edifici` (
   CONSTRAINT `Denominazione.1` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`identificativo_nazionale`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1040 DEFAULT CHARSET=utf8 COMMENT='Il valore 0 di foglio ne indica la molteplicità';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
+-- Dumping structure for view pe.edifici_view
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `edifici_view` (
+	`ID` INT(10) UNSIGNED NOT NULL,
+	`Stradario` CHAR(60) NOT NULL COLLATE 'utf8_general_ci',
+	`Note` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Fogli` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Mappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
+) ENGINE=MyISAM;
 
--- Dump della struttura di tabella pe.fogli_mappali_edifici
+-- Dumping structure for table pe.fogli_mappali_edifici
 CREATE TABLE IF NOT EXISTS `fogli_mappali_edifici` (
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
@@ -54,9 +64,9 @@ CREATE TABLE IF NOT EXISTS `fogli_mappali_edifici` (
   CONSTRAINT `FK_fogli_mappali_edifici_edifici` FOREIGN KEY (`Edificio`) REFERENCES `edifici` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.imprese
+-- Dumping structure for table pe.imprese
 CREATE TABLE IF NOT EXISTS `imprese` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Intestazione` char(100) NOT NULL,
@@ -67,9 +77,9 @@ CREATE TABLE IF NOT EXISTS `imprese` (
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=379 DEFAULT CHARSET=utf8 COMMENT='INFO{"Value":"ID", "Description":"Intestazione"}ENDINFO';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.intestatari_persone
+-- Dumping structure for table pe.intestatari_persone
 CREATE TABLE IF NOT EXISTS `intestatari_persone` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Cognome` char(60) NOT NULL,
@@ -84,9 +94,9 @@ CREATE TABLE IF NOT EXISTS `intestatari_persone` (
   KEY `Cognome` (`Cognome`,`Nome`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1936 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.intestatari_societa
+-- Dumping structure for table pe.intestatari_societa
 CREATE TABLE IF NOT EXISTS `intestatari_societa` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Intestazione` char(70) NOT NULL,
@@ -100,9 +110,9 @@ CREATE TABLE IF NOT EXISTS `intestatari_societa` (
   KEY `Intestazione` (`Intestazione`)
 ) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.log_cancellazioni
+-- Dumping structure for table pe.log_cancellazioni
 CREATE TABLE IF NOT EXISTS `log_cancellazioni` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Utente` int(10) unsigned NOT NULL,
@@ -116,9 +126,9 @@ CREATE TABLE IF NOT EXISTS `log_cancellazioni` (
   CONSTRAINT `log_cancellazioni_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.log_gestione_utenti
+-- Dumping structure for table pe.log_gestione_utenti
 CREATE TABLE IF NOT EXISTS `log_gestione_utenti` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Utente` int(10) unsigned NOT NULL,
@@ -130,9 +140,9 @@ CREATE TABLE IF NOT EXISTS `log_gestione_utenti` (
   CONSTRAINT `log_gestione_utenti_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.log_inserimenti
+-- Dumping structure for table pe.log_inserimenti
 CREATE TABLE IF NOT EXISTS `log_inserimenti` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Utente` int(10) unsigned NOT NULL,
@@ -146,9 +156,9 @@ CREATE TABLE IF NOT EXISTS `log_inserimenti` (
   CONSTRAINT `FK_log_inserimenti_utenti` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.log_modifiche
+-- Dumping structure for table pe.log_modifiche
 CREATE TABLE IF NOT EXISTS `log_modifiche` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Utente` int(10) unsigned NOT NULL,
@@ -163,9 +173,9 @@ CREATE TABLE IF NOT EXISTS `log_modifiche` (
   CONSTRAINT `log_modifiche_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.log_report
+-- Dumping structure for table pe.log_report
 CREATE TABLE IF NOT EXISTS `log_report` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Utente` int(10) unsigned NOT NULL,
@@ -178,9 +188,9 @@ CREATE TABLE IF NOT EXISTS `log_report` (
   CONSTRAINT `log_report_ibfk_1` FOREIGN KEY (`Utente`) REFERENCES `utenti` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_condoni
+-- Dumping structure for table pe.pe_condoni
 CREATE TABLE IF NOT EXISTS `pe_condoni` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Mappali` char(40) NOT NULL,
@@ -202,9 +212,9 @@ CREATE TABLE IF NOT EXISTS `pe_condoni` (
   CONSTRAINT `ID Foglio Stradario` FOREIGN KEY (`Edificio`) REFERENCES `edifici` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=118 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_edifici_pratiche
+-- Dumping structure for table pe.pe_edifici_pratiche
 CREATE TABLE IF NOT EXISTS `pe_edifici_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -214,9 +224,9 @@ CREATE TABLE IF NOT EXISTS `pe_edifici_pratiche` (
   CONSTRAINT `FK_pe_edifici_pratiche_pe_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `pe_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_fogli_mappali_pratiche
+-- Dumping structure for table pe.pe_fogli_mappali_pratiche
 CREATE TABLE IF NOT EXISTS `pe_fogli_mappali_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -230,9 +240,9 @@ CREATE TABLE IF NOT EXISTS `pe_fogli_mappali_pratiche` (
   CONSTRAINT `FK_pe_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_intestatari_persone_pratiche
+-- Dumping structure for table pe.pe_intestatari_persone_pratiche
 CREATE TABLE IF NOT EXISTS `pe_intestatari_persone_pratiche` (
   `Persona` int(10) unsigned NOT NULL,
   `Pratica` int(10) unsigned NOT NULL,
@@ -242,9 +252,9 @@ CREATE TABLE IF NOT EXISTS `pe_intestatari_persone_pratiche` (
   CONSTRAINT `FK_pe_intestatari_persone_pratiche_pe_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `pe_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_intestatari_rubrica
+-- Dumping structure for table pe.pe_intestatari_rubrica
 CREATE TABLE IF NOT EXISTS `pe_intestatari_rubrica` (
   `Rubrica` int(10) unsigned NOT NULL,
   `Cognome` char(50) DEFAULT NULL,
@@ -254,9 +264,9 @@ CREATE TABLE IF NOT EXISTS `pe_intestatari_rubrica` (
   CONSTRAINT `FK_intestatari_rubrica_rubrica` FOREIGN KEY (`Rubrica`) REFERENCES `pe_rubrica` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_intestatari_societa_pratiche
+-- Dumping structure for table pe.pe_intestatari_societa_pratiche
 CREATE TABLE IF NOT EXISTS `pe_intestatari_societa_pratiche` (
   `Societa` int(10) unsigned NOT NULL,
   `Pratica` int(10) unsigned NOT NULL,
@@ -266,9 +276,9 @@ CREATE TABLE IF NOT EXISTS `pe_intestatari_societa_pratiche` (
   CONSTRAINT `FK_pe_intestatari_societa_pratiche_pe_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `pe_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_pratiche
+-- Dumping structure for table pe.pe_pratiche
 CREATE TABLE IF NOT EXISTS `pe_pratiche` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `TIPO` enum('SCIA','DIA','CIL','CILA','VARIE','PERMESSI') NOT NULL,
@@ -298,9 +308,9 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche` (
   CONSTRAINT `pe_pratiche_ibfk_4` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`identificativo_nazionale`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1628 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_pratiche_non_trovate
+-- Dumping structure for table pe.pe_pratiche_non_trovate
 CREATE TABLE IF NOT EXISTS `pe_pratiche_non_trovate` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Edificio` char(10) DEFAULT NULL,
@@ -317,10 +327,36 @@ CREATE TABLE IF NOT EXISTS `pe_pratiche_non_trovate` (
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=235 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
+-- Dumping structure for view pe.pe_pratiche_view
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `pe_pratiche_view` (
+	`ID` INT(10) UNSIGNED NOT NULL,
+	`Tipo` ENUM('SCIA','DIA','CIL','CILA','VARIE','PERMESSI') NOT NULL COLLATE 'utf8_general_ci',
+	`Anno` INT(4) NOT NULL,
+	`Numero` INT(4) NOT NULL,
+	`Barrato` CHAR(12) NOT NULL COLLATE 'utf8_general_ci',
+	`Data` DATE NULL,
+	`Protocollo` INT(8) NULL,
+	`Tecnico` INT(10) UNSIGNED NULL,
+	`TecnicoNome` VARCHAR(61) NULL COLLATE 'utf8_general_ci',
+	`Impresa` INT(10) UNSIGNED NULL,
+	`Direzione_lavori` INT(10) UNSIGNED NULL,
+	`Zona` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Intervento` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Data_inizio_lavori` DATE NULL,
+	`Documento_elettronico` CHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Note` VARCHAR(255) NULL COLLATE 'utf8_general_ci',
+	`Sigla` VARCHAR(43) NOT NULL COLLATE 'utf8_general_ci',
+	`Stradario` VARCHAR(60) NULL COLLATE 'utf8_general_ci',
+	`FogliMappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Intestatari_persone` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Intestatari_societa` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
+) ENGINE=MyISAM;
 
--- Dump della struttura di tabella pe.pe_rubrica
+-- Dumping structure for table pe.pe_rubrica
 CREATE TABLE IF NOT EXISTS `pe_rubrica` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Anno` int(4) NOT NULL,
@@ -335,9 +371,9 @@ CREATE TABLE IF NOT EXISTS `pe_rubrica` (
   CONSTRAINT `FK_rubrica_edifici` FOREIGN KEY (`Edificio`) REFERENCES `edifici` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2696 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.pe_subalterni_pratiche
+-- Dumping structure for table pe.pe_subalterni_pratiche
 CREATE TABLE IF NOT EXISTS `pe_subalterni_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -352,9 +388,9 @@ CREATE TABLE IF NOT EXISTS `pe_subalterni_pratiche` (
   CONSTRAINT `FK_pe_subalterni_pratiche_subalterni_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`, `Subalterno`) REFERENCES `subalterni_edifici` (`Edificio`, `Foglio`, `Mappale`, `Subalterno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.stradario
+-- Dumping structure for table pe.stradario
 CREATE TABLE IF NOT EXISTS `stradario` (
   `Identificativo_nazionale` int(6) unsigned NOT NULL,
   `Denominazione` char(60) NOT NULL,
@@ -362,9 +398,9 @@ CREATE TABLE IF NOT EXISTS `stradario` (
   UNIQUE KEY `Identificativo_nazionale` (`Identificativo_nazionale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='INFO{"Value":"Identificativo_nazionale", "Description":"Denominazione"}ENDINFO';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.subalterni_edifici
+-- Dumping structure for table pe.subalterni_edifici
 CREATE TABLE IF NOT EXISTS `subalterni_edifici` (
   `Edificio` int(10) unsigned NOT NULL,
   `Foglio` char(4) NOT NULL,
@@ -375,9 +411,9 @@ CREATE TABLE IF NOT EXISTS `subalterni_edifici` (
   CONSTRAINT `FK_subalterni_edifici_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tecnici
+-- Dumping structure for table pe.tecnici
 CREATE TABLE IF NOT EXISTS `tecnici` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Cognome` varchar(30) NOT NULL,
@@ -396,9 +432,9 @@ CREATE TABLE IF NOT EXISTS `tecnici` (
   KEY `Cognome` (`Cognome`,`Nome`)
 ) ENGINE=InnoDB AUTO_INCREMENT=292 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='INFO{"Value":"ID", "Description":"CONCAT(Cognome, '' '', Nome)"}ENDINFO';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_edifici_pratiche
+-- Dumping structure for table pe.tec_edifici_pratiche
 CREATE TABLE IF NOT EXISTS `tec_edifici_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -408,9 +444,9 @@ CREATE TABLE IF NOT EXISTS `tec_edifici_pratiche` (
   CONSTRAINT `FK_tec_edifici_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_fogli_mappali_pratiche
+-- Dumping structure for table pe.tec_fogli_mappali_pratiche
 CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -425,9 +461,9 @@ CREATE TABLE IF NOT EXISTS `tec_fogli_mappali_pratiche` (
   CONSTRAINT `FK_tec_mappali_pratiche_fogli_mappali_edifici` FOREIGN KEY (`Edificio`, `Foglio`, `Mappale`) REFERENCES `fogli_mappali_edifici` (`Edificio`, `Foglio`, `Mappale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='Vari mappali sono identificati con 0 (VARI, STRADE)';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_intestatari_persone_pratiche
+-- Dumping structure for table pe.tec_intestatari_persone_pratiche
 CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
   `Persona` int(10) unsigned NOT NULL,
   `Pratica` int(10) unsigned NOT NULL,
@@ -438,9 +474,9 @@ CREATE TABLE IF NOT EXISTS `tec_intestatari_persone_pratiche` (
   CONSTRAINT `FK_tec_intestatari_persone_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_intestatari_societa_pratiche
+-- Dumping structure for table pe.tec_intestatari_societa_pratiche
 CREATE TABLE IF NOT EXISTS `tec_intestatari_societa_pratiche` (
   `Societa` int(10) unsigned NOT NULL,
   `Pratica` int(10) unsigned NOT NULL,
@@ -451,9 +487,9 @@ CREATE TABLE IF NOT EXISTS `tec_intestatari_societa_pratiche` (
   CONSTRAINT `FK_tec_intestatari_societa_pratiche_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_oneri_e_cc_superfici_alloggi
+-- Dumping structure for table pe.tec_oneri_e_cc_superfici_alloggi
 CREATE TABLE IF NOT EXISTS `tec_oneri_e_cc_superfici_alloggi` (
   `Pratica` int(10) unsigned NOT NULL,
   `Ou_cc` int(10) unsigned DEFAULT NULL,
@@ -464,9 +500,9 @@ CREATE TABLE IF NOT EXISTS `tec_oneri_e_cc_superfici_alloggi` (
   CONSTRAINT `FK_tec_oneri_e_cc_superfici_alloggi_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_ou_cc
+-- Dumping structure for table pe.tec_ou_cc
 CREATE TABLE IF NOT EXISTS `tec_ou_cc` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Pratica` int(10) unsigned NOT NULL,
@@ -494,9 +530,9 @@ CREATE TABLE IF NOT EXISTS `tec_ou_cc` (
   CONSTRAINT `FK_tec_oneri_e_cc_tec_pratiche` FOREIGN KEY (`Pratica`) REFERENCES `tec_pratiche` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=795 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_ou_cc_old
+-- Dumping structure for table pe.tec_ou_cc_old
 CREATE TABLE IF NOT EXISTS `tec_ou_cc_old` (
   `Pratica` int(10) unsigned NOT NULL,
   `Numero_revisione` int(10) unsigned DEFAULT NULL,
@@ -522,9 +558,9 @@ CREATE TABLE IF NOT EXISTS `tec_ou_cc_old` (
   `OU2` decimal(10,2) unsigned NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_pagamenti_cc
+-- Dumping structure for table pe.tec_pagamenti_cc
 CREATE TABLE IF NOT EXISTS `tec_pagamenti_cc` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Ou_cc` int(10) unsigned DEFAULT NULL,
@@ -535,9 +571,9 @@ CREATE TABLE IF NOT EXISTS `tec_pagamenti_cc` (
   CONSTRAINT `FK_tec_pagamenti_cc_tec_ou_cc` FOREIGN KEY (`Ou_cc`) REFERENCES `tec_ou_cc` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=418 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_pagamenti_ou
+-- Dumping structure for table pe.tec_pagamenti_ou
 CREATE TABLE IF NOT EXISTS `tec_pagamenti_ou` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Ou_cc` int(10) unsigned DEFAULT NULL,
@@ -548,9 +584,9 @@ CREATE TABLE IF NOT EXISTS `tec_pagamenti_ou` (
   CONSTRAINT `FK_tec_pagamenti_ou_tec_ou_cc` FOREIGN KEY (`Ou_cc`) REFERENCES `tec_ou_cc` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=537 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_pratiche
+-- Dumping structure for table pe.tec_pratiche
 CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `IDold` char(10) DEFAULT NULL,
@@ -597,11 +633,32 @@ CREATE TABLE IF NOT EXISTS `tec_pratiche` (
   UNIQUE KEY `ID` (`IDold`),
   KEY `FK_tec_pratiche_stradario` (`Stradario`),
   CONSTRAINT `FK_tec_pratiche_stradario` FOREIGN KEY (`Stradario`) REFERENCES `stradario` (`Identificativo_nazionale`)
-) ENGINE=InnoDB AUTO_INCREMENT=1782 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1783 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_subalterni_pratiche
+-- Dumping structure for view pe.tec_pratiche_view
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `tec_pratiche_view` (
+	`ID` INT(10) UNSIGNED NOT NULL,
+	`Tipo` ENUM('Autorizzazione','Permesso','Concessione','Sanatoria','Opera_interna','Condono') NOT NULL COLLATE 'utf8_general_ci',
+	`Anno` INT(4) NOT NULL,
+	`Numero` INT(4) NOT NULL,
+	`Barrato` CHAR(12) NOT NULL COLLATE 'utf8_general_ci',
+	`Data` DATE NULL,
+	`Protocollo` VARCHAR(6) NULL COLLATE 'utf8_general_ci',
+	`Intervento` VARCHAR(300) NULL COLLATE 'utf8_general_ci',
+	`Data_inizio_lavori` DATE NULL,
+	`Note` TEXT NULL COLLATE 'utf8_general_ci',
+	`Sigla` VARCHAR(49) NOT NULL COLLATE 'utf8_general_ci',
+	`Stradario` VARCHAR(60) NULL COLLATE 'utf8_general_ci',
+	`FogliMappali` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Subalterni` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Intestatari_persone` MEDIUMTEXT NULL COLLATE 'utf8_general_ci',
+	`Intestatari_societa` MEDIUMTEXT NULL COLLATE 'utf8_general_ci'
+) ENGINE=MyISAM;
+
+-- Dumping structure for table pe.tec_subalterni_pratiche
 CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
   `Pratica` int(10) unsigned NOT NULL,
   `Edificio` int(10) unsigned NOT NULL,
@@ -615,9 +672,9 @@ CREATE TABLE IF NOT EXISTS `tec_subalterni_pratiche` (
   CONSTRAINT `FK_tec_subalterni_pratiche_tec_edifici_pratiche` FOREIGN KEY (`Pratica`, `Edificio`) REFERENCES `tec_edifici_pratiche` (`Pratica`, `Edificio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tec_tecnici_pratiche
+-- Dumping structure for table pe.tec_tecnici_pratiche
 CREATE TABLE IF NOT EXISTS `tec_tecnici_pratiche` (
   `Tecnico` int(10) unsigned NOT NULL,
   `Pratica` int(10) unsigned NOT NULL,
@@ -628,9 +685,9 @@ CREATE TABLE IF NOT EXISTS `tec_tecnici_pratiche` (
   CONSTRAINT `FK_tec_tecnici_pratiche_tecnici` FOREIGN KEY (`Tecnico`) REFERENCES `tecnici` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CAPIRE COSA METTERE AL POSTO DELLA COLONNA TIPO';
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.tmp
+-- Dumping structure for table pe.tmp
 CREATE TABLE IF NOT EXISTS `tmp` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `IDold` char(10) DEFAULT NULL,
@@ -675,9 +732,9 @@ CREATE TABLE IF NOT EXISTS `tmp` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1780 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
--- Dump della struttura di tabella pe.utenti
+-- Dumping structure for table pe.utenti
 CREATE TABLE IF NOT EXISTS `utenti` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Email` varchar(100) NOT NULL,
@@ -688,8 +745,11 @@ CREATE TABLE IF NOT EXISTS `utenti` (
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
--- L’esportazione dei dati non era selezionata.
+-- Data exporting was unselected.
 
+-- Dumping structure for view pe.edifici_view
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `edifici_view`;
 CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note Note,
 		(SELECT GROUP_CONCAT(DISTINCT fm.Foglio ORDER BY fm.Foglio)
 		FROM fogli_mappali_edifici fm
@@ -719,6 +779,9 @@ CREATE VIEW `edifici_view` AS SELECT e.ID ID, s.Denominazione Stradario, e.Note 
 FROM edifici e
 JOIN stradario s ON s.Identificativo_nazionale = e.Stradario ;
 
+-- Dumping structure for view pe.pe_pratiche_view
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `pe_pratiche_view`;
 CREATE VIEW `pe_pratiche_view` AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
@@ -743,7 +806,10 @@ CREATE VIEW `pe_pratiche_view` AS SELECT  p.ID,
 
 		(SELECT GROUP_CONCAT(CONCAT( 'F.',fm.Foglio,
 									' m.', fm.Mappale,
-									IF(fm.EX IS NOT NULL, ' (ex)', ''))
+									IF(fm.EX IS NOT NULL, ' (ex)', ''),
+									' [Edificio ',
+									fm.Edificio,
+									']')
 							ORDER BY fm.Foglio, fm.Mappale
 							SEPARATOR ', ')
 		FROM pe_fogli_mappali_pratiche fmp
@@ -781,7 +847,10 @@ CREATE VIEW `pe_pratiche_view` AS SELECT  p.ID,
 FROM pe_pratiche p
 LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
-CREATE VIEW tec_pratiche_view AS SELECT  p.ID,
+-- Dumping structure for view pe.tec_pratiche_view
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `tec_pratiche_view`;
+CREATE VIEW `tec_pratiche_view` AS SELECT  p.ID,
 		p.TIPO Tipo,
 		p.Anno,
 		p.Numero,
@@ -798,9 +867,6 @@ CREATE VIEW tec_pratiche_view AS SELECT  p.ID,
 		Oggetto Intervento,
 		Data_inizio_lavori,
 		Note_pratica Note,
-		(SELECT GROUP_CONCAT(oc.OU1 SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) OU1,
-		(SELECT GROUP_CONCAT(oc.OU2 SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) OU2,
-		(SELECT GROUP_CONCAT(oc.CC SEPARATOR ' ; ') FROM tec_ou_cc oc WHERE oc.Attivo = 'S' AND oc.Pratica = p.ID GROUP BY p.ID) CC,
 
 		CONCAT(p.TIPO, p.Anno, '/', p.Numero, p.Barrato) Sigla,
 		IF(s.Denominazione IS NULL, '', s.Denominazione) Stradario,
@@ -843,7 +909,7 @@ CREATE VIEW tec_pratiche_view AS SELECT  p.ID,
 		WHERE isp.Pratica = p.ID) Intestatari_societa
 
 FROM tec_pratiche p
-LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale
+LEFT JOIN stradario s ON p.Stradario = s.Identificativo_nazionale ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

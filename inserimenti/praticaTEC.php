@@ -13,7 +13,7 @@
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         
-        $keys = ['tipo', 'anno', 'numero', 'barrato', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
+        $keys = ['tipo', 'anno', 'numero', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
         $cols = [];
         $params = [];
         foreach ($_POST as $key => $value) 
@@ -21,6 +21,7 @@
                 $cols[] = $key;
                 $params[] = ifEmptyGet($_POST[$key]);
             }
+        
         $res = $c->db->dml(
             'INSERT INTO tec_pratiche ('.implode(',', $cols).')
               VALUES (?'.str_repeat(',?', (count($cols)-1)).')',
