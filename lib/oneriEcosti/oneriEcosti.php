@@ -62,8 +62,9 @@
             		}
 	                $i = 0;
 	                $ccTab1 = 0;
-	                foreach ($rangesSuperfici as $sup)
-	                    $ccTab1 = $ccTab1 + ($coeffTab1[$i++] * ($sup / $superficie));
+	                if($superficie != 0)
+    	                foreach ($rangesSuperfici as $sup)
+    	                    $ccTab1 = $ccTab1 + ($coeffTab1[$i++] * ($sup / $superficie));
 	                
 	                echo "CC Tab.1: <span>$ccTab1</span>
 
@@ -72,20 +73,23 @@ SU: <span>$superficie</span>
 ";
 
 	                //CC Tab 3
-	                $ccTab3 = (int)($snr / $superficie* 100);
-	                switch(true) {
-	                	case $ccTab3 <= 50:
-	                		$ccTab3 = 0;
-	                		break;
-	                	case in_array($ccTab3, range(51,75)):
-	                		$ccTab3 = 10;
-	                		break;
-	                	case in_array($ccTab3, range(76,100)):
-	                		$ccTab3 = 20;
-	                		break;
-	                	default:
-	                		$ccTab3 = 30;
-	                		break;
+	                $ccTab3 = 0;
+	                if($superficie != 0) {
+	                   $ccTab3 = (int)($snr / $superficie* 100);
+    	                switch(true) {
+    	                	case $ccTab3 <= 50:
+    	                		$ccTab3 = 0;
+    	                		break;
+    	                	case in_array($ccTab3, range(51,75)):
+    	                		$ccTab3 = 10;
+    	                		break;
+    	                	case in_array($ccTab3, range(76,100)):
+    	                		$ccTab3 = 20;
+    	                		break;
+    	                	default:
+    	                		$ccTab3 = 30;
+    	                		break;
+    	                }
 	                }
 	                
 	                echo "CC Tab.3: <span>$ccTab3</span>

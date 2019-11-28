@@ -171,9 +171,9 @@
         			<p>Nessun costo di costruzione per le attivit&agrave; produttive</p>
         		</div>
         		
+			</div>
+			<textarea style="margin-top: 50px;" rows="5" cols="50" name="note" placeholder="Note..."></textarea>
 		</div>
-		</div>
-		<textarea style="margin-top: 50px;" rows="5" cols="50" name="note" placeholder="Note..."></textarea>
 		</form>
 		<button id="calcola" type="button" onclick="checkANDsubmit();">Calcola</button>
 		

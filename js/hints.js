@@ -14,7 +14,7 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
       });
 
 		request.error = function(msg) {
-          alert( "Errore: " + msg);
+          //alert( "Errore: " + msg);
     };
 
 	    request.fail(function(jqXHR, textStatus) {

@@ -13,7 +13,7 @@
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
         
-        $keys = ['tipo', 'anno', 'numero', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
+        $keys = ['tipo', 'anno', 'numero', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'tipologia_fabbricato', 'cod_int', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
         $cols = [];
         $params = [];
         foreach ($_POST as $key => $value) 
@@ -252,8 +252,28 @@
               <label>Civico</label>
               <input type="number" name="civico">
             </div>
+            
+            <div class="field">
+              <label>Codice intervento</label>
+              <select name="cod_int">
+                <?php
+                $types = $c->getEnumValues('tec_pratiche', 'COD_INT', $c->db);
+                foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
+                ?>
+              </select>
+            </div>
+            
+            <div class="field">
+              <label>Tipologia fabbricato</label>
+              <select name="tipologia_fabbricato">
+                <?php
+                $types = $c->getEnumValues('tec_pratiche', 'Tipologia_fabbricato', $c->db);
+                foreach ($types as $type) echo "<option value=\"$type\">$type</option>";
+                ?>
+              </select>
+            </div>
 
-             <div class="field">
+            <div class="field">
               <label>N. protocollo</label>
               <input type="number" name="n_protocollo">
             </div>
@@ -304,8 +324,8 @@
             <div class="field">
               <label>Beni ambientali</label>
                 <select name="beni_ambientali">
-                	<option value="S">Si</option>
                 	<option value="N">No</option>
+                	<option value="S">Si</option>
                 </select>
             </div>
 

@@ -217,12 +217,12 @@
 
     function searchEdificio($foglio, $mappale, $db) {
         $params = [];
-        if(!empty($foglio)) $params[] = $foglio;
-        if(!empty($mappale)) $params[] = $mappale;
+        if($foglio) $params[] = $foglio;
+        if($mappale) $params[] = $mappale;
 
         $where = [];
-        if(!empty($foglio)) $where[] = 'Foglio = ?';
-        if(!empty($mappale)) $where[] = 'Mappale = ?';
+        if($foglio) $where[] = 'Foglio = ?';
+        if($mappale) $where[] = 'Mappale = ?';
         
         $res = $db->ql(
             'SELECT ID, Mappali, Stradario, Note
@@ -230,7 +230,7 @@
             WHERE ID IN(
                 SELECT  Edificio
                 FROM fogli_mappali_edifici '.
-                (count($params) > 0?' WHERE '.implode(' AND ', $where):'').
+                'WHERE '.(count($params) > 0?implode(' AND ', $where):' FALSE').
              ') LIMIT 10',
             $params);
 

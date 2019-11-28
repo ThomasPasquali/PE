@@ -36,7 +36,7 @@ function checkANDsubmit() {
 	//CC
 	if($('.branch0.level0 select').val() == 'Residenza'){
 		for (let alloggio of document.getElementsByClassName('fieldAlloggio'))
-			if(alloggio.value && alloggio.value > 1)
+			if(alloggio.value >= 0)
 				alloggi.push(alloggio.value);
 		if(alloggi.length <= 0){
 			alert('Inserire almeno la superficie di un alloggio');
