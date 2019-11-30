@@ -164,6 +164,14 @@
         			[$id]);
         	return (count($res) === 1)?$res[0]:NULL;
         }
+        
+        public function getDatiPraticaPE($id) {
+        	$res = $this->db->ql('SELECT *
+                                            FROM pe_pratiche_view
+                                            WHERE ID = ?',
+        			[$id]);
+        	return (count($res) === 1)?$res[0]:NULL;
+        }
 
         /**
          *

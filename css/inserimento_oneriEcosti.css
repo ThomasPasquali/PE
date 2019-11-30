@@ -21,7 +21,7 @@ button, input, #fields-alloggi {
 }
 
 .risultato-pratica {
-	cursor: crosshair;
+	cursor: pointer;
 }
 
 .hidden, #calcola, #container, #inserimento-imponibile , #cc-turistico-direzionale, #cc-residenza, #cc-attivita-produttiva {

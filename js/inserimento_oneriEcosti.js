@@ -8,6 +8,7 @@ function selectPratica(el) {
 	$('#container').css('display', 'grid');
 	$('#calcola').show();
 	$('#container').show();
+	$('#note').show();
 };
 
 var countAlloggi = 0;

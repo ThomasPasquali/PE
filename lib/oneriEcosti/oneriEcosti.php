@@ -9,7 +9,7 @@
             OneriECosti::$costi_e_oneri = json_decode(json_encode(simplexml_load_file(__DIR__.'\costiBase.xml')), true);
         }
         
-        public static function calcola($dati, $db = NULL) {
+        public static function calcola($dati, $pe_o_tec, $db = NULL) {
             echo '<pre style="text-align:left;">';
             /*echo '-----------------------------------------RICHIESTA--------------------------------------------
 ';
@@ -50,16 +50,19 @@
             		$coeffTab1 = [0, 5, 15, 30, 50];
             		$superficie= 0;
             		$imponibileOU = $dati['imponibileOU'];
-            		foreach ($superficiAlloggi as $sup) {
-            			while(isset($ranges[$i]) && $sup > $ranges[$i]) $i++;
-            			
-            			if(!isset($rangesSuperfici[$i]))
-            				$rangesSuperfici[$i] = 0;
-            				
+            		
+            		foreach ($superficiAlloggi as $sup) 
+            			if(is_numeric($sup??'')) {
+	            			while(isset($ranges[$i]) && $sup > $ranges[$i]) $i++;
+	            			
+	            			if(!isset($rangesSuperfici[$i]))
+	            				$rangesSuperfici[$i] = 0;
+	            				
             				$rangesSuperfici[$i] = $rangesSuperfici[$i] + $sup;
             				
-            				$superficie = $superficie+ $sup;
-            		}
+            				$superficie = $superficie + $sup;
+            			}
+            		
 	                $i = 0;
 	                $ccTab1 = 0;
 	                if($superficie != 0)
@@ -118,13 +121,11 @@ SU: <span>$superficie</span>
 		                	else 
 		                	$maggiorazione = $maggiorazione + 0.05;
 	                
-	               echo "Magg. costo base: <span>$maggiorazione</span>
-";
+	               echo "Magg. costo base: <span>$maggiorazione</span>\r\n";
 	                
 		                $cc = (205.04992 * $maggiorazione) * ($superficie + ($snr * 0.6));
 		                
-		                echo "CC:  <span>$cc</span>
-";
+		                echo "CC:  <span>$cc</span>\r\n";
 		                
 		                $percTassaCC = 0;
 		                if($tipoIntervento == 'Nuova_costruzione') {
@@ -161,13 +162,13 @@ SU: <span>$superficie</span>
 	               		break;
             }
             
-			echo "Costo di costruzione: <span>$cc</span>\r\nOneri di urbanizzazione primari: <span>$ou1</span>\r\nOneri di urbanizzazione secondari: <span>$ou2</span>";
+			echo "\r\nCosto di costruzione: <span>$cc</span>\r\nOneri di urbanizzazione primari: <span>$ou1</span>\r\nOneri di urbanizzazione secondari: <span>$ou2</span>";
             $cols = [];
             $cols['Pratica'] = $pratica;
             if($db) $cols['Numero_revisione'] = $db->ql('SELECT IF(MAX(Numero_revisione) IS NULL, 1, MAX(Numero_revisione)+1) AS n FROM tec_ou_cc WHERE Pratica = ?', [$pratica])[0]['n'];
             $cols['Note'] = ($dati['note']??'') ? $dati['note'] : NULL;
             $cols['Zona_omogenea'] = $zona;
-            $cols['Tipo_intervento'] = $ou['Tipo_di_intervento'];
+            $cols['Tipo_intervento'] = ($ou['Tipo_di_intervento']??'') ? $ou['Tipo_di_intervento'] : NULL;
             $cols['Caratteristiche_edificio'] = ($dati['Caratteristiche_edificio']??'') ? $dati['Caratteristiche_edificio'] : NULL;
             $cols['Tipologia_edificio'] = ($dati['Tipologia_edificio']??'') ? $dati['Tipologia_edificio'] : NULL;
             $cols['Destinazione_uso'] = $destinazioneUso;
@@ -177,7 +178,7 @@ SU: <span>$superficie</span>
             $cols['ImponibileOU'] = $imponibileOU;
             $cols['Superficie'] = $superficie;
             $cols['Superficie_non_residenziale'] = $snr;
-            $cols['Incremento'] = isset($ccTab4) ? ($ccTab4 / 10) : NULL;
+            $cols['Incremento'] = isset($ccTab4) ? ($ccTab4 / 10) : 0;
             $cols['CC'] = $cc;
             $cols['OU1'] = $ou1;
             $cols['OU2'] = $ou2;
@@ -190,17 +191,19 @@ SU: <span>$superficie</span>
             echo '-----------------------------------------SQL--------------------------------------------
 ';*/
             
-            $sql = "INSERT INTO tec_ou_cc (".implode(", ", array_keys($cols)).") VALUES (?".str_repeat(', ?', (count(($cols))-1)).')';
+            $sql = 'INSERT INTO '.$pe_o_tec."_ou_cc (".implode(", ", array_keys($cols)).") VALUES (?".str_repeat(', ?', (count(($cols))-1)).')';
             if($db) {
             	$db->dml($sql, array_values($cols));
             	if($db->lastErrorInfo[0] != 0)
             		echo $db->lastErrorInfo[2];
 
 	            foreach ($superficiAlloggi as $alloggio) {
-		            $sql = 'INSERT INTO tec_oneri_e_cc_superfici_alloggi (Pratica, Superficie) VALUES (?, ?)';
-		            $db->dml($sql, [$pratica, $alloggio]);
+	            	if($alloggio > 0) {
+	            	$sql = 'INSERT INTO '.$pe_o_tec.'_oneri_e_cc_superfici_alloggi (Ou_cc, Superficie) VALUES ((SELECT MAX(ID) FROM '.$pe_o_tec.'_ou_cc), ?)';
+		            $db->dml($sql, [$alloggio]);
 		            if($db->lastErrorInfo[0] != 0)
 		            	echo $db->lastErrorInfo[2];
+	            	}
 	            }
             }
             /*echo '-----------------------------------------ENDSQL--------------------------------------------

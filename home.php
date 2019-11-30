@@ -200,7 +200,8 @@
                 <div class="dropdown-content">
                 	<a href="inserimenti/praticaPE.php">Pratica</a>
                 	<a href="inserimenti/praticaTEC.php">Pratica tec</a>
-                	<a href="inserimenti/oneriEcosti.php">OU e CC</a>
+                	<a href="inserimenti/oneriEcostiTec.php">OU e CC Tec</a>
+                	<a href="inserimenti/oneriEcostiPE.php">OU e CC PE</a>
                     <a onclick="changeContent('insAnagIntestPers');">Persona</a>
                     <a onclick="changeContent('insAnagTecnici');">Tecnico</a>
                     <a onclick="changeContent('insAnagSocieta');">Società</a>
@@ -219,7 +220,8 @@
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
                 	<a href="gestione/edifici.php">Gestione edifici</a>
-                	<a href="gestione/pagamentiOneriEcosti.php">Gestione pagamenti CC e OU</a>
+                	<a href="gestione/pagamentiOneriEcostiTec.php">Gestione pagamenti CC e OU Tec</a>
+                	<a href="gestione/pagamentiOneriEcostiPE.php">Gestione pagamenti CC e OU PE</a>
                 	<a href="modulistica/">Modulistica</a>
             	</div>
  			</div>

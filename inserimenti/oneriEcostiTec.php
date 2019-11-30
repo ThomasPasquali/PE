@@ -43,7 +43,7 @@
 	<?php 
 	if($c->check(['OU1', 'OU2', 'imponibileOU', 'formOneri'], $_POST)) {
 		$db = (isset($_REQUEST['conferma']) ? $c->db : NULL);
-		OneriECosti::calcola($_POST, $db);
+		OneriECosti::calcola($_POST, 'tec', $db);
 		if(!$db){
 	?>		
 			<form id="form" method="post">
@@ -58,7 +58,7 @@
 	<?php 
 			exit();
 		}else {
-			header('Location: ../gestione/pagamentiOneriEcosti.php?p='.$_POST['pratica']);
+			header('Location: ../gestione/pagamentiOneriEcostiTec.php?p='.$_POST['pratica']);
 			exit();
 		}
 	} 
@@ -79,15 +79,15 @@
                 <input name="numero" type="number" placeholder="Numero...">
                 <input type="submit" value="Cerca">
               </form>
-              <h3 class="centered">Risultati ricerca</h3>
-              <div class="box-risultati">
+            </div>
+          </div>
+          <h3 class="centered">Risultati ricerca</h3>
+          <div class="box-risultati">
               	<?php 
               	if(isset($pratiche))
               	    foreach ($pratiche as $pratica)
               	        echo "<p class=\"risultato-pratica\" onclick=\"selectPratica(this);\"><span style=\"display:none;\">$pratica[ID]</span>$pratica[TIPO]$pratica[Anno]/$pratica[Numero]</p>";
               	?>
-              </div>
-            </div>
           </div>
 	</div>
 	
@@ -172,8 +172,8 @@
         		</div>
         		
 			</div>
-			<textarea style="margin-top: 50px;" rows="5" cols="50" name="note" placeholder="Note..."></textarea>
 		</div>
+		<textarea id="note" style="margin-top: 50px; display: none;" rows="5" cols="50" name="note" placeholder="Note..."></textarea>
 		</form>
 		<button id="calcola" type="button" onclick="checkANDsubmit();">Calcola</button>
 		

@@ -80,27 +80,27 @@
                 exit();
                 
             case 'activatePagamenti':
-            	activatePagamenti($_POST['calcolo'], $c->db);
+            	activatePagamenti($_POST['calcolo'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
             case 'deactivatePagamenti':
-            	deactivatePagamenti($_POST['calcolo'], $c->db);
+            	deactivatePagamenti($_POST['calcolo'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
             case 'aggiungiPagamentoOU':
-            	aggiungiPagamentoOU($_POST['importo'], $_POST['data'], $_POST['calcolo'], $c->db);
+            	aggiungiPagamentoOU($_POST['importo'], $_POST['data'], $_POST['calcolo'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
             case 'aggiungiPagamentoCC':
-            	aggiungiPagamentoCC($_POST['importo'], $_POST['data'], $_POST['calcolo'], $c->db);
+            	aggiungiPagamentoCC($_POST['importo'], $_POST['data'], $_POST['calcolo'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
             case 'eliminaPagamentoOU':
-            	eliminaPagamentoOU($_POST['pagamento'], $c->db);
+            	eliminaPagamentoOU($_POST['pagamento'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
             case 'eliminaPagamentoCC':
-            	eliminaPagamentoCC($_POST['pagamento'], $c->db);
+            	eliminaPagamentoCC($_POST['pagamento'], $_POST['pe_o_tec'], $c->db);
             	exit();
             	
 
@@ -281,33 +281,33 @@
       echo ($res?$res[0]['n']:'');
     }
     
-    function activatePagamenti($calcolo, $db) {
-    	$db->dml('UPDATE tec_ou_cc SET Attivo = \'S\' WHERE ID = ?', [$calcolo]);
+    function activatePagamenti($calcolo, $pe_o_tec, $db) {
+    	$db->dml('UPDATE '.$pe_o_tec.'_ou_cc SET Attivo = \'S\' WHERE ID = ?', [$calcolo]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     
-    function deactivatePagamenti($calcolo, $db) {
-    	$db->dml('UPDATE tec_ou_cc SET Attivo = \'N\' WHERE ID = ?', [$calcolo]);
+    function deactivatePagamenti($calcolo, $pe_o_tec, $db) {
+    	$db->dml('UPDATE '.$pe_o_tec.'_ou_cc SET Attivo = \'N\' WHERE ID = ?', [$calcolo]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     
-    function aggiungiPagamentoOU($importo, $data, $calcolo, $db) {
-    	$db->dml('INSERT INTO tec_pagamenti_ou (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
+    function aggiungiPagamentoOU($importo, $data, $calcolo, $pe_o_tec, $db) {
+    	$db->dml('INSERT INTO '.$pe_o_tec.'_pagamenti_ou (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     
-    function aggiungiPagamentoCC($importo, $data, $calcolo, $db) {
-    	$db->dml('INSERT INTO tec_pagamenti_cc (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
+    function aggiungiPagamentoCC($importo, $data, $calcolo, $pe_o_tec, $db) {
+    	$db->dml('INSERT INTO '.$pe_o_tec.'_pagamenti_cc (Ou_cc, Importo, Data) VALUES (?, ?, ?)', [$calcolo, $importo, ($data)?$data:NULL]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     
-    function eliminaPagamentoOU($pagamento, $db) {
-    	$db->dml('DELETE FROM tec_pagamenti_ou WHERE ID = ?', [$pagamento]);
+    function eliminaPagamentoOU($pagamento, $pe_o_tec, $db) {
+    	$db->dml('DELETE FROM '.$pe_o_tec.'_pagamenti_ou WHERE ID = ?', [$pagamento]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     
-    function eliminaPagamentoCC($pagamento, $db) {
-    	$db->dml('DELETE FROM tec_pagamenti_cc WHERE ID = ?', [$pagamento]);
+    function eliminaPagamentoCC($pagamento, $pe_o_tec, $db) {
+    	$db->dml('DELETE FROM '.$pe_o_tec.'_pagamenti_cc WHERE ID = ?', [$pagamento]);
     	if($db->lastErrorInfo[0] != 0) echo $db->lastErrorInfo[2];
     }
     

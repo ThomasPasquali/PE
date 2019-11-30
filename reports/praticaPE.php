@@ -19,11 +19,10 @@
 
                 if($datiGenericiPratica !== NULL){
 
-                    $edifici = $c->db->ql(
-                        'SELECT e.ID, e.Mappali
-                        FROM pe_edifici_pratiche ep
-                        JOIN edifici_view e ON e.ID = ep.Edificio
-                        WHERE Pratica = ?',
+                    $fogliMappali = $c->db->ql(
+                        "SELECT Edificio, CONCAT('F.', Foglio, 'm.', Mappale) FoglioMappale
+                        FROM pe_fogli_mappali_pratiche
+                        WHERE Pratica = ?",
                         [$datiGenericiPratica['ID']]);
 
                     $intestatariPersone = $c->db->ql(
@@ -105,7 +104,16 @@
         
         <p><span>Intervento:</span> <?= $datiGenericiPratica['Intervento'] ?></p>
         
-        <p><span>Fogli-mappali: </span><?= $datiGenericiPratica['FogliMappali'] ?> </p>
+        <p><span>Fogli-mappali: </span>
+        <?php
+        $i = 0;
+        foreach ($fogliMappali as $foglioMappale){
+          $sep = $i > 0 ? ' - ' : '';
+          echo "$sep$foglioMappale[FoglioMappale]<a href=\"edificio.php?edificio=$foglioMappale[Edificio]\"> (Edficio $foglioMappale[Edificio])</a>";
+          $i++;
+        }
+        ?>
+        </p>
         
         <p><span>Subalterni:</span> <?= $datiGenericiPratica['Subalterni'] ?></p>
     </div>
