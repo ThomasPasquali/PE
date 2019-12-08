@@ -155,7 +155,7 @@ class DbTableFormGenerator {
     	//echo '<pre>'; print_r($map); echo '</pre>';
         foreach ($map as $table => $arr) {
         	echo '<div id="'.$arr['name'].'" class="manyTOmany">';
-            echo "<label>$arr[title]</label>";
+            echo "<label>$arr[title]</label><br>";
             echo '<div id="'.$arr['name'].'Sub">';
 
             $where = [];

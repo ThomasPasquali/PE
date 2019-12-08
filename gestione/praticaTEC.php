@@ -12,6 +12,16 @@ if(!$c->logged()){
 $id = $_REQUEST['id'];
 
 if($c->check(['update'], $_REQUEST)) {
+	//Gestione fogli-mappali
+	$c->db->dml('DELETE FROM tec_fogli_mappali_pratiche WHERE Pratica = ?', [$id]);
+	foreach ($_REQUEST as $key => $edFoMa)
+		if(substr($key, 0, 2) == 'fm') {
+			$edFoMa = explode('-', $edFoMa);
+			$c->db->dml('INSERT INTO tec_fogli_mappali_pratiche (Pratica, Edificio, Foglio, Mappale) VALUES (?,?,?,?)',
+					[$id, $edFoMa[0], $edFoMa[1], $edFoMa[2]]);
+			unset($_REQUEST[$key]);
+		}
+	//Modifica record tabella
     unset($_REQUEST['id']);
     unset($_REQUEST['update']);
     $res = DbTableFormGenerator::updateRecord($c->db, $table, $_REQUEST);
@@ -36,6 +46,7 @@ else $pratica = $res[0];
 ?>
 <html>
 <head>
+	<title>Modifica pratica TEC</title>
     <style type="text/css">
         input, select, textarea {
             display: block;
@@ -57,22 +68,40 @@ else $pratica = $res[0];
     <form method="post">
     	<input type="hidden" name="id" value="<?= $id ?>">
     	<?php
-    	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'IDold'], ['Barrato']);
+    	//Form pratica
+    	DbTableFormGenerator::generate($c, $table, $pratica, FALSE, ['ID', 'Documento_elettronico'], ['Barrato']);
 
-      /*$res = $c->db->ql('SELECT Edificio FROM pe_edifici_pratiche WHERE Pratica = ?', [$pratica['ID']]);
-      $edificiPratica = [];
-      foreach ($res as $value)
-        $edificiPratica[] = $value['Edificio'];
-      DbTableFormGenerator::generateManyToMany($c->db,
+    	//Form fogli-mappali
+      	$fogli_mappali_edifici_associati = $c->db->ql(
+      		'SELECT CONCAT(\'F.\', fm.Foglio, \' m.\', fm.Mappale) Description, CONCAT_WS(\'-\', e.Edificio, fm.Foglio, fm.Mappale) Value
+			FROM tec_edifici_pratiche e
+			JOIN fogli_mappali_edifici fm ON fm.Edificio = e.Edificio
+			WHERE e.Pratica = ?', [$pratica['ID']]);
+      	
+      	$fogli_mappali_pratica = $c->db->ql(
+      			'SELECT CONCAT_WS(\'-\', Edificio, Foglio, Mappale) Value
+			FROM tec_fogli_mappali_pratiche
+			WHERE Pratica = ?', [$pratica['ID']]);
+      	
+      	echo '<label>Fogli-mappali</label><br>';
+      	echo '<div id="fogli-mappali"></div>';
+      	echo '<script>
+				var fogliMappaliEdificiAssociati = '.json_encode($fogli_mappali_edifici_associati, TRUE).';';
+      	foreach ($fogli_mappali_pratica as $fm)
+      		echo 'addManyTOManyField($("#fogli-mappali"), fogliMappaliEdificiAssociati, "fm", "'.$fm['Value'].'");';
+      	echo '</script>';
+      	echo '<br><br><button type="button" onclick="addManyTOManyField($(\'#fogli-mappali\'), fogliMappaliEdificiAssociati, \'fm\');">Aggiungi foglio-mappale</button><br><br>';
+      /*
+       * TODO Buone intenzioni troppo ambiziose
+       * DbTableFormGenerator::generateManyToMany($c->db,
 	    [
         	'pe_fogli_mappali_pratiche' => [
 	      	    'title' => 'Fogli-mappali',
 	        	'name' => 'fm',
         	  	'optionsFilter' => ['Edificio' => $edificiPratica],
         		'initValuesFilter' => ['Pratica' => $pratica['ID']],
-        		'value' => ['Edificio', 'Pratica', 'Foglio', 'Mappale'],
-        		//TODO Da gestire tabella esterna
-        	   'description' => "CONCAT('F.',Foglio,'m.',Mappale)"
+        		'value' => ['Pratica', 'Edificio', 'Foglio', 'Mappale'],
+        	   'description' => "CONCAT('F.',Foglio,' m.',Mappale)"
         	]
     	]);*/
     	?>

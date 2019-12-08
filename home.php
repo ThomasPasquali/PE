@@ -209,16 +209,10 @@
                 </div>
             </div>
 
-			<div class="dropdown active">
-            	<button class="dropbtn">Modifiche<i class="fas fa-caret-down"></i></button>
-                <div class="dropdown-content">
-                	<a onclick="changeContent('modPra');">Pratica</a>
-                </div>
-            </div>
-
  			<div class="dropdown active">
  				<button class="dropbtn">Altro<i class="fas fa-caret-down"></i></button>
                 <div class="dropdown-content">
+                	<a onclick="changeContent('modPra');">Modifica pratiche</a>
                 	<a href="gestione/edifici.php">Gestione edifici</a>
                 	<a href="gestione/pagamentiOneriEcostiTec.php">Gestione pagamenti CC e OU Tec</a>
                 	<a href="gestione/pagamentiOneriEcostiPE.php">Gestione pagamenti CC e OU PE</a>
