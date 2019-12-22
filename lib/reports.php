@@ -8,7 +8,7 @@
          * @param string $cognome
          * @param string $cf
          */
-        public static function anagraficaIntestatari($db, $nome = '', $cognome = '', $cf = ''){
+        public static function anagraficaIntestatari($db, $nome = '', $cognome = '', $cf = '', $url = '', $paramName = '', $btnTxt = ''){
             $where = [];
             if(!empty($nome)) $where[] = 'Nome LIKE :n';
             if(!empty($cognome)) $where[] = 'Cognome LIKE :c';
@@ -47,8 +47,8 @@
     							?>
     						</p>
     						<p><span class="title">Sesso:</span> <?= $codiceFiscale->getSex() ?></p>
-    						<form action="reports/anagrafica.php" method="get">
-        						<button name="persona" class="formBtn" value="<?= $row['ID'] ?>">Visualizza/modifica</button>
+    						<form action="<?= $url ?>" method="get">
+        						<button name="<?= $paramName ?>" class="formBtn" value="<?= $row['ID'] ?>"><?= $btnTxt ?></button>
         					</form>
     					</div>
     				</div>
@@ -63,7 +63,7 @@
          * @param string $intestazione
          * @param string $piva
          */
-        public static function anagraficaSocieta($db, $intestazione = '', $piva = ''){
+        public static function anagraficaSocieta($db, $intestazione = '', $piva = '', $url = '', $paramName = '', $btnTxt = ''){
             $where = [];
             if(!empty($intestazione)) $where[] = 'Intestazione LIKE :i';
             if(!empty($piva)) $where[] = 'Partita_iva LIKE :piva';
@@ -89,8 +89,8 @@
         					<p><span class="title">Intestazione:</span> <?= $row['Intestazione'] ?></p>
     						<p><span class="title">Partita iva:</span> <?= $row['piva'] ?></p>
 
-    						<form action="reports/anagrafica.php" method="get">
-        						<button name="societa" class="formBtn" value="<?= $row['ID'] ?>">Visualizza/modifica</button>
+    						<form action="<?= $url ?>" method="get">
+        						<button name="<?= $paramName ?>" class="formBtn" value="<?= $row['ID'] ?>"><?= $btnTxt ?></button>
         					</form>
     					</div>
     				</div>

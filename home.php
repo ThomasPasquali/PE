@@ -163,7 +163,7 @@
 		<link rel="stylesheet" href="lib/mini-default.min.css">
 		<link rel="stylesheet" href="lib/fontawesome/css/all.css">
 		<link rel="stylesheet" type="text/css" href="css/home.css">
-    <link rel="stylesheet" type="text/css" href="css/form.css">
+    	<link rel="stylesheet" type="text/css" href="css/form.css">
 		<style type="text/css">
     	   .hintBox{
     	       background-color: #272727;
@@ -192,6 +192,7 @@
                 	<a onclick="changeContent('intAnag');">Anagrafiche</a>
                     <a onclick="changeContent('intPra');">Pratiche</a>
                     <a href="reports/pratiche.php">Pratiche da-a</a>
+                    <a onclick="changeContent('intPraticheInt');">Pratiche intestatario</a>
                 </div>
             </div>
 
@@ -318,6 +319,69 @@
             	</form>
         	</div>
         </div>
+        
+        <div id="intPraticheInt" class="content">
+        	<div class="form">
+        		<h1>Report pratiche intestatario</h1>
+
+            	<form action="" method="post">
+
+            		<div class="section">Tipologia</div>
+            		<script type="text/javascript">
+						function chgPratInt(el) {
+							directChgPratInt(el.value);
+						}
+						function directChgPratInt(val) {
+							switch (val) {
+							case 'persona':
+								hide('intestazione-int-prat'); hide('piva-int-prat'); show('nome-cognome-int-prat'); show('cf-int-prat');
+								break;
+
+							case 'societa':
+								hide('nome-cognome-int-prat'); show('piva-int-prat'); show('intestazione-int-prat'); hide('cf-int-prat');
+								break;
+								
+							default:
+								break;
+							}
+							var sel = document.getElementById('tipo');
+						  	var opts = sel.options;
+						  	for (var opt, j = 0; opt = opts[j]; j++)
+						    	if (opt.value == val) {
+    						      sel.selectedIndex = j;
+    						      break;
+    						    }
+						}
+            		</script>
+            		<input type="hidden" name="tipo" value="praticheIntestatario">
+            		<div class="inner-wrap">
+							<select id="tipo" name="tipologia" onchange="chgPratInt(this);">
+								<option value="persona" selected="selected">Intestatario persona</option>
+								<option value="societa">Intestatario societ&agrave;</option>
+                    		</select>
+            		</div>
+
+            		<div class="section">Dati personali</div>
+            		<div class="inner-wrap">
+            			<div id="nome-cognome-int-prat">
+            				<label>Nome<input type="text" name="nome" value="<?= $_POST['nome']??'' ?>"></label>
+                			<label>Cognome<input type="text" name="cognome" value="<?= $_POST['cognome']??'' ?>"></label>
+            			</div>
+            			<div id="intestazione-int-prat" style="display: none;">
+            				<label>Intestazione<input type="text" name="intestazione" value="<?= $_POST['intestazione']??'' ?>"></label>
+            			</div>
+            			<div id="cf-int-prat">
+            				<label>Codice fiscale<input type="text" name="cf" value="<?= $_POST['cf']??'' ?>"></label>
+            			</div>
+                		<div id="piva-int-prat" style="display: none;">
+            				<label>Partita iva<input type="text" name="piva" value="<?= $_POST['piva']??'' ?>"></label>
+            			</div>
+            		</div>
+
+            		<button type="submit" name="btn" value="report">Cerca</button>
+            	</form>
+        	</div>
+        </div>
 
         <div id="intPra" class="content">
         	<div class="form">
@@ -398,7 +462,7 @@
         				<label>Numero ordine<input type="number" name="numero_ordine" value="<?= $_POST['numero_ordine']??'' ?>"></label>
         				<label>Provincia albo (sigla)<input type="text" name="provincia_albo" pattern="|[A-Z]{2}" value="<?= $_POST['provincia_albo']??'' ?>"></label>
             			<label>Indirizzo<input type="text" name="indirizzo" value="<?= $_POST['indirizzo']??'' ?>"></label>
-            			<label>Città<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
+            			<label>Citt&agrave;<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
             			<label>Provincia (sigla)<input type="text" name="provincia" pattern="|[A-Z]{2}" value="<?= $_POST['provincia']??'' ?>"></label>
             			<label>Note<textarea rows="3" name="note"><?= $_POST['note']??'' ?></textarea></label>
             		</div>
@@ -409,7 +473,7 @@
 
          <div id="insAnagSocieta" class="content">
         	<div class="form">
-        		<h1>Inserimento Società</h1>
+        		<h1>Inserimento Societ&agrave;</h1>
 
             	<form action="" method="post">
             		<input type="hidden" name="tipo" value="societa">
@@ -418,7 +482,7 @@
             			<label>Intestazione<input type="text" name="intestazione" required="required" value="<?= $_POST['intestazione']??'' ?>"></label>
             		    <label>Partita iva<input type="text" name="piva" required="required" pattern="\d{11}" value="<?= $_POST['piva']??'' ?>"></label>
             			<label>Indirizzo<input type="text" name="indirizzo" value="<?= $_POST['indirizzo']??'' ?>"></label>
-            			<label>Città<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
+            			<label>Citt&agrave;<input type="text" name="citta" value="<?= $_POST['citta']??'' ?>"></label>
             			<label>Provincia (sigla)<input type="text" name="provincia" pattern="|[A-Z]{2}" value="<?= $_POST['provincia']??'' ?>"></label>
             		</div>
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
@@ -510,11 +574,11 @@
             include_once 'lib/reports.php';
             switch ($_POST['tipo']) {
                 case 'persona':
-                    Reports::anagraficaIntestatari($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf']);
+                    Reports::anagraficaIntestatari($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf'], 'reports/anagrafica.php', 'persona','Visualizza/modifica');
                    break;
 
                 case 'societa':
-                    Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva']);
+                    Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva'], 'reports/anagrafica.php', 'societa', 'Visualizza/modifica');
                     break;
 
                 case 'tecnico':
@@ -539,6 +603,13 @@
                         break;
                     }
                     break;
+                    
+                case 'praticheIntestatario':
+                    if($_POST['tipologia'] == 'persona')
+                        Reports::anagraficaIntestatari($GLOBALS['c']->db, $_POST['nome'], $_POST['cognome'], $_POST['cf'], 'reports/praticheIntestatario.php', 'p_id', 'Visualizza pratiche');
+                    else if($_POST['tipologia'] == 'societa')
+                        Reports::anagraficaSocieta($GLOBALS['c']->db, $_POST['intestazione'], $_POST['piva'], 'reports/praticheIntestatario.php', 's_id', 'Visualizza pratiche');
+                   break;
 
                 default:
                     echo '<h1 style="color: red;">Report non supportato!<h1>';
@@ -546,6 +617,8 @@
             }
             if($_POST['tipo'] == 'pratica')
               echo "<script>changeContent('intPra');</script>";
+            else if($_POST['tipo'] == 'praticheIntestatario')
+                echo "<script>directChgPratInt('$_POST[tipologia]'); changeContent('intPraticheInt');</script>";
             else
               echo "<script>directChg('$_POST[tipo]'); changeContent('intAnag');</script>";
         }
