@@ -218,11 +218,11 @@
     function searchEdificio($foglio, $mappale, $db) {
         $params = [];
         if($foglio) $params[] = $foglio;
-        if($mappale) $params[] = $mappale;
+        if($mappale) $params[] = $mappale.'%';
 
         $where = [];
         if($foglio) $where[] = 'Foglio = ?';
-        if($mappale) $where[] = 'Mappale = ?';
+        if($mappale) $where[] = 'Mappale LIKE ?';
         
         $res = $db->ql(
             'SELECT ID, Mappali, Stradario, Note
