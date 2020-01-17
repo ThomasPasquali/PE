@@ -269,7 +269,7 @@
 		           	$days[$date]['totSeconds'] += $diff;
 	                
 	                $days[$date]['totSecondsDiurniFeriali'] += $secondsDiurniFeriali;
-	                $days[$date]['totSecondsNotturniFeriali'] += $secondsDiurniFestivi;
+	                $days[$date]['totSecondsNotturniFeriali'] += $secondsNotturniFeriali;
 	                $days[$date]['totSecondsDiurniFestivi'] += $secondsDiurniFestivi;
 	                $days[$date]['totSecondsNotturniFestivi'] += $secondsNotturniFestivi;
 	                
@@ -516,7 +516,7 @@
         </form>
 
     <?php }else { ?>
-
+		
         <h3>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_REQUEST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_REQUEST['a']),"d/m/Y"); ?></h3>
         <?php 
         $url = '?export=csv';
