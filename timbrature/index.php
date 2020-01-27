@@ -20,6 +20,12 @@
 		<script type="text/javascript" src="../lib/tabulator/dist/js/tabulator.min.js"></script>
 		<link href="../lib/tabulator/dist/css/tabulator_midnight.min.css" rel="stylesheet">
 		
+		<style type="text/css">
+			h3 {
+				margin-bottom: 0;
+				margin-top: 0.5em;
+			}
+		</style>
 		<script type="text/javascript">
 			$(document).ready(function() {
 			    $.getScript("table.js");
@@ -28,25 +34,28 @@
 		<title>Timbrature</title>
 	</head>
 	<body>
-		<form id="form">
-            <select name="user">
-                <?php
-                $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
-                foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
-                ?>
-            </select>
-            <label>Da: </label>
-            <input type="date" name="da" value="<?= $_GET['da'] ?>">
-            <label>A: </label>
-            <input type="date" name="a" value="<?= $_GET['a'] ?>">
-            <button type="button" onclick="refreshData();">Aggiorna tabella</button>
-        </form>
-		
-		<div>
+		<div id="menu">
+			<form id="form">
+	            <select name="user">
+	                <?php
+	                $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
+	                foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
+	                ?>
+	            </select>
+	            <label>Da: </label>
+	            <input type="date" name="da" value="<?= $_GET['da'] ?>">
+	            <label>A: </label>
+	            <input type="date" name="a" value="<?= $_GET['a'] ?>">
+	            <button type="button" onclick="refreshData();">Aggiorna tabella</button>
+	        </form>
 			<button id="download-csv" type="button">Download CSV</button>
-			<button id="print" type="button">Stampa</button>
 		</div>
 		
+		<h3>Statistiche timbrature</h3>
         <div id="table"></div>
+        
+        <h3>Statistiche assenze</h3>
+        <div id="table-stats-ore"></div>
+        <div id="table-stats-conteggi"></div>
 	</body>
 </html>

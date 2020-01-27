@@ -131,13 +131,6 @@
 								
 		//Variabili globali
 		$days = [];
-		$tot = (int)0;
-		$totAssenze = (int)0;
-		$totTeorico = (int)0;
-		$totSecondsDiurniFestivi = (int)0;
-		$totSecondsNotturniFestivi = (int)0;
-		$totSecondsDiurniFeriali = (int)0;
-		$totSecondsNotturniFeriali = (int)0;
 		$giorniSettimana = array('Lun','Mar','Mer','Gio','Ven','Sab','Dom');
 		$giorniLavorati = (int)0;
 		$assenzeParzialiStats = [];
@@ -159,8 +152,6 @@
 					'totSecondsDiurniFestivi' => (int)0,
 					'totSecondsNotturniFestivi' => (int)0,
 					'totSecondsSDiurniFeriali' => (int)0];
-			
-			if(!isFestivo($da_cpy)) $totTeorico += $orariSettimanali[dayOfWeek($da_cpy)]*60;
 			
 			$da_cpy->modify('+1 day');
 		}
@@ -191,7 +182,7 @@
 				$days[$date]['workcodes'][] = ['in' => $in, 'out' => $out, 'diff' => $diff, 'workcode' => $results[$i]['logCode']];
 				if(!isset($assenzeParzialiStats[$workcodes[$results[$i]['logCode']]]))
 					$assenzeParzialiStats[$workcodes[$results[$i]['logCode']]] = (int)0;
-					$assenzeParzialiStats[$workcodes[$results[$i]['logCode']]] += $diff;
+				$assenzeParzialiStats[$workcodes[$results[$i]['logCode']]] += $diff;
 					
 			}else {
 				//Tutto il resto
@@ -250,10 +241,6 @@
 						}
 					}
 				}
-				$totSecondsDiurniFestivi += $secondsDiurniFestivi;
-				$totSecondsNotturniFestivi += $secondsNotturniFestivi;
-				$totSecondsDiurniFeriali += $secondsDiurniFeriali;
-				$totSecondsNotturniFeriali += $secondsNotturniFeriali;
 				
 				//Inserimento giornata
 				$days[$date]['timbrature'][] = ['in' => $in, 'out' => $out];
@@ -264,9 +251,6 @@
 				$days[$date]['totSecondsNotturniFeriali'] += $secondsNotturniFeriali;
 				$days[$date]['totSecondsDiurniFestivi'] += $secondsDiurniFestivi;
 				$days[$date]['totSecondsNotturniFestivi'] += $secondsNotturniFestivi;
-				
-				//Stats globali
-				$tot += $diff;
 			}
 		}
 								
@@ -276,7 +260,6 @@
 			$secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
 			$days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
 			$days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
-			$totAssenze += $secondiTeorici;
 		}
 		
 		//Conteggio giorni lavoorati
@@ -285,13 +268,11 @@
 				$giorniLavorati++;
 				
 		//Saldo straordinari diurni feriali
-		$totSecondsSDiurniFeriali = (int)0;
 		foreach (array_keys($days) as $date)
 			if(count($days[$date]['timbrature']) > 0) {
 				$day = date_create_from_format ('d/m/Y', $date);
 				$teorico = (isFestivo($day)?0:($orariSettimanali[dayOfWeek($day)]*60));
 				$secondsSDiurniFeriali = $days[$date]['totSecondsDiurniFeriali'] - $teorico;
-				$totSecondsSDiurniFeriali += $secondsSDiurniFeriali;
 				$days[$date]['totSecondsSDiurniFeriali']  = $secondsSDiurniFeriali;
 			}
 	
@@ -364,20 +345,20 @@
 				'giust_ass' => $giustificazioni
 		];
 	}
+	
+	$statsOre = [];
+	foreach ($assenzeParzialiStats as $key => $val)
+		$statsOre[] = ['tipo' => $key, 'durata' => secondsToHMS($val)];
+	
+	$statsConteggi = [];
+	foreach ($assenzeIntereStats as $key => $val)
+		$statsConteggi[] = ['tipo' => $key, 'ricorrenze' => $val];
 		
 	header('Content-type: application/json');
 	$data = [
 			'datiTabella' => $datiTabella,
-			'totali' => [
-					'lavorate' => $tot,
-					'assenza' => $totAssenze,
-					'orario' => $totTeorico,
-					's_diu_fer' => $totSecondsDiurniFeriali,
-					's_not_fer' => $totSecondsNotturniFeriali,
-					's_diu_fes' => $totSecondsDiurniFestivi,
-					's_not_fes' => $totSecondsNotturniFestivi,
-					'giorni_lavorati' => $giorniLavorati
-			],
+			'statsOre' => $statsOre,
+			'statsConteggi' => $statsConteggi,
 			'misc' => [
 					'title' => "Piano di lavoro di $user[Username] dal ".date_format(date_create($_REQUEST['da']),"d/m/Y")." al ".date_format(date_create($_REQUEST['a']),"d/m/Y")
 			]

@@ -34,7 +34,6 @@ function HMToSeconds(segno, h, m) {
 var cmpData = function(a, b, aRow, bRow, column, dir, sorterParams) {
 	let mA = a.match(/^(.*)\(.*$/);
 	let mB = b.match(/^(.*)\(.*$/);
-	console.log(getDate(mA[1]));
 	return getDate(mA[1]) - getDate(mB[1]); 
 }
 
@@ -59,6 +58,8 @@ function refreshData() {
 		 console.log(result);
 		 downloadName = result.misc.title;
 		 table.setData(result.datiTabella);
+		 tableStatsOre.setData(result.statsOre);
+		 tableStatsConteggi.setData(result.statsConteggi);
 	});
 }
 
@@ -75,42 +76,110 @@ function getFormAsJSON($form){
 
 /***************TABLE INIT*****************/
 var downloadName = "Report timbrature";
-var widthOrari = "5%";
+var widthOrari = "60";//"7%";
 var alignment = "center";
 
 var table = new Tabulator("#table", {
-	layout:"fitData",
+	layout:"fitColumns",
+    printAsHtml:true,
+    printVisibleRows:true,
+    printHeader:downloadName,
+    movableColumns:true,
+    columnHeaderVertAlign:"bottom",
+    columns:[
+        {title:"Data", field:"data", tooltip:"Data", align:alignment, topCalc:"count", bottomCalc:"count", sorter:cmpData},
+        {title:"Timbrature", field:"timbrature", tooltip:"Timbrature", align:alignment, bottomCalc:sumNotEmpty, topCalc:sumNotEmpty},
+        {title:"Lavorate", field:"lavorate", tooltip:"Ore e minuti lavorati", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"Diurne feriali", field:"diu_fer", tooltip:"Ore e minuti lavorati Diurni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"S. diurni feriali", field:"s_diu_fer", tooltip:"Straordinari ore e minuti lavorati Diurni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"S. notturni feriali", field:"s_not_fer", tooltip:"Straordinari ore e minuti lavorati Notturni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"S. diurni festivi", field:"s_diu_fes", tooltip:"Straordinari ore e minuti lavorati Diurni Festivi", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"S. notturni festivi", field:"s_not_fes", tooltip:"Straordinari ore e minuti lavorati Notturni Festivi", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"Saldo", field:"saldo", tooltip:"Saldo ore e minuti", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"Da orario", field:"orario", tooltip:"Ore e minuti da orario", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"Assenza giustificata", field:"assenza", tooltip:"Ore e minuti assenza giustificata", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
+        {title:"Giustificazione assenza", field:"giust_ass", tooltip:"Giustificazione assenza", align:alignment, bottomCalc:sumNotEmpty, topCalc:sumNotEmpty}
+    ],
+});
+
+var tableStatsOre = new Tabulator("#table-stats-ore", {
+	layout:"fitColumns",
     printAsHtml:true,
     printVisibleRows:true,
     printHeader:downloadName,
     movableColumns:true,
     columns:[
-        {title:"Data", field:"data", tooltip:"Data", align:alignment, topCalc:"count", bottomCalc:"count", sorter:cmpData},
-        {title:"Timbrature", field:"timbrature", tooltip:"Timbrature", align:alignment, bottomCalc:sumNotEmpty, topCalc:sumNotEmpty},
-        {
-			title:"Orari",
-			columns:[
-		        {title:"Lavorate", field:"lavorate", tooltip:"Ore e minuti lavorati", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"Diurne feriali", field:"diu_fer", tooltip:"Ore e minuti lavorati Diurni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"S. diurni feriali", field:"s_diu_fer", tooltip:"Straordinari ore e minuti lavorati Diurni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"S. notturni feriali", field:"s_not_fer", tooltip:"Straordinari ore e minuti lavorati Notturni Feriali", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"S. diurni festivi", field:"s_diu_fes", tooltip:"Straordinari ore e minuti lavorati Diurni Festivi", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"S. notturni festivi", field:"s_not_fes", tooltip:"Straordinari ore e minuti lavorati Notturni Festivi", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"Saldo", field:"saldo", tooltip:"Saldo ore e minuti", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"Da orario", field:"orario", tooltip:"Ore e minuti da orario", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari},
-		        {title:"Assenza giustificata", field:"assenza", tooltip:"Ore e minuti assenza giustificata", width:widthOrari, align:alignment, bottomCalc:sumOrari, topCalc:sumOrari, sorter:cmpOrari}
-		   ]
-        },
-        {title:"Giustificazione assenza", field:"giust_ass", tooltip:"Giustificazione assenza", align:alignment, bottomCalc:sumNotEmpty, topCalc:sumNotEmpty}
+        {title:"Tipo assenza", field:"tipo", tooltip:"Tipo assenza", align:alignment, sorter:"string"},
+        {title:"Durata totale", field:"durata", tooltip:"Durata totale", align:alignment, sorter:cmpOrari}
+    ],
+});
+
+var tableStatsConteggi = new Tabulator("#table-stats-conteggi", {
+	layout:"fitColumns",
+    printAsHtml:true,
+    printVisibleRows:true,
+    printHeader:downloadName,
+    movableColumns:true,
+    columns:[
+        {title:"Tipo assenza", field:"tipo", tooltip:"Tipo assenza", align:alignment, sorter:"string"},
+        {title:"Ricorrenze", field:"ricorrenze", tooltip:"Ricorrenze", align:alignment, sorter:"number"}
     ],
 });
 
 /***************BUTTONS HANDLERS*****************/
 //trigger download of data.csv file
 $("#download-csv").click(function(){
-    table.download("csv", downloadName+".csv", {delimiter:";"});
+    //table.download("csv", downloadName+".csv", {delimiter:";"});
+	Download.save(
+			"Statistiche timbrature"+JSONtoCSV(table.getData("active"))+"\r\n\r\n"+
+			"Statistiche assenze\r\n"+JSONtoCSV(tableStatsConteggi.getData("active"))+"\r\n\r\n"+
+			JSONtoCSV(tableStatsOre.getData("active")), 
+			downloadName+".csv");
 });
 
-$("#print").on("click", function(){
-   table.print(false, true);
-});
+window.onbeforeprint = function(){
+	$("#menu").css("display", "none");
+	//for (let column of table.getColumns())
+		//column.updateDefinition({headerVertical:"flip"});
+}
+
+window.onafterprint = function(){
+	$("#menu").css("display", "block");
+	//for (let column of table.getColumns())
+		//column.updateDefinition({headerVertical:false});
+}
+
+function JSONtoCSV(json) {
+	if(json.length <= 0) return "";
+		
+	var fields = Object.keys(json[0]);
+	var replacer = function(key, value) { return value === null ? '' : value } ;
+	var csv = json.map(function(row){
+	  return fields.map(function(fieldName){
+	    return JSON.stringify(row[fieldName], replacer)
+	  }).join(';')
+	});
+	csv.unshift(fields.join(';')); // add header column
+	csv = csv.join('\r\n');
+	return csv;
+}
+
+var Download = {
+    click : function(node) {
+        var ev = document.createEvent("MouseEvents");
+        ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        return node.dispatchEvent(ev);
+    },
+    encode : function(data) {
+            return 'data:application/octet-stream;base64,' + btoa( data );
+    },
+    link : function(data, name){
+        var a = document.createElement('a');
+        a.download = name || self.location.pathname.slice(self.location.pathname.lastIndexOf('/')+1);
+        a.href = data || self.location.href;
+        return a;
+    }
+};
+Download.save = function(data, name) {
+    this.click(this.link(this.encode( data ), name));
+};
