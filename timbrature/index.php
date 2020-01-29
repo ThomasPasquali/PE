@@ -107,10 +107,10 @@
 
             //Timbrature
             $results = $db->ql(
-                'SELECT d.devName, r.*
+                'SELECT e.logNote AS note, r.*
                 FROM ts_records r
                 JOIN ts_users u ON u.idUser = r.idUser
-                LEFT JOIN ts_devices d ON d.devNum = r.deviceNum 
+				LEFT JOIN ts_records_extra e ON r.idLog = e.idLog
                 WHERE   u.Username LIKE :u
                     AND DATE(r.logTime) BETWEEN :da AND :a
 					AND r.valid = 1
@@ -211,7 +211,14 @@
                 //Assenza giustificata parziale
                 if(!in_array($results[$i]['logCode'], WORKCODES_BL) && $results[$i]['logCode'] == $results[($i+1)]['logCode']) {
                 	
-                	$days[$date]['workcodes'][] = ['in' => $in, 'out' => $out, 'diff' => $diff, 'workcode' => $results[$i]['logCode']];
+                	$days[$date]['workcodes'][] = [
+                			'in' => $in,
+                			'out' => $out,
+                			'diff' => $diff,
+                			'workcode' => $results[$i]['logCode'],
+                			'note_in' => $results[$i]['note'],
+                			'note_out' => $results[$i+1]['note']
+                	];
                 	if(!isset($assenzeParzialiStats[$workcodes[$results[$i]['logCode']]])) 
                 		$assenzeParzialiStats[$workcodes[$results[$i]['logCode']]] = (int)0;
                 	$assenzeParzialiStats[$workcodes[$results[$i]['logCode']]] += $diff;
@@ -279,7 +286,7 @@
 	                $totSecondsNotturniFeriali += $secondsNotturniFeriali;
 	                
 	                //Inserimento giornata
-	                $days[$date]['timbrature'][] = ['in' => $in, 'out' => $out];
+	                $days[$date]['timbrature'][] = ['in' => $in, 'out' => $out, 'note_in' => $results[$i]['note'], 'note_out' => $results[$i+1]['note']];
 	                
 		           	$days[$date]['totSeconds'] += $diff;
 	                
@@ -587,8 +594,14 @@
 				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
                 
                 <td>
-            		<?php foreach ($day['timbrature'] as $timbratura)
-		             	echo '<p>'.date_format($timbratura['in'],"H:i").' - '.date_format($timbratura['out'],"H:i").'</p>'; ?>
+            		<?php 
+            		foreach ($day['timbrature'] as $timbratura)
+            			echo '<p>'.
+              				date_format($timbratura['in'],"H:i").($timbratura['note_in'] ? " ($timbratura[note_in])<br>" : '').
+              				' - '.
+            				date_format($timbratura['out'],"H:i").($timbratura['note_out'] ? " ($timbratura[note_out])<br>": '').
+            				'</p>';
+            		?>
                 </td>
 
                 <td title="Ore e minuti lavorati"><?= secondsToHMS($day['totSeconds']) ?></td>
