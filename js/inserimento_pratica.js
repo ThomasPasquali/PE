@@ -64,7 +64,7 @@ function ricercaEdificio(form){
     type: "POST",
     data: data,
     error: function(jqXHR, textStatus) {
-            alert('Errore: '+textStatus);
+            console.log('Errore: '+textStatus);
 						console.log(jqXHR);
            },
    success: function(msg) {
