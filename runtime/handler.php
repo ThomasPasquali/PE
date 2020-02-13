@@ -153,7 +153,7 @@
     }
 
     function sendIntestatarioPersonaHints($search, $db) {
-        $res = $db->ql('SELECT ID, CONCAT_WS(\' \', Cognome, Nome, \' (\', Codice_fiscale, \')\') Description
+        $res = $db->ql('SELECT ID, CONCAT(Cognome, \' \', Nome, \' (\', Codice_fiscale, \')\') Description
                                 FROM intestatari_persone
                                 WHERE CONCAT(Cognome, \' \', Nome) LIKE ?
                                 ORDER BY Cognome, Nome

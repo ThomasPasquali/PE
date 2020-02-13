@@ -21,19 +21,20 @@ function updateHints(type, field, hintBoxID, targetFieldID) {
 	         request.error(textStatus);
       });
 
-      request.done(function(hints) {
-			//console.log(hints);
-			if(hints){
-				hints = JSON.parse(hints);
-	      	$(hintBoxID).empty();
-	      	$(hintBoxID).css("display", "block");
-	      	for (let el of hints) {
-	        	let a = document.createElement('a');
-	        	a.innerHTML = el.Description;
-	        	a.setAttribute('onclick', 'setValue("'+targetFieldID+'", "'+el.ID+'"); setValue("#'+field.id+'", "'+a.innerHTML+'"); $("'+hintBoxID+'").css("display", "none");');
-	        	$(hintBoxID).append(a);
-				}
-			}});
+    request.done(function(hints) {
+		if(hints){
+			hints = JSON.parse(hints);
+			$(hintBoxID).empty();
+			if(hints.length > 0)
+				$(hintBoxID).css("display", "block");
+			for (let el of hints) {
+				let a = document.createElement('a');
+				a.innerHTML = el.Description;
+				a.setAttribute('onclick', 'setValue("'+targetFieldID+'", "'+el.ID+'"); setValue("#'+field.id+'", "'+a.innerHTML+'"); $("'+hintBoxID+'").css("display", "none");');
+				$(hintBoxID).append(a);
+			}
+		}
+	});
 }
 
 function getHints(table, column, searchFieldID, hintBoxID, targetFieldID) {

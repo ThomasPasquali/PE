@@ -21,6 +21,20 @@ if($c->check(['update'], $_REQUEST)) {
 					[$id, $edFoMa[0], $edFoMa[1], $edFoMa[2]]);
 			unset($_REQUEST[$key]);
 		}
+	//Gestione intestatari persone TODO sul tec
+	$c->db->dml('DELETE FROM tec_intestatari_persone_pratiche WHERE Pratica = ?', [$id]);
+	foreach ($_REQUEST as $key => $persona)
+		if(substr($key, 0, strlen('intestatario_persona')) == 'intestatario_persona') {
+			$c->db->dml('INSERT INTO tec_intestatari_persone_pratiche (Pratica, Persona) VALUES (?,?)', [$id, $persona]);
+			unset($_REQUEST[$key]);
+		}
+	//Gestione intestatari societa TODO
+	$c->db->dml('DELETE FROM tec_intestatari_societa_pratiche WHERE Pratica = ?', [$id]);
+	foreach ($_REQUEST as $key => $societa)
+		if(substr($key, 0, strlen('intestatario_societa')) == 'intestatario_societa') {
+			$c->db->dml('INSERT INTO tec_intestatari_societa_pratiche (Pratica, Societa) VALUES (?,?)', [$id, $societa]);
+			unset($_REQUEST[$key]);
+		}
 	//Modifica record tabella
     unset($_REQUEST['id']);
     unset($_REQUEST['update']);
@@ -51,12 +65,13 @@ else $pratica = $res[0];
         input, select, textarea {
             display: block;
         }
-        .hintDiv *{
+        .hintBox *{
             display: block;
         }
     </style>
-    <script src="../lib/jquery-3.3.1.min.js"></script>
-    <script src="../js/gestione_pratiche.js"></script>
+	<script src="../lib/jquery-3.3.1.min.js"></script>
+	<script defer type="text/javascript" src="../js/hints.js"></script>
+	<script type="text/javascript" src="../js/gestione_pratiche.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/utils_bar.css">
 </head>
 <body>
@@ -82,31 +97,48 @@ else $pratica = $res[0];
       			'SELECT CONCAT_WS(\'-\', Edificio, Foglio, Mappale) Value
 			FROM tec_fogli_mappali_pratiche
 			WHERE Pratica = ?', [$pratica['ID']]);
-      	
-      	echo '<label>Fogli-mappali</label><br>';
-      	echo '<div id="fogli-mappali"></div>';
-      	echo '<script>
-				var fogliMappaliEdificiAssociati = '.json_encode($fogli_mappali_edifici_associati, TRUE).';';
-      	foreach ($fogli_mappali_pratica as $fm)
-      		echo 'addManyTOManyField($("#fogli-mappali"), fogliMappaliEdificiAssociati, "fm", "'.$fm['Value'].'");';
-      	echo '</script>';
-      	echo '<br><br><button type="button" onclick="addManyTOManyField($(\'#fogli-mappali\'), fogliMappaliEdificiAssociati, \'fm\');">Aggiungi foglio-mappale</button><br><br>';
-      /*
-       * TODO Buone intenzioni troppo ambiziose
-       * DbTableFormGenerator::generateManyToMany($c->db,
-	    [
-        	'pe_fogli_mappali_pratiche' => [
-	      	    'title' => 'Fogli-mappali',
-	        	'name' => 'fm',
-        	  	'optionsFilter' => ['Edificio' => $edificiPratica],
-        		'initValuesFilter' => ['Pratica' => $pratica['ID']],
-        		'value' => ['Pratica', 'Edificio', 'Foglio', 'Mappale'],
-        	   'description' => "CONCAT('F.',Foglio,' m.',Mappale)"
-        	]
-    	]);*/
-    	?>
+
+		$intestatari_persone = $c->db->ql(
+			"SELECT ip.ID, CONCAT(ip.Cognome, ' ', ip.Nome, '(', ip.Codice_fiscale, ')') descr
+			FROM tec_intestatari_persone_pratiche ipp
+			JOIN intestatari_persone ip ON ip.ID = ipp.Persona
+			WHERE Pratica = ?", [$pratica['ID']]);
+
+		$intestatari_societa = $c->db->ql(
+			"SELECT i.ID, CONCAT(i.Intestazione, ' (', i.Partita_iva, ')') descr
+			FROM tec_intestatari_societa_pratiche isp
+			JOIN intestatari_societa i ON i.ID = isp.Societa
+			WHERE Pratica = ?", [$pratica['ID']]);
+		?>
+
+		<label>Intestatari persone</label><br>
+		<div id="intestatari-persone">
+			<button class="add" type="button">+</button>
+		</div>
+
+		<label>Intestatari societ&agrave;</label><br>
+      	<div id="intestatari-societa">
+			<button class="add" type="button">+</button>
+		</div>	
+
+		<label>Fogli-mappali</label><br>
+		  <div id="fogli-mappali"></div>
+		  
+		<script>
+			var fogliMappaliEdificiAssociati = <?= json_encode($fogli_mappali_edifici_associati, TRUE) ?>;
+			<?php 
+			foreach ($fogli_mappali_pratica as $fm)
+				echo "addManyTOManyField($('#fogli-mappali'), fogliMappaliEdificiAssociati, 'fm', '$fm[Value]'); ";
+			foreach($intestatari_persone as $ip) 
+				echo "addFieldIntestatarioPersona($ip[ID],'".str_replace("'","\'",$ip['descr'])."'); ";
+			foreach($intestatari_societa as $is) 
+				echo "addFieldIntestatarioSocieta($is[ID],'".str_replace("'","\'",$is['descr'])."'); ";
+			?>
+		</script>
+
+		<br><br><button type="button" onclick="addManyTOManyField($(\'#fogli-mappali\'), fogliMappaliEdificiAssociati, \'fm\');">Aggiungi foglio-mappale</button><br><br>
+
     	<input type="submit" name="update">
     </form>
-	<script type="text/javascript" src="../js/hints.js"></script>
 </body>
 </html>
