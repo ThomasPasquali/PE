@@ -1,4 +1,6 @@
 <?php
+    if(session_status() != PHP_SESSION_ACTIVE) session_start();
+
     define("INI_DIR", __DIR__."/../PE_ini/");
 
     class Controls{
@@ -11,8 +13,6 @@
         public $doc_el_root_path;
 
         public function __construct() {
-            if(session_status() != PHP_SESSION_ACTIVE) session_start();
-
             $peINI = parse_ini_file(INI_DIR.'PE.ini');
             $this->doc_el_root_path = $peINI['DOC_EL_ROOT'];
 
