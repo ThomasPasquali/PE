@@ -64,51 +64,52 @@ function ricercaEdificio(form){
     type: "POST",
     data: data,
     error: function(jqXHR, textStatus) {
-            console.log('Errore: '+textStatus);
-						console.log(jqXHR);
-           },
+		console.log('Errore: '+textStatus);
+		console.log(jqXHR);
+	},
    success: function(msg) {
-			$('#risultati-ricerca-edificio').empty();
-			for (let ed of msg) {
-				//controllo presenza in edifici selezionati
-				var giaPresente = false
-				$('.edificio-selezionato .id-edificio-selezionato').each(function() {
-					if($(this).html() == ed['ID'])
-						giaPresente = true;
-				});
-				if(!giaPresente){
-					let div = $('<div></div>');
-					div.addClass('risultato-ricerca-edificio');
-					for(let attr in ed){
-						let row = $('<div></div>');
-						let p = $('<p></p>');
-						p.text(ed[attr]);
-						let strong = $('<strong></strong>');
-						strong.text(attr + ':');
-						row.append(strong);
-						row.append(p);
-						div.append(row);
-					}
-
-					let idDiv = $('<div></div>');
-					idDiv.css('display', 'none');
-					idDiv.html(ed['ID'])
-					idDiv.addClass('id-edificio-selezionato');
-					div.append(idDiv);
-
-					div.click(function(){
-						if($(this).attr('class') == 'risultato-ricerca-edificio'){
-							$('#edifici-selezionati').append(div);
-							$(this).attr('class', 'edificio-selezionato')
-						}else{
-							$('#risultati-ricerca-edificio').append(div);
-							$(this).attr('class', 'risultato-ricerca-edificio')
-						}
-					});
-
-					$('#risultati-ricerca-edificio').append(div);
+	   //console.log(msg);
+		$('#risultati-ricerca-edificio').empty();
+		for (let ed of msg) {
+			//controllo presenza in edifici selezionati
+			var giaPresente = false
+			$('.edificio-selezionato .id-edificio-selezionato').each(function() {
+				if($(this).html() == ed['ID'])
+					giaPresente = true;
+			});
+			if(!giaPresente){
+				let div = $('<div></div>');
+				div.addClass('risultato-ricerca-edificio');
+				for(let attr in ed){
+					let row = $('<div></div>');
+					let p = $('<p></p>');
+					p.text(ed[attr]);
+					let strong = $('<strong></strong>');
+					strong.text(attr + ':');
+					row.append(strong);
+					row.append(p);
+					div.append(row);
 				}
+
+				let idDiv = $('<div></div>');
+				idDiv.css('display', 'none');
+				idDiv.html(ed['ID'])
+				idDiv.addClass('id-edificio-selezionato');
+				div.append(idDiv);
+
+				div.click(function(){
+					if($(this).attr('class') == 'risultato-ricerca-edificio'){
+						$('#edifici-selezionati').append(div);
+						$(this).attr('class', 'edificio-selezionato')
+					}else{
+						$('#risultati-ricerca-edificio').append(div);
+						$(this).attr('class', 'risultato-ricerca-edificio')
+					}
+				});
+
+				$('#risultati-ricerca-edificio').append(div);
 			}
+		}
     }
   });
 }

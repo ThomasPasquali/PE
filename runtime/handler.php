@@ -218,24 +218,30 @@
     function searchEdificio($foglio, $mappale, $db) {
         $params = [];
         if($foglio) $params[] = $foglio;
-        if($mappale) $params[] = $mappale.'%';
+        if($mappale) $params[] = $mappale;
 
         $where = [];
         if($foglio) $where[] = 'Foglio = ?';
-        if($mappale) $where[] = 'Mappale LIKE ?';
+        if($mappale) $where[] = 'Mappale = ?';
         
         $res = $db->ql(
+            'SELECT e.ID, e.Mappali, e.Stradario, e.Note
+            FROM edifici_view e
+            JOIN fogli_mappali_edifici efm ON efm.Edificio = e.ID AND '.(empty($params)?'FALSE':implode(' AND ', $where)).'
+            LIMIT 10',
+            $params);
+        /*$res = $db->ql(
             'SELECT ID, Mappali, Stradario, Note
-            FROM edifici_view
+            FROM edifici_view e
             WHERE ID IN(
                 SELECT  Edificio
                 FROM fogli_mappali_edifici '.
-                'WHERE '.(count($params) > 0?implode(' AND ', $where):' FALSE').
+                'WHERE '.(empty($params)?implode(' AND ', $where):'FALSE').
              ') LIMIT 10',
-            $params);
+            $params);*/
 
         header('Content-type: text/json');
-        echo json_encode($res, TRUE);
+        echo empty($res) ? '[]' : json_encode($res, TRUE);
     }
 
     function getFogliMappaliEdifici($edifici, $db){
