@@ -78,7 +78,7 @@ class DbTableFormGenerator {
         echo '</select>';
     }
 
-    private function generateForeingKey($table, $column, $c, $value, $required, $length) {
+    private static function generateForeingKey($table, $column, $c, $value, $required, $length) {
         $fks = $c->db->ql("SELECT `referenced_table_name` AS tab, `referenced_column_name`  AS col
                                 FROM `information_schema`.`KEY_COLUMN_USAGE`
                                 WHERE `constraint_schema` = SCHEMA() AND `column_name`= '$column' AND `table_name` = '$table' AND `referenced_column_name` IS NOT NULL")[0];

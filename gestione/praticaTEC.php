@@ -136,7 +136,7 @@ else $pratica = $res[0];
 			?>
 		</script>
 
-		<br><br><button type="button" onclick="addManyTOManyField($(\'#fogli-mappali\'), fogliMappaliEdificiAssociati, \'fm\');">Aggiungi foglio-mappale</button><br><br>
+		<br><br><button type="button" onclick="addManyTOManyField($('#fogli-mappali'), fogliMappaliEdificiAssociati, 'fm');">Aggiungi foglio-mappale</button><br><br>
 
     	<input type="submit" name="update">
     </form>
