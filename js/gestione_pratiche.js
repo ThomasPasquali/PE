@@ -17,6 +17,11 @@ var countIntSoc = 0;
 $(document).ready(function() {
 	$('#intestatari-persone .add').click(function() { addFieldIntestatarioPersona(); });
 	$('#intestatari-societa .add').click(function() { addFieldIntestatarioSocieta(); });
+	$('input[type="button"][name="delete"]').click((e) => {
+		e.preventDefault();
+		if(confirm('Sei sicuro di voler eliminare la pratica e tutti i suoi collegamenti?'))
+			$('#formModifica').append('<input type="hidden" name="delete" value="delete">').submit();
+	})
 });
 
 function addFieldIntestatarioPersona(id = '', descr = '') {

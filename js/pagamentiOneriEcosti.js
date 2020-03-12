@@ -1,42 +1,49 @@
-function attivaPagamenti(calcolo, btn, pe_o_tec) {
-	$.ajax({
-        url: "/runtime/handler.php",
-        type: "POST",
-        data: { "action" : "activatePagamenti", "calcolo" : calcolo, "pe_o_tec" : pe_o_tec },
-        dataType: "text",
-        success : function(res) {
-    	  if(res)
-    		  alert(res);
-    	  else {
-    		  $(btn).html('Disattiva pagamenti');
-    		  $(btn).click(function() {
-				disattivaPagamenti(calcolo, btn, pe_o_tec);
-    		  });
-    		  $(btn).parent().removeClass('inattivo');
-    	  }
-      }
+$(document).ready(() => {
+	$('body').on('click', '.btnAttivaDisattiva', function() {
+		let e = $(this);
+		let wasAttivo = e.data('attivo');
+		$.ajax({
+			url: "/runtime/handler.php",
+			type: "POST",
+			data: {
+				"action" : (wasAttivo?'deactivatePagamenti':'activatePagamenti'),
+				"calcolo" : e.data('idcalcolo'),
+				"pe_o_tec" : e.data('peotec')
+			},
+			dataType: "text",
+			success : function(res) {
+			  if(res)
+				  alert(res);
+			  else {
+				  if(wasAttivo) e.parent().addClass('inattivo');
+				  else 			e.parent().removeClass('inattivo');
+				  e.data('attivo', !wasAttivo);
+				  e.text(wasAttivo?'Attiva pagamenti':'Disattiva pagamenti');
+			  }
+		  }
+		});
 	});
-}
 
-function disattivaPagamenti(calcolo, btn, pe_o_tec) {
-	$.ajax({
-        url: "/runtime/handler.php",
-        type: "POST",
-        data: { "action" : "deactivatePagamenti", "calcolo" : calcolo, "pe_o_tec" : pe_o_tec },
-        dataType: "text",
-        success : function(res) {
-    	  if(res)
-    		  alert(res);
-    	  else {
-    		  $(btn).html('Attiva pagamenti');
-    		  $(btn).click(function() {
-				attivaPagamenti(calcolo, btn, pe_o_tec);
-    		  });
-    		  $(btn).parent().addClass('inattivo');
-    	  }
-      }
+	$('body').on('click', '.btnElimina', function() {
+		let e = $(this);
+		if(confirm('Sei sicuro di voler eliminare definitivamente il calcolo e tutti i pagamenti associati?'))
+			$.ajax({
+				url: "/runtime/handler.php",
+				type: "POST",
+				data: {
+					"action" : 'deleteCalcolo',
+					"calcolo" : e.data('idcalcolo'),
+					"pe_o_tec" : e.data('peotec')
+				},
+				dataType: "text",
+				success : function(res) {
+					if(res) alert(res);
+					else	window.location.reload();
+			}
+			});
 	});
-}
+	
+});
 
 function eliminaPagamentoCC(pagamento, btn, pe_o_tec) {
 	$.ajax({

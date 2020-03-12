@@ -11,6 +11,15 @@ if(!$c->logged()){
 
 $id = $_REQUEST['id'];
 
+if($c->check(['delete'], $_REQUEST)) {
+	$res = $c->db->dml('DELETE FROM pe_pratiche WHERE ID = ?', [$id]);
+	if($res->errorCode() == 0) {
+		header('Location: ../');
+		exit();
+	}else
+		echo $res->errorInfo()[2];
+}
+
 if($c->check(['update'], $_REQUEST)) {
 	//Gestione fogli-mappali
 	$c->db->dml('DELETE FROM pe_fogli_mappali_pratiche WHERE Pratica = ?', [$id]);
@@ -21,14 +30,14 @@ if($c->check(['update'], $_REQUEST)) {
 					[$id, $edFoMa[0], $edFoMa[1], $edFoMa[2]]);
 			unset($_REQUEST[$key]);
 		}
-	//Gestione intestatari persone TODO sul tec
+	//Gestione intestatari persone
 	$c->db->dml('DELETE FROM pe_intestatari_persone_pratiche WHERE Pratica = ?', [$id]);
 	foreach ($_REQUEST as $key => $persona)
 		if(substr($key, 0, strlen('intestatario_persona')) == 'intestatario_persona') {
 			$c->db->dml('INSERT INTO pe_intestatari_persone_pratiche (Pratica, Persona) VALUES (?,?)', [$id, $persona]);
 			unset($_REQUEST[$key]);
 		}
-	//Gestione intestatari societa TODO
+	//Gestione intestatari societa
 	$c->db->dml('DELETE FROM pe_intestatari_societa_pratiche WHERE Pratica = ?', [$id]);
 	foreach ($_REQUEST as $key => $societa)
 		if(substr($key, 0, strlen('intestatario_societa')) == 'intestatario_societa') {
@@ -80,7 +89,7 @@ else $pratica = $res[0];
 	if(isset($err))
         echo "<h1>Errore durante la modifica: $err</h1>";
 	?>
-    <form method="post">
+    <form id="formModifica" method="post">
     	<input type="hidden" name="id" value="<?= $id ?>">
     	<?php
     	//Form pratica
@@ -138,7 +147,8 @@ else $pratica = $res[0];
 
 		<br><br><button type="button" onclick="addManyTOManyField($('#fogli-mappali'), fogliMappaliEdificiAssociati, 'fm');">Aggiungi foglio-mappale</button><br><br>
 		
-		<input type="submit" name="update">
+		<input type="button" name="delete" style="background-color:red;font-size:1rem;position:absolute;right:20px;bottom:20px;" value="Elimina pratica">
+		<input type="submit" name="update" style="background-color:green;font-size:1.6rem;" value="Aggiorna pratica">
     </form>
 </body>
 </html>

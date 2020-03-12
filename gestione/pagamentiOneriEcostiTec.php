@@ -87,7 +87,8 @@
 				foreach ($calcoli as $calcolo) {
 					?>
 					<div class="calcolo<?= $calcolo['Attivo']=='N'?' inattivo':'' ?>">
-						<button type="button" onclick="<?= $calcolo['Attivo']=='N'?'':'dis' ?>attivaPagamenti('<?= $calcolo['ID'] ?>', this, 'tec');"><?= $calcolo['Attivo']=='N'?'Attiva':'Disattiva' ?> pagamenti</button>
+						<button type="button" class="btnAttivaDisattiva" data-attivo="<?= $calcolo['Attivo']=='S'?'true':'false' ?>" data-idcalcolo="<?= $calcolo['ID'] ?>" data-peOtec="tec"><?= $calcolo['Attivo']=='N'?'Attiva':'Disattiva' ?> pagamenti</button>
+						<button type="button" class="btnElimina" data-idcalcolo="<?= $calcolo['ID'] ?>" data-peOtec="tec" style="background-color:red; font-size:0.8rem;">Elimina calcolo</button>
 						<div class="calcolo-sub">
 							<div class="descrizione-calcolo">
 								<h3>Descrizione calcolo</h3>
