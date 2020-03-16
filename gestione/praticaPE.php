@@ -141,7 +141,7 @@ else $pratica = $res[0];
 			foreach($intestatari_persone as $ip) 
 				echo "addFieldIntestatarioPersona($ip[ID],'".str_replace("'","\'",$ip['descr'])."'); ";
 			foreach($intestatari_societa as $is) 
-				echo "addFieldIntestatarioSocieta($is[ID],'".str_replace("'","\'",$ip['descr'])."'); ";
+				echo "addFieldIntestatarioSocieta($is[ID],'".str_replace("'","\'",$is['descr'])."'); ";
 			?>
 		</script>
 
