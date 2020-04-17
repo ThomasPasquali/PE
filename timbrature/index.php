@@ -1,7 +1,8 @@
 <?php
 	session_start();	
 
-    define('FESTE', ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']);
+    define('FESTE_ITERATIVE', ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']);
+    define('FESTE_STATICHE', ['2020-04-13', '2021-04-05', '2022-04-18']);
     define('DIURNO_START', 6);
     define('DIURNO_END', 22);
     define('WORKCODES_BL', [0,2]);
@@ -451,7 +452,7 @@
      * @return bool
      */
     function isFestivo(DateTime $day) {
-        return ((dayOfWeek($day) == 6) || (in_array($day->format('m-d'), FESTE)));
+        return ((dayOfWeek($day) == 6) || (in_array($day->format('m-d'), FESTE_ITERATIVE)) || (in_array($day->format('Y-m-d'), FESTE_STATICHE)));
     }
 
     echo '<pre>';
