@@ -182,7 +182,9 @@
 		<link rel="icon" type="image/ico" href="favicon.ico">
 	</head>
 	<body>
-		<script type="text/javascript" src="js/home.js"></script>
+        <script type="text/javascript" src="js/home.js"></script>
+        
+        <p id="made-by">Made by Thomas P.</p>
 
 		<div id="navbar" class="navbar sticky">
             <div class="dropdown active">

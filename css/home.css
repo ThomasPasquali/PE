@@ -1,3 +1,13 @@
+#made-by {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 3px;
+	font-size: 10px;
+	margin: 0;
+	font-family: 'Comic Sans MS';
+}
+  
 pre {
 	white-space: pre-wrap;
 }

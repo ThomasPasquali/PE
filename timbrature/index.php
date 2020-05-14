@@ -1,5 +1,5 @@
 <?php
-	session_start();	
+	session_start();
 
     define('FESTE_ITERATIVE', ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']);
     define('FESTE_STATICHE', ['2020-04-13', '2021-04-05', '2022-04-18']);
@@ -24,8 +24,11 @@
     		$_SESSION['user_timbrature'] = $res[0]['u'];
     }
     
-    if(isset($_REQUEST['cambia_user']))
-    	unset($_SESSION['user_timbrature']);    	
+    if(isset($_REQUEST['cambia_user'])) {
+        unset($_SESSION['user_timbrature']);
+        header('Location: index.php');
+        exit();
+    }
     
     if(
     		(isset($_REQUEST['da']) && isset($_REQUEST['a'])&&isset($_SESSION['user_timbrature'])) && 
@@ -460,13 +463,6 @@
     //print_r($user);
     echo '</pre>';
 ?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Timbrature</title>
     <script src="../lib/jquery-3.4.1.min.js"></script>
     <script src="../lib/jquery.qtip.min.js"></script>
     
@@ -520,9 +516,28 @@
 		table td:nth-child(even) {
 			background-color: #EEEEEE;
 		}
+        #menu {
+            width: 100%;
+            display: inline-flex;
+            justify-content: space-evenly;
+        }
+        h3,h2,p {
+            text-align: center;
+        }
+        #made-by {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 3px;
+            font-size: 10px;
+            margin: 0;
+            font-family: 'Comic Sans MS';
+        }
     </style>
+    <title>Timbrature</title>
 </head>
 <body>
+    <p id="made-by">Made by Thomas P.</p>
 	<?php if(!isset($_SESSION['user_timbrature'])) { ?>
 	
 		<form action="" method="POST">
@@ -530,47 +545,38 @@
             <input type="password" name="password">
         </form>
         
-    <?php }else if(!isset($results)&&$_SESSION['user_timbrature'] == 'admin') { ?>
+    <?php }else if(!isset($results)) { ?>
 
-        <form action="" method="POST">
-            <select name="user">
-                <?php
-                $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
-                foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
-                ?>
-            </select>
+        <form action="" method="POST" target="_blank">
+            <?php
+                if($_SESSION['user_timbrature'] == 'admin') {
+                    echo '<select name="user">';
+                    $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
+                    foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
+                    echo '</select>';
+                }
+            ?>
             <label>Da: </label>
             <input type="date" name="da">
             <label>A: </label>
             <input type="date" name="a">
-            <input type="submit">
-            <input type="submit" name="cambia_user" value="Cambia persona">
+            <button type="button" onclick="this.form.action=''; this.form.submit();">Crea report</button>
+            <button type="button" onclick="this.form.action='raw.php'; this.form.submit();">Visualizza dati</button>
+            <button type="button" onclick="this.form.action='?cambia_user'; this.form.submit();">Cambia persona</button>
         </form>
 
-    <?php }else if(!isset($results)){ ?>
-    	
-    	<h3><?= $_SESSION['user_timbrature'] ?></h3>
-    	<form action="" method="POST">
-            <label>Da: </label>
-            <input type="date" name="da">
-            <label>A: </label>
-            <input type="date" name="a">
-            <input type="submit">
-            <input type="submit" name="cambia_user" value="Cambia persona">
-        </form>
-        
     <?php }else {?>
 		
         <h3>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_REQUEST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_REQUEST['a']),"d/m/Y"); ?></h3>
         <?php 
-        $url = '?export=csv';
+        $urlExport = '?export=csv';
         foreach ($_REQUEST as $key => $val)
-        	$url .= "&$key=$val";
+            $urlExport .= "&$key=$val";
         ?>
         
         <div id="menu">
-        	<a href="<?= $url ?>">Esporta in CSV</a>
-        	<a href="" style="margin-left: 50px;">Indietro</a>
+            <a href="<?= $urlExport ?>">Esporta in CSV</a>
+        	<a href="#" onclick="window.close();">Chiudi pagina</a>
         </div>
         
         <table id="tabellona">
