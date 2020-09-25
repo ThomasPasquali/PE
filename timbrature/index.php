@@ -7,6 +7,7 @@
     define('DIURNO_END', 22);
     define('WORKCODES_BL', [0,2]);
     define('CSV_SEP', ';');
+    define('LETTERE_SETTIMANA', ['Lu','Ma','Me','Gi','Ve','Sa','Do']);
     
     include_once '../lib/db.php';
     $ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
@@ -60,13 +61,27 @@
              * cod min pausa
              */
 
-            /*--------------QUERY----------------*/
+            /*--------------QUERY--------------*/
 
             //Orari settimanali
+            $orarioSettimanale = [];
+            $orariSettimanaliDB = $db->ql('SELECT idTime, weekTime, timeName FROM ts_timetables WHERE timeName LIKE ? ORDER BY idTime', ['%'.$user['Username'].'%']);
+            if(count($orariSettimanaliDB) < 1) {
+                echo "Orario settimanale non trovato\r\n";
+                exit();
+            }
+
             $orariSettimanali = [];
-            $res = $db->ql('SELECT weekTime FROM ts_timetables WHERE SUBSTR(timeName, 11) LIKE ?', [$user['Username'].'%'])[0]['weekTime'];
-            for($i = 0; $i < strlen($res); $i+=8)
-                $orariSettimanali[] = (int)substr($res, $i+4, 4);
+            foreach ($orariSettimanaliDB as $orario) {
+                for($i = 0; $i < strlen($orario['weekTime']); $i+=8)
+                    $orariSettimanali[$orario['idTime']]['orario'][] = (int)substr($orario['weekTime'], $i+4, 4);
+                $orariSettimanali[$orario['idTime']]['nome'] = $orario['timeName'].' -> ';
+            }
+            
+            if(isset($_REQUEST['orario']) && intval($_REQUEST['orario']) > 0)
+                $orarioSettimanale = $orariSettimanali[$_REQUEST['orario']];
+            else
+                $orarioSettimanale = array_values($orariSettimanali)[0];
             
             //Workcodes
             $workcodes = [];
@@ -151,7 +166,7 @@
             if(count($erroriInOutTimbrature) > 0) {
             	header('Content-type: text/txt');
             	foreach ($erroriInOutTimbrature as $err)
-            		echo "Entrate/Uscite non coerenti il giorno $err\r\n";
+            		echo "Entrate/Uscite non coerenti il giorno ".date_format($err, 'Y-m-d')."\r\n";
             	exit();
             }
             /*--------------FINE CONTROLLI VALIDITA' DATI----------------*/
@@ -187,7 +202,7 @@
                    	'totSecondsNotturniFestivi' => (int)0,
                     'totSecondsSDiurniFeriali' => (int)0];
 
-                    if(!isFestivo($da_cpy)) $totTeorico += $orariSettimanali[dayOfWeek($da_cpy)]*60;
+                    if(!isFestivo($da_cpy)) $totTeorico += $orarioSettimanale['orario'][dayOfWeek($da_cpy)]*60;
 
                 $da_cpy->modify('+1 day');
             }
@@ -199,7 +214,7 @@
                 $out = new DateTime($results[$i+1]['logTime']);
                 $diff = dateDiff($in, $out);
                 $date = date_format($in, "d/m/Y");
-                $teorico = (isFestivo($in)?0:($orariSettimanali[dayOfWeek($in)]*60));
+                $teorico = (isFestivo($in)?0:($orarioSettimanale['orario'][dayOfWeek($in)]*60));
                 
                 //Controlli
             	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo '<br>Entrata ed uscita su giorni diversi<br>';
@@ -308,7 +323,7 @@
             //Inserimento assenze (giornate intere)
             foreach ($assenze as $assenza) {
                 $dataAssenza = new DateTime($assenza['dayStart']);
-                $secondiTeorici = $orariSettimanali[dayOfWeek($dataAssenza)]*60;
+                $secondiTeorici = $orarioSettimanale['orario'][dayOfWeek($dataAssenza)]*60;
                 $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
                 $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
                 $totAssenze += $secondiTeorici;
@@ -324,7 +339,7 @@
             foreach (array_keys($days) as $date)
             	if(count($days[$date]['timbrature']) > 0) {
 	            	$day = date_create_from_format ('d/m/Y', $date);
-	            	$teorico = (isFestivo($day)?0:($orariSettimanali[dayOfWeek($day)]*60));
+	            	$teorico = (isFestivo($day)?0:($orarioSettimanale['orario'][dayOfWeek($day)]*60));
 	            	$secondsSDiurniFeriali = $days[$date]['totSecondsDiurniFeriali'] - $teorico;
 	            	$totSecondsSDiurniFeriali += $secondsSDiurniFeriali;
 	            	$days[$date]['totSecondsSDiurniFeriali']  = $secondsSDiurniFeriali;
@@ -357,7 +372,7 @@
             		echo CSV_SEP;
             		echo secondsToHMS($day['totSecondsNotturniFestivi']);
             		echo CSV_SEP;
-            		$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
+            		$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orarioSettimanale['orario'][dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
             		$saldo = ($day['totSeconds'] + $day['totSecondsAssenza']) - $teorico;
             		echo ($saldo < 0?'-':'').secondsToHMS(abs($saldo));
             		echo CSV_SEP;
@@ -466,7 +481,7 @@
     <script src="../lib/jquery-3.4.1.min.js"></script>
     <script src="../lib/jquery.qtip.min.js"></script>
     
-    <script type="text/javascript">
+    <script type="text/javascript" assert>
 	    $('#tabellona').on('mouseover', 'td[title]', function() {
 	        var target = $(this);
 	        if (target.data('qtip')) { return false; }
@@ -497,7 +512,7 @@
 	        target.trigger('mouseover');
 	    });
 	    window.onbeforeprint = function(){ $("#menu").css("display", "none"); }
-	    window.onafterprint = function(){ $("#menu").css("display", "block"); }
+        window.onafterprint = function(){ $("#menu").css("display", "block"); }
 	</script>
     <style>
         table {
@@ -566,7 +581,27 @@
         </form>
 
     <?php }else {?>
-		
+        
+    <?php if(count($orariSettimanali) > 1) { ?>
+            <form id="formOrari" action="" method="POST">
+                <label>Orario settimanale: </label>
+                <input type="hidden" name="da" value="<?= $_REQUEST['da'] ?>">
+                <input type="hidden" name="a" value="<?= $_REQUEST['a'] ?>">
+                <input type="hidden" name="user" value="<?= $_REQUEST['user'] ?>">
+                <select name="orario" onchange="$('#formOrari').submit();">
+                <?php
+                foreach ($orariSettimanali as $id => $orario) {
+                    echo '<option value="'.$id.'" '.(isset($_REQUEST['orario'])&&$_REQUEST['orario']==$id?'selected="selected"':'').'>'.$orario['nome'].' ';
+                    $i = 0;
+                    foreach ($orario['orario'] as $ore)
+                        echo LETTERE_SETTIMANA[$i++].' '.secondsToHMS($ore*60).($i<7?' | ':'');
+                    echo '</option>';
+                }
+                ?>
+                </select>
+            </form>
+    <?php } ?>
+
         <h3>Piano di lavoro di <?= $user['Username'] ?> dal <?= date_format(date_create($_REQUEST['da']),"d/m/Y"); ?> al <?= date_format(date_create($_REQUEST['a']),"d/m/Y"); ?></h3>
         <?php 
         $urlExport = '?export=csv';
@@ -595,7 +630,7 @@
                 <td>Giustificazione assenza</td>
             </tr>
     <?php  foreach($days as $date => $day) { 
-    				$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orariSettimanali[dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
+    				$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orarioSettimanale['orario'][dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
     		?>
             <tr <?= ((isFestivo(date_create_from_format('d/m/Y', $date)) || dayOfWeek(date_create_from_format('d/m/Y', $date)) == 5)?'class="festivo"':'') ?>>
 				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
