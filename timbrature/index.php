@@ -1,7 +1,7 @@
 <?php
 	session_start();
 
-    define('FESTE_ITERATIVE', ['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']);
+    define('FESTE_ITERATIVE', ['01-01','01-06','04-25','05-01','06-02','06-24','08-15','11-01','12-08','12-25','12-26']);
     define('FESTE_STATICHE', ['2020-04-13', '2021-04-05', '2022-04-18']);
     define('DIURNO_START', 6);
     define('DIURNO_END', 22);
@@ -39,6 +39,7 @@
     	$username = ($_SESSION['user_timbrature'] == 'admin' ? $_REQUEST['user'] : $_SESSION['user_timbrature']);
     	
         $a = new DateTime($_REQUEST['a']);
+        $da = new DateTime($_REQUEST['da']);
 
         $user = $db->ql(
             'SELECT *
@@ -78,10 +79,14 @@
                 $orariSettimanali[$orario['idTime']]['nome'] = $orario['timeName'].' -> ';
             }
             
-            if(isset($_REQUEST['orario']) && intval($_REQUEST['orario']) > 0)
+            if(isset($_REQUEST['orario']) && intval($_REQUEST['orario']) > 0) {
                 $orarioSettimanale = $orariSettimanali[$_REQUEST['orario']];
-            else
+                define('ORARIO_SETTIMANALE', $orariSettimanali[$_REQUEST['orario']]);
+                
+            }else {
                 $orarioSettimanale = array_values($orariSettimanali)[0];
+                define('ORARIO_SETTIMANALE', array_values($orariSettimanali)[0]);
+            }
             
             //Workcodes
             $workcodes = [];
@@ -91,10 +96,10 @@
 
             //Assenze
             $assenze = $db->ql(
-                'SELECT dayStart, exWhy, exLen_days
+                'SELECT dayStart, exWhy, exLen_days 
                 FROM ts_schedules_ex
                 WHERE   idDeptUser = :user
-                    AND DATE(dayStart) BETWEEN :da AND :a
+                    AND (dayStart + interval exLen_days day) BETWEEN :da AND :a
                 ORDER BY dayStart',
                 [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
             
@@ -104,10 +109,18 @@
             foreach($assenze as $assenza) {
                 $day = new DateTime($assenza['dayStart']);
 
+                //Controllo che non sia un giorno antecedente ad inizio report
+                $daysDiff = $da->diff($day);
+                if($daysDiff->format('%r') == '-') {                    
+                    $day = clone $da;
+                    $assenza['exLen_days'] -= intval($daysDiff->format('%d'));
+                }
+
                 //"Scompatto" i giorni di assenza multipli
                 while(dateDiff($day, $a) >= 0 && $assenza['exLen_days'] > 0) {
-                    //Controllo se il giorno � lavorativo
-                    if(!(isFestivo($day) || dayOfWeek($day) == 5)) {
+                    //Se Why = Festivo lo posso sovrapporre alle festività
+                    //Controllo se il giorno è lavorativo per la persona in questione
+                    if($assenza['exWhy'] == 'Festivo' || !(isFestivo($day) || $orarioSettimanale['orario'][dayOfWeek($day)] == 0)) {
                         $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy']];
                         
                         if(!isset($assenzeIntereStats[$assenza['exWhy']]))
@@ -323,10 +336,13 @@
             //Inserimento assenze (giornate intere)
             foreach ($assenze as $assenza) {
                 $dataAssenza = new DateTime($assenza['dayStart']);
-                $secondiTeorici = $orarioSettimanale['orario'][dayOfWeek($dataAssenza)]*60;
-                $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
+                //Il Why = Festivo si sovrappone alle festivita'
+                if(!(isFestivo($dataAssenza) && $assenza['exWhy'] == 'Festivo')) {
+                    $secondiTeorici = $orarioSettimanale['orario'][dayOfWeek($dataAssenza)]*60;
+                    $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
+                    $totAssenze += $secondiTeorici;
+                }
                 $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
-                $totAssenze += $secondiTeorici;
             }
             
             //Conteggio giorni lavoorati
@@ -470,7 +486,15 @@
      * @return bool
      */
     function isFestivo(DateTime $day) {
-        return ((dayOfWeek($day) == 6) || (in_array($day->format('m-d'), FESTE_ITERATIVE)) || (in_array($day->format('Y-m-d'), FESTE_STATICHE)));
+        return ((in_array($day->format('m-d'), FESTE_ITERATIVE)) || (in_array($day->format('Y-m-d'), FESTE_STATICHE)));
+    }
+
+    /**
+     * Per quanto riguarda la persona in questione
+     * @return bool
+     */
+    function isNonLavorativo(DateTime $day) {
+        return (ORARIO_SETTIMANALE['orario'][dayOfWeek($day)] == 0);
     }
 
     echo '<pre>';
@@ -629,11 +653,12 @@
                 <td>Ore assenza giustificate</td>
                 <td>Giustificazione assenza</td>
             </tr>
-    <?php  foreach($days as $date => $day) { 
-    				$teorico = (isFestivo(date_create_from_format ('d/m/Y', $date))?0:($orarioSettimanale['orario'][dayOfWeek(date_create_from_format ('d/m/Y', $date))]*60));
+    <?php  foreach($days as $dateStr => $day) {
+                $date = date_create_from_format('d/m/Y', $dateStr);
+    			$teorico = (isFestivo($date)?0:($orarioSettimanale['orario'][dayOfWeek($date)]*60));
     		?>
-            <tr <?= ((isFestivo(date_create_from_format('d/m/Y', $date)) || dayOfWeek(date_create_from_format('d/m/Y', $date)) == 5)?'class="festivo"':'') ?>>
-				<td><?= $date.' ('.$giorniSettimana[dayOfWeek(date_create_from_format ('d/m/Y', $date))].')' ?></td>
+            <tr <?= ((isFestivo($date) || isNonLavorativo($date))?'class="festivo"':'') ?>>
+				<td><?= $dateStr.' ('.$giorniSettimana[dayOfWeek($date)].')' ?></td>
                 
                 <td>
             		<?php 
