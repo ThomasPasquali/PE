@@ -8,6 +8,8 @@
     define('WORKCODES_BL', [0,2]);
     define('CSV_SEP', ';');
     define('LETTERE_SETTIMANA', ['Lu','Ma','Me','Gi','Ve','Sa','Do']);
+    define('WARNING_ASSENZE_TIMBRATURE', ['Ferie', 'Donazione Sangue', 'Malattia', 'Infortunio', 'Aspettativa', 'Congedo', 'Maternità /Paternità']);
+    
     
     include_once '../lib/db.php';
     $ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
@@ -31,10 +33,9 @@
         exit();
     }
     
-    if(
-    		(isset($_REQUEST['da']) && isset($_REQUEST['a'])&&isset($_SESSION['user_timbrature'])) && 
-    		($_SESSION['user_timbrature'] != 'admin' || 
-    				($_SESSION['user_timbrature'] == 'admin' && isset($_REQUEST['user'])))) {
+    if( (isset($_REQUEST['da']) && isset($_REQUEST['a'])&&isset($_SESSION['user_timbrature'])) && 
+        ($_SESSION['user_timbrature'] != 'admin' || 
+                ($_SESSION['user_timbrature'] == 'admin' && isset($_REQUEST['user'])))) {
         
     	$username = ($_SESSION['user_timbrature'] == 'admin' ? $_REQUEST['user'] : $_SESSION['user_timbrature']);
     	
@@ -96,13 +97,13 @@
 
             //Assenze
             $assenze = $db->ql(
-                'SELECT dayStart, exWhy, exLen_days 
+                'SELECT dayStart, exWhy, exLen_days, exLen_time  
                 FROM ts_schedules_ex
                 WHERE   idDeptUser = :user
-                    AND (dayStart + interval exLen_days day) BETWEEN :da AND :a
+                    AND (dayStart + interval (exLen_days-1) day) BETWEEN :da AND :a
                 ORDER BY dayStart',
                 [':user' => $user['id'], ':da'=>$_REQUEST['da'], ':a'=>$_REQUEST['a']]);
-            
+                
             //Numero assenze per tipo
             $assenzeIntereStats = [];
             $tmp = [];
@@ -121,7 +122,7 @@
                     //Se Why = Festivo lo posso sovrapporre alle festività
                     //Controllo se il giorno è lavorativo per la persona in questione
                     if($assenza['exWhy'] == 'Festivo' || !(isFestivo($day) || $orarioSettimanale['orario'][dayOfWeek($day)] == 0)) {
-                        $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy']];
+                        $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy'], 'exLen_time' => intval($assenza['exLen_time'])*60];
                         
                         if(!isset($assenzeIntereStats[$assenza['exWhy']]))
                             $assenzeIntereStats[$assenza['exWhy']] = (int)0;
@@ -230,7 +231,7 @@
                 $teorico = (isFestivo($in)?0:($orarioSettimanale['orario'][dayOfWeek($in)]*60));
                 
                 //Controlli
-            	if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo '<br>Entrata ed uscita su giorni diversi<br>';
+                if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo '<br>Entrata ed uscita su giorni diversi<br>';
                 
                 //Statistiche sulle ore lavorate
                 $hIn = intval($in->format('H'));
@@ -242,8 +243,7 @@
                 
                 //Assenza giustificata parziale
                 if(!in_array($results[$i]['logCode'], WORKCODES_BL) && $results[$i]['logCode'] == $results[($i+1)]['logCode']) {
-                	
-                	$days[$date]['workcodes'][] = [
+                	$days[$date]['4'][] = [
                 			'in' => $in,
                 			'out' => $out,
                 			'diff' => $diff,
@@ -336,16 +336,21 @@
             //Inserimento assenze (giornate intere)
             foreach ($assenze as $assenza) {
                 $dataAssenza = new DateTime($assenza['dayStart']);
+                $date = date_format($dataAssenza, "d/m/Y");
+                //Errore in caso di timbrature in giorni di assenze note
+                if(count($days[$date]['timbrature']) > 0 && in_array($assenza['exWhy'], WARNING_ASSENZE_TIMBRATURE))
+                    $days[$date]['giustificazione'] .= '<span style="color:red">ATTENZIONE: timbrature effettuate<br>in giorno in cui &egrave; prevista assenza.</span><br>';
                 //Il Why = Festivo si sovrappone alle festivita'
                 if(!(isFestivo($dataAssenza) && $assenza['exWhy'] == 'Festivo')) {
-                    $secondiTeorici = $orarioSettimanale['orario'][dayOfWeek($dataAssenza)]*60;
-                    $days[date_format($dataAssenza, "d/m/Y")]['totSecondsAssenza'] += $secondiTeorici;
-                    $totAssenze += $secondiTeorici;
+                    $secAssenza = $assenza['exLen_time'] > 0 ? $assenza['exLen_time'] : $orarioSettimanale['orario'][dayOfWeek($dataAssenza)]*60;
+                    $days[$date]['totSecondsAssenza'] += $secAssenza;
+                    $days[$date]['totSecondsDiurniFeriali'] += $secAssenza;
+                    $totAssenze += $secAssenza;
                 }
                 $days[date_format($dataAssenza, "d/m/Y")]['giustificazione'] .= $assenza['exWhy'];
             }
             
-            //Conteggio giorni lavoorati
+            //Conteggio giorni lavorati
             foreach($days as $day)
             	if(count($day['timbrature']) > 0)
             		$giorniLavorati++;
@@ -574,6 +579,7 @@
         }
     </style>
     <title>Timbrature</title>
+    <?= (!isset($results) || !isset($_SESSION['user_timbrature'])) ? '<link rel="stylesheet" href="./index.css">' : ''; ?>
 </head>
 <body>
     <p id="made-by">Made by Thomas P.</p>
@@ -586,23 +592,26 @@
         
     <?php }else if(!isset($results)) { ?>
 
-        <form action="" method="POST" target="_blank">
-            <?php
+        <div class="container">
+            <form action="" method="POST" target="_blank">
+                <label>Dipendente</label>
+                <?php
                 if($_SESSION['user_timbrature'] == 'admin') {
                     echo '<select name="user">';
                     $users = $db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
                     foreach($users as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>";
                     echo '</select>';
                 }
-            ?>
-            <label>Da: </label>
-            <input type="date" name="da">
-            <label>A: </label>
-            <input type="date" name="a">
-            <button type="button" onclick="this.form.action=''; this.form.submit();">Crea report</button>
-            <button type="button" onclick="this.form.action='raw.php'; this.form.submit();">Visualizza dati</button>
-            <button type="button" onclick="this.form.action='?cambia_user'; this.form.submit();">Cambia persona</button>
-        </form>
+                ?>
+                <label>Da</label>
+                <input type="date" name="da">
+                <label>A</label>
+                <input type="date" name="a">
+                <button type="button" onclick="this.form.action=''; this.form.submit();">Crea report</button>
+                <button type="button" onclick="this.form.action='raw.php'; this.form.submit();">Visualizza dati</button>
+                <button type="button" onclick="this.form.action='?cambia_user'; this.form.submit();">Cambia persona</button>
+            </form>
+        </div>
 
     <?php }else {?>
         
