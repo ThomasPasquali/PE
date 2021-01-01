@@ -97,7 +97,7 @@
 
             //Assenze
             $assenze = $db->ql(
-                'SELECT dayStart, exWhy, exLen_days, exLen_time  
+                'SELECT dayStart, exWhy, exLen_days, exLen_time 
                 FROM ts_schedules_ex
                 WHERE   idDeptUser = :user
                     AND (dayStart + interval (exLen_days-1) day) BETWEEN :da AND :a
@@ -112,9 +112,10 @@
 
                 //Controllo che non sia un giorno antecedente ad inizio report
                 $daysDiff = $da->diff($day);
-                if($daysDiff->format('%r') == '-') {                    
+                if($daysDiff->format('%r') == '-') {
+                    //lunghezza assenza -= (diff inizioFerie-inizioReport - festivi/nonLavorativi nel periodo + 1)
+                    $assenza['exLen_days'] = intval($assenza['exLen_days'])-(intval($daysDiff->format('%d'))-countFestiviOnonLavorativi($day, $da));
                     $day = clone $da;
-                    $assenza['exLen_days'] -= intval($daysDiff->format('%d'));
                 }
 
                 //"Scompatto" i giorni di assenza multipli
@@ -134,6 +135,7 @@
                     }
                     
                     $day->modify('+1 day');
+                    
                 }
             }
             $assenze = $tmp;
@@ -500,6 +502,21 @@
      */
     function isNonLavorativo(DateTime $day) {
         return (ORARIO_SETTIMANALE['orario'][dayOfWeek($day)] == 0);
+    }
+
+    /**
+     * 
+     * @return int
+     */
+    function countFestiviOnonLavorativi(DateTime $from, DateTime $to) {
+        $count = 0;
+        $from = clone $from;
+        while(dateDiff($from, $to) >= 0) {
+            //echo $from->format('Y-m-d').(isFestivo($from) || isNonLavorativo($from)).'<br>';
+            if(isFestivo($from) || isNonLavorativo($from)) $count++;
+            $from->modify('+1 day');
+        }
+        return $count;
     }
 
     echo '<pre>';
