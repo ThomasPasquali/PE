@@ -34,47 +34,45 @@
         public $reportReady = false;
         
         public function __construct($user, $password, $logout) {
-            //if(!$logged) $this->exitWithMessage(NULL,'Formato richiesta errato');
-            $this->checkNewLogin($user, $password);
-            $this->checkLogout($logout);
-
-            if(!$this->validRequestForReport($user)) return;
-
             $this->ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
-            $this->db = new DB(
-                ['db'=>$this->ini['db'], 
+            $this->db = new DB([
+                'db'=>$this->ini['db'], 
                 'host'=>$this->ini['host'],
                 'dbName'=>$this->ini['dbName'],
                 'port'=>$this->ini['port'],
                 'user'=>$this->ini['user'],
-                'pass'=>$this->ini['pass']]);
-            $this->username = ($_SESSION['user_timbrature'] == 'admin' ? $_REQUEST['user'] : $_SESSION['user_timbrature']);
-            $this->a = new DateTime($_REQUEST['a']);
-            $this->da = new DateTime($_REQUEST['da']);
-            $this->user = $this->db->ql('SELECT *
-                                        FROM ts_users
-                                        WHERE   Username = ?',
-                                        [$this->username]);
-            
-            if(count($this->user) != 1) $this->exitWithMessage('Username errato');
-            
-            $this->user = $this->user[0];
+                'pass'=>$this->ini['pass']
+            ]);
+            $this->username = $user;
 
-            $this->loadOrariSettimanali();
-            $this->loadWorkcodes();
-            $this->loadAssenze();
-            $this->loadTimbrature();
+            //if(!$logged) $this->exitWithMessage(NULL,'Formato richiesta errato');
+            $this->checkNewLogin($password);
+            $this->checkLogout($logout);
 
-            $this->checkTimbrature();
+            if($this->validRequestForReport()) {
+                $this->a = new DateTime($_REQUEST['a']);
+                $this->da = new DateTime($_REQUEST['da']);
 
-            $this->tot=$this->totAssenze=$this->totAssenze=$this->totTeorico=$this->totSecondsDiurniFeriali=$this->totSecondsDiurniFestivi=$this->totSecondsNotturniFeriali=$this->totSecondsNotturniFestivi=$this->giorniLavorati = (int)0;
-            
-            $this->initDays();
-            $this->elaborateTimbrature();
-            $this->elaborateAssenze();
-            $this->countGiorniLavorati();
-            $this->elaborateSaldoStraordinari();
-            $this->reportReady = true;
+                $this->user = $this->db->ql('SELECT * FROM ts_users WHERE Username = ?', [$this->username]);
+                if(count($this->user) != 1) $this->exitWithMessage('Username errato');
+                $this->user = $this->user[0];
+
+                $this->loadOrariSettimanali();
+                $this->loadWorkcodes();
+                $this->loadAssenze();
+                $this->loadTimbrature();
+
+                $this->checkTimbrature();
+
+                $this->tot=$this->totAssenze=$this->totAssenze=$this->totTeorico=$this->totSecondsDiurniFeriali=$this->totSecondsDiurniFestivi=$this->totSecondsNotturniFeriali=$this->totSecondsNotturniFestivi=$this->giorniLavorati = (int)0;
+                
+                $this->initDays();
+                $this->elaborateTimbrature();
+                $this->elaborateAssenze();
+                $this->countGiorniLavorati();
+                $this->elaborateSaldoStraordinari();
+                $this->reportReady = true;
+            }
         }
 
         /************LOAD FUNCTIONS************/
@@ -164,8 +162,8 @@
 
         /************CHECK FUNCTIONS************/
         
-        private function checkNewLogin($user, $password) {
-            if(is_null($user)&&isset($password)) {
+        private function checkNewLogin($password) {
+            if(is_null($this->username)&&isset($password)) {
                 $res = $this->db->ql('SELECT Username u FROM ts_users WHERE Pwd = ?', [$password]);
                 if(count($res) > 0) $_SESSION['user_timbrature'] = $res[0]['u'];
             }
@@ -178,9 +176,9 @@
             }
         }
     
-        public function validRequestForReport($user) {
-            return (isset($_REQUEST['da']) && isset($_REQUEST['a'])&&!is_null($user)) && 
-                   ($user != 'admin' || ($user == 'admin' && isset($_REQUEST['user'])));
+        public function validRequestForReport() {
+            return (isset($_REQUEST['da']) && isset($_REQUEST['a'])&&!is_null($this->username)) && 
+                   ($this->username != 'admin' || ($this->username == 'admin' && isset($_REQUEST['user'])));
         }
 
         /**
