@@ -23,7 +23,7 @@
         public $days = [];
 
         public $tot, $totAssenze, $totTeorico;
-        public $totSecondsDiurniFestivi, $totSecondsNotturniFestivi, $totSecondsDiurniFeriali, $totSecondsNotturniFeriali;
+        public $totSecondsDiurniFestivi, $totSecondsNotturniFestivi, $totSecondsDiurniFeriali, $totSecondsSDiurniFeriali, $totSecondsNotturniFeriali;
 
         public $giorniSettimana = array('Lun','Mar','Mer','Gio','Ven','Sab','Dom');
         public $giorniLavorati;
@@ -64,7 +64,7 @@
 
                 $this->checkTimbrature();
 
-                $this->tot=$this->totAssenze=$this->totAssenze=$this->totTeorico=$this->totSecondsDiurniFeriali=$this->totSecondsDiurniFestivi=$this->totSecondsNotturniFeriali=$this->totSecondsNotturniFestivi=$this->giorniLavorati = (int)0;
+                $this->tot=$this->totAssenze=$this->totAssenze=$this->totTeorico=$this->totSecondsSDiurniFeriali=$this->totSecondsDiurniFeriali=$this->totSecondsDiurniFestivi=$this->totSecondsNotturniFeriali=$this->totSecondsNotturniFestivi=$this->giorniLavorati = (int)0;
                 
                 $this->initDays();
                 $this->elaborateTimbrature();
@@ -85,7 +85,7 @@
             foreach ($orariSettimanaliDB as $o) {
                 $orario = json_decode($o['segments'], TRUE)[0];
                 //Lun-Sab e poi Dom
-                for ($i=1,$n=0; $n<count($orario['Days']); $n++,$i=(($i+1)%count($orario['Days'])))
+                for($i=1,$n=0; $n<count($orario['Days']); $n++,$i=(($i+1)%count($orario['Days'])))
                     $this->orariSettimanali[$o['idTime']]['orario'][$n] = (int)$this->HMStoMinutes($orario['Days'][$i]['ServiceChunk']['Duration']);
                     
                 $this->orariSettimanali[$o['idTime']]['nome'] = $o['timeName'].' -> ';
@@ -133,11 +133,8 @@
                     if($assenza['exWhy'] == 'Festivo' || !($this->isFestivo($day) || $this->orarioSettimanale['orario'][$this->dayOfWeek($day)] == 0)) {
                         $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy'], 'exLen_time' => intval($assenza['exLen_time'])*60];
 
-                        if(!isset($assenzeIntereStats[$assenza['exWhy']]))
-                            $this->assenzeIntereStats[$assenza['exWhy']] = (int)0;
-                            
                         //Statistiche sui giorni "scompattati"
-                        $this->assenzeIntereStats[$assenza['exWhy']]++;
+                        $this->assenzeIntereStats[$assenza['exWhy']] = ($this->assenzeIntereStats[$assenza['exWhy']]??0) + 1;
                         
                         $assenza['exLen_days']--;
                     }
@@ -364,7 +361,6 @@
                 if(!($this->isFestivo($dataAssenza) && $assenza['exWhy'] == 'Festivo')) {
                     $secAssenza = $assenza['exLen_time'] > 0 ? $assenza['exLen_time'] : $this->orarioSettimanale['orario'][$this->dayOfWeek($dataAssenza)]*60;
                     $this->days[$date]['totSecondsAssenza'] += $secAssenza;
-                    //FIXME
                     $this->days[$date]['totSecondsDiurniFeriali'] += $secAssenza;
                     $this->totAssenze += $secAssenza;
                 }
@@ -379,13 +375,12 @@
         }
 
         private function elaborateSaldoStraordinari() {
-            $totSecondsSDiurniFeriali = (int)0;
             foreach (array_keys($this->days) as $date)
             	if(count($this->days[$date]['timbrature']) > 0) {
 	            	$day = date_create_from_format ('d/m/Y', $date);
 	            	$teorico = ($this->isFestivo($day)?0:($this->orarioSettimanale['orario'][$this->dayOfWeek($day)]*60));
 	            	$secondsSDiurniFeriali = $this->days[$date]['totSecondsDiurniFeriali'] - $teorico;
-	            	$totSecondsSDiurniFeriali += $secondsSDiurniFeriali;
+	            	$this->totSecondsSDiurniFeriali += $secondsSDiurniFeriali;
 	            	$this->days[$date]['totSecondsSDiurniFeriali']  = $secondsSDiurniFeriali;
 	            }
         }

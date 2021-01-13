@@ -14,6 +14,10 @@ table td{
 table td:nth-child(even) {
     background-color: #EEEEEE;
 }
+table tr:first-child,
+table tr:first-child td {
+    background-color: #999999;
+}
 #menu {
     width: 100%;
     display: inline-flex;

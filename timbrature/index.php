@@ -18,7 +18,7 @@
     <link rel="stylesheet" type="text/css" href="table.css">
     <?= (!$lib->reportReady || !isset($_SESSION['user_timbrature'])) ? '<link rel="stylesheet" href="./index.css">' : ''; ?>
 
-    <title>Timbrature</title>
+    <title>Report personale</title>
 </head>
 <body>
     <p id="made-by">Made by Thomas P.</p>
@@ -177,7 +177,7 @@
 	        	<td title="Totale giorni con timbrature"><?= $lib->giorniLavorati ?></td>
                 <td title="Totale ore e minuti lavorate"><?= $lib->secondsToHMS($lib->tot) ?></td>
                 <td title="Totale ore e minuti Diurne Feriali"><?= $lib->secondsToHMS($lib->totSecondsDiurniFeriali) ?></td>
-                <td title="Totale straordinari ore e minuti Diurne Feriali"><?= $lib->secondsToHMS($lib->totSecondsDiurniFeriali) ?></td>
+                <td title="Totale straordinari ore e minuti Diurne Feriali"><?= $lib->secondsToHMS($lib->totSecondsSDiurniFeriali) ?></td>
                 <td title="Totale straordinari ore e minuti Notturne Feriali"><?= $lib->secondsToHMS($lib->totSecondsNotturniFeriali) ?></td>
                 <td title="Totale straordinari ore e minuti Diurne Festive"><?= $lib->secondsToHMS($lib->totSecondsDiurniFestivi) ?></td>
                 <td title="Totale straordinari ore e minuti Notturne Festive"><?= $lib->secondsToHMS($lib->totSecondsNotturniFestivi) ?></td>
@@ -195,6 +195,10 @@
         
         <h2>Statistiche assenze</h2>
         <table>
+            <tr>
+                <td>Tipo assenza (intera)</td>
+                <td>Occorenze</td>
+            </tr>
         <?php 
         foreach($lib->assenzeIntereStats as $reason => $t) { ?>
             <tr>
@@ -205,7 +209,12 @@
         }
         ?>
         </table>
+        <br>
         <table>
+            <tr>
+                <td>Tipo assenza (parziale)</td>
+                <td>Occorenze</td>
+            </tr>
         <?php 
         foreach($lib->assenzeParzialiStats as $reason => $t) { ?>
             <tr>
