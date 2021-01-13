@@ -9,50 +9,16 @@
         $_REQUEST['cambia_user']??NULL
     );
 ?>
+<html>
+<head>
     <script src="../lib/jquery-3.4.1.min.js"></script>
     <script src="../lib/jquery.qtip.min.js"></script>
-    
     <script src="./index.js" type="text/javascript" assert></script>
-    <style>
-        table {
-        	text-align: center;
-            width: 100%;
-            font-size: 13px;
-			border-collapse:collapse;
-			border:1px solid #FF0000;
-        }
-		table td{
-			border:1px solid #FF0000;
-		}
-		.festivo {
-			background-color: #DDDDDD;
-		}
-		table td:nth-child(even) {
-			background-color: #EEEEEE;
-		}
-        #menu {
-            width: 100%;
-            display: inline-flex;
-            justify-content: space-evenly;
-        }
-        h3,h2,p {
-            text-align: center;
-        }
-        #made-by {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 3px;
-            font-size: 10px;
-            margin: 0;
-            font-family: 'Comic Sans MS';
-        }
-        #dipendentiSelezionati input {
-            cursor: not-allowed;
-        }
-    </style>
-    <title>Timbrature</title>
+
+    <link rel="stylesheet" type="text/css" href="table.css">
     <?= (!$lib->reportReady || !isset($_SESSION['user_timbrature'])) ? '<link rel="stylesheet" href="./index.css">' : ''; ?>
+
+    <title>Timbrature</title>
 </head>
 <body>
     <p id="made-by">Made by Thomas P.</p>
@@ -273,6 +239,5 @@
     } 
     ?>
 
-	
 </body>
 </html>

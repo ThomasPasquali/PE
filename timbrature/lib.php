@@ -84,8 +84,10 @@
 
             foreach ($orariSettimanaliDB as $o) {
                 $orario = json_decode($o['segments'], TRUE)[0];
-                foreach ($orario['Days'] as $day)
-                    $this->orariSettimanali[$o['idTime']]['orario'][] = (int)$this->HMStoMinutes($day['ServiceChunk']['Duration']);
+                //Lun-Sab e poi Dom
+                for ($i=1,$n=0; $n<count($orario['Days']); $n++,$i=(($i+1)%count($orario['Days'])))
+                    $this->orariSettimanali[$o['idTime']]['orario'][$n] = (int)$this->HMStoMinutes($orario['Days'][$i]['ServiceChunk']['Duration']);
+                    
                 $this->orariSettimanali[$o['idTime']]['nome'] = $o['timeName'].' -> ';
             }
             
@@ -93,7 +95,6 @@
             $this->orarioSettimanale = $specifiedOrario ? 
                                             $this->orariSettimanali[$_REQUEST['orario']] :
                                             array_values($this->orariSettimanali)[0];
-            define('ORARIO_SETTIMANALE', $this->orarioSettimanale);
         }
 
         private function loadWorkcodes() {
@@ -113,6 +114,7 @@
                 
             //Numero assenze per tipo
             $tmp = [];
+            
             foreach($assenze as $assenza) {
                 $day = new DateTime($assenza['dayStart']);
 
@@ -123,14 +125,14 @@
                     $assenza['exLen_days'] = intval($assenza['exLen_days'])-(intval($daysDiff->format('%d'))-$this->countFestiviOnonLavorativi($day, $this->da));
                     $day = clone $this->da;
                 }
-
+                
                 //"Scompatto" i giorni di assenza multipli
                 while($this->dateDiff($day, $this->a) >= 0 && $assenza['exLen_days'] > 0) {
                     //Se Why = Festivo lo posso sovrapporre alle festività
                     //Controllo se il giorno è lavorativo per la persona in questione
                     if($assenza['exWhy'] == 'Festivo' || !($this->isFestivo($day) || $this->orarioSettimanale['orario'][$this->dayOfWeek($day)] == 0)) {
                         $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy'], 'exLen_time' => intval($assenza['exLen_time'])*60];
-                        
+
                         if(!isset($assenzeIntereStats[$assenza['exWhy']]))
                             $this->assenzeIntereStats[$assenza['exWhy']] = (int)0;
                             
@@ -141,7 +143,6 @@
                     }
                     
                     $day->modify('+1 day');
-                    
                 }
             }
             $this->assenze = $tmp;
@@ -363,6 +364,7 @@
                 if(!($this->isFestivo($dataAssenza) && $assenza['exWhy'] == 'Festivo')) {
                     $secAssenza = $assenza['exLen_time'] > 0 ? $assenza['exLen_time'] : $this->orarioSettimanale['orario'][$this->dayOfWeek($dataAssenza)]*60;
                     $this->days[$date]['totSecondsAssenza'] += $secAssenza;
+                    //FIXME
                     $this->days[$date]['totSecondsDiurniFeriali'] += $secAssenza;
                     $this->totAssenze += $secAssenza;
                 }
@@ -394,12 +396,12 @@
             return $this->db->ql('SELECT DISTINCT Username FROM ts_users WHERE Username <> \'admin\' ORDER BY Username');
         }
 
-        public function exitWithRedirect(String $redirectLocation) {
+        public static function exitWithRedirect(String $redirectLocation) {
             header('Location: '.$redirectLocation);
             exit();
         }
 
-        public function exitWithMessage(String $message = NULL) {
+        public static function exitWithMessage(String $message = NULL) {
             echo "<h1>$message</h1>";
             exit();
         }
@@ -447,7 +449,7 @@
          * @return bool
          */
         function isNonLavorativo(DateTime $day) {
-            return (ORARIO_SETTIMANALE['orario'][$this->dayOfWeek($day)] == 0);
+            return ($this->orarioSettimanale['orario'][$this->dayOfWeek($day)] == 0);
         }
     
         /**

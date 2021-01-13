@@ -1,0 +1,36 @@
+table {
+    text-align: center;
+    width: 100%;
+    font-size: 13px;
+    border-collapse:collapse;
+    border:1px solid #FF0000;
+}
+table td{
+    border:1px solid #FF0000;
+}
+.festivo {
+    background-color: #DDDDDD;
+}
+table td:nth-child(even) {
+    background-color: #EEEEEE;
+}
+#menu {
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-evenly;
+}
+h3,h2,p {
+    text-align: center;
+}
+#made-by {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 3px;
+    font-size: 10px;
+    margin: 0;
+    font-family: 'Comic Sans MS';
+}
+#dipendentiSelezionati input {
+    cursor: not-allowed;
+}
