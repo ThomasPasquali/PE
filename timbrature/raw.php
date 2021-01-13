@@ -2,6 +2,7 @@
 session_start();
 
 include_once '../lib/db.php';
+include_once 'lib.php';
 $ini = parse_ini_file("../../PE_ini/DB.ini", TRUE)['timbrature'];
 $db = new DB(
     ['db'=>$ini['db'], 
@@ -44,9 +45,15 @@ if((isset($_REQUEST['da']) && isset($_REQUEST['a'])&&isset($_SESSION['user_timbr
 
         //Orari settimanali
         $orariSettimanali = [];
-        $res = $db->ql('SELECT weekTime FROM ts_timetables WHERE SUBSTR(timeName, 11) LIKE ?', [$user['Username'].'%'])[0]['weekTime'];
-        for($i = 0; $i < strlen($res); $i+=8)
-            $orariSettimanali[] = (int)substr($res, $i+4, 4);
+        $orario = $db->ql('SELECT segments FROM ts_timetables WHERE SUBSTR(timeName, 11) LIKE ? AND LENGTH(timeShortName) >= 2', [$user['Username'].'%']);
+        
+        if(count($orario) <= 0) Lib::exitWithMessage('Orario non trovato');
+
+        $orario = json_decode($orario[0]['segments'], true)[0];
+    
+        for($i=1,$n=0; $n<count($orario['Days']); $n++,$i=(($i+1)%count($orario['Days'])))
+            $orariSettimanali[] = HMStoMinutes($orario['Days'][$i]['ServiceChunk']['Duration']);
+
         $orariSettimanali = [
             'Luned&igrave;' => $orariSettimanali[0],
             'Marted&igrave;' => $orariSettimanali[1],
@@ -95,6 +102,11 @@ function secondsToHMS($seconds) {
     $seconds = round($seconds);
     $s = abs((int)($seconds/ 60 % 60));
     return (int)($seconds/ 3600).':'.(strlen($s) < 2?'0'.$s:$s);//.(int)($seconds % 60).'s';
+}
+
+function HMStoMinutes($hms){
+    $hms = explode(':', $hms);
+    return ($hms[0]*60) + ($hms[1]) + ($hms[2]/60);
 }
 
 ?>

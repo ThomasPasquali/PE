@@ -11,7 +11,7 @@
 ?>
 <html>
 <head>
-    <script src="../lib/jquery-3.4.1.min.js"></script>
+    <script src="../lib/jquery-3.5.1.min.js"></script>
     <script src="../lib/jquery.qtip.min.js"></script>
     <script src="./index.js" type="text/javascript" assert></script>
 
@@ -43,7 +43,8 @@
                     /***********SELECTION DIPENDENTE/I************/
                     if($_SESSION['user_timbrature'] == 'admin') {
                     ?>
-                        <select name="user" onchange="selezionaDipendente($(this).val());">
+                        <select name="user">
+                            <option default>--seleziona--</option>
                             <?php foreach($lib->getUsers() as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>"; ?>
                         </select>
                         <label>Dipendenti selezionati</label>
@@ -56,8 +57,8 @@
                     <input type="date" name="da" required>
                     <label>A</label>
                     <input type="date" name="a" required>
-                    <button type="button" onclick="this.form.action=($('#dipendentiSelezionati').children().length > 1 ? 'cumulative.php' : ''); this.form.submit();">Crea report</button>
-                    <button type="button" onclick="this.form.action='raw.php'; this.form.submit();">Visualizza dati</button>
+                    <button type="button" onclick="submitFormForReport();">Crea report</button>
+                    <button type="button" onclick="submitFormForRaw();">Visualizza dati</button>
                     <button type="button" onclick="this.form.action='?cambia_user'; this.form.target = '_self'; this.form.submit();">Esci</button>
                 </form>
             </div>
