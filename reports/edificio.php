@@ -110,8 +110,10 @@ GROUP BY r.ID',
 
             /*----------------------------------------------*/
 
-            $condoni = $c->db->ql('SELECT ID, Mappali, Anno, Numero, Cognome, Nome, Codice_fiscale cf
-                                                FROM pe_condoni
+            $condoni = $c->db->ql('SELECT c.ID, c.Mappali, c.Anno, c.Numero, ip.Cognome, ip.Nome, ins.Intestazione, c.Partita_iva pi, c.Codice_fiscale cf
+                                                FROM pe_condoni c
+                                                LEFT JOIN intestatari_persone ip ON ip.Codice_fiscale = c.Codice_fiscale
+                                                LEFT JOIN intestatari_societa ins ON ins.Partita_iva = c.Partita_iva
                                                 WHERE Edificio = ?',
                                                 [$edificioID]);
 
@@ -221,8 +223,13 @@ GROUP BY r.ID',
         <p><span>Condoni:</span></p>
         <p><?php
             $temp = [];
-            foreach ($condoni as $pra)
-                $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Nome] $pra[Cognome] - $pra[cf])";
+            foreach ($condoni as $pra) {
+                if($pra['cf'])
+                    $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Nome] $pra[Cognome] - $pra[cf])";
+                if($pra['pi'])
+                    $temp[] = "$pra[Numero]/$pra[Anno] Mapp. $pra[Mappali] ($pra[Intestazione] - $pra[pi])";
+            }
+                
             echo implode(' - ', $temp)
         ?></p>
       </div>
