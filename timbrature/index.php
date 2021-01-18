@@ -38,7 +38,7 @@
     ?>
             <div class="container">
                 <form action="" method="POST" target="_blank">
-                    <label>Dipendente <?= ($_SESSION['user_timbrature'] != 'admin' ? $_SESSION['user_timbrature'] : '') ?></label>
+                    <label>Dipendente <?= ($_SESSION['user_timbrature'] != 'admin' ? '<br>'.$_SESSION['user_timbrature'] : '') ?></label>
                     <?php
                     /***********SELECTION DIPENDENTE/I************/
                     if($_SESSION['user_timbrature'] == 'admin') {
@@ -48,11 +48,12 @@
                             <?php foreach($lib->getUsers() as $u) echo "<option value=\"$u[Username]\">$u[Username]</option>"; ?>
                         </select>
                         <label>Dipendenti selezionati</label>
-                        <div id="dipendentiSelezionati"></div>
                     <?php
                     /***********END SELECTION DIPENDENTE/I************/
                     }
                     ?>
+                    <div id="dipendentiSelezionati">
+                        <?= $_SESSION['user_timbrature'] == 'admin' ? '' : "<input style=\"display:none;\" name=\"dipendente_0\" value=\"$_SESSION[user_timbrature]\" readonly>" ?>                    </div>
                     <label>Da</label>
                     <input type="date" name="da" required>
                     <label>A</label>

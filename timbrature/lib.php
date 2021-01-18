@@ -218,7 +218,8 @@
         private function initDays() {
             $da_cpy = clone $this->da;
             while(date_format($da_cpy, "Y-m-d") <= date_format($this->a, "Y-m-d")) {
-                $this->days[date_format($da_cpy, "d/m/Y")] = 
+                $date = date_format($da_cpy, "d/m/Y");
+                $this->days[$date] = 
                     ['timbrature' => [],
                     'workcodes' => [],
                     'totSeconds' => (int)0,
@@ -234,6 +235,8 @@
                 if(!$this->isFestivo($da_cpy))
                     $this->totTeorico += $this->orarioSettimanale['orario'][$this->dayOfWeek($da_cpy)]*60;
 
+                $this->days[$date]['teorico'] = ($this->isFestivo($da_cpy)?0:($this->orarioSettimanale['orario'][$this->dayOfWeek($da_cpy)]*60));
+
                 $da_cpy->modify('+1 day');
             }
         }
@@ -245,7 +248,6 @@
                 $out = new DateTime($this->timbrature[$i+1]['logTime']);
                 $diff = $this->dateDiff($in, $out);
                 $date = date_format($in, "d/m/Y");
-                $this->days[$date]['teorico'] = ($this->isFestivo($in)?0:($this->orarioSettimanale['orario'][$this->dayOfWeek($in)]*60));
                 
                 //Controlli
                 if(date_format($in, "Y-m-d") != date_format($out, "Y-m-d")) echo '<br>Entrata ed uscita su giorni diversi<br>';
