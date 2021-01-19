@@ -9,6 +9,7 @@
     define('CSV_SEP', ';');
     define('LETTERE_SETTIMANA', ['Lu','Ma','Me','Gi','Ve','Sa','Do']);
     define('WARNING_ASSENZE_TIMBRATURE', ['Ferie', 'Donazione Sangue', 'Malattia', 'Infortunio', 'Aspettativa', 'Congedo', 'Maternità /Paternità']);
+    define('IGNORES_FESTIVI', ['Malattia', 'Infortunio', 'Aspettativa', 'Congedo', 'Maternità /Paternità']);
 
     class Lib {
         private $ini, $db;
@@ -130,11 +131,14 @@
                 while($this->dateDiff($day, $this->a) >= 0 && $assenza['exLen_days'] > 0) {
                     //Se Why = Festivo lo posso sovrapporre alle festività
                     //Controllo se il giorno è lavorativo per la persona in questione
-                    if($assenza['exWhy'] == 'Festivo' || !($this->isFestivo($day) || $this->orarioSettimanale['orario'][$this->dayOfWeek($day)] == 0)) {
+                    if(in_array($assenza['exWhy'], IGNORES_FESTIVI) || !($this->isFestivo($day) || $this->isNonLavorativo($day))) {
                         $tmp[] = ['dayStart' => date_format($day, 'Y-m-d'), 'exWhy' => $assenza['exWhy'], 'exLen_time' => intval($assenza['exLen_time'])*60];
 
                         //Statistiche sui giorni "scompattati"
-                        $this->assenzeIntereStats[$assenza['exWhy']] = ($this->assenzeIntereStats[$assenza['exWhy']]??0) + 1;
+                        if($assenza['exLen_time'] < 0)
+                            $this->assenzeIntereStats[$assenza['exWhy']] = ($this->assenzeIntereStats[$assenza['exWhy']]??0) + 1;
+                        else
+                            $this->assenzeParzialiStats[$assenza['exWhy']] = ($this->assenzeIntereStats[$assenza['exWhy']]??0) + intval($assenza['exLen_time']*60);
                         
                         $assenza['exLen_days']--;
                     }
@@ -269,10 +273,10 @@
                 			'workcode' => $this->timbrature[$i]['logCode'],
                 			'note_in' => $this->timbrature[$i]['note'],
                 			'note_out' => $this->timbrature[$i+1]['note']
-                	];
-                	if(!isset($assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]])) 
-                		$assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]] = (int)0;
-                	$assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]] += $diff;
+                    ];
+                	if(!isset($this->assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]])) 
+                		$this->assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]] = (int)0;
+                	$this->assenzeParzialiStats[$this->workcodes[$this->timbrature[$i]['logCode']]] += $diff;
                 		
                 }else {
                 	//Tutto il resto

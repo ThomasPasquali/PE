@@ -102,8 +102,8 @@
         <h2>Statistiche assenze</h2>
         <table>
             <tr>
-                <td>Tipo assenza (parziale)</td>
-                <td>Occorenze</td>
+                <td>Tipo assenza (intera)</td>
+                <td>Giorni</td>
             </tr>
         <?php 
         foreach($assenzeIntereStats as $reason => $t) { ?>
@@ -119,7 +119,7 @@
         <table>
             <tr>
                 <td>Tipo assenza (parziale)</td>
-                <td>Occorenze</td>
+                <td>Ore</td>
             </tr>
         <?php
         foreach($assenzeParzialiStats as $reason => $t) { ?>

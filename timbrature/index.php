@@ -29,7 +29,7 @@
 	
             <form action="" method="POST">
                 <label>Password utente: </label>
-                <input type="password" name="password">
+                <center><input type="password" name="password" style="width:10%;margin-top:30px;" autofocus></center>
             </form>
         
     <?php /********END LOGIN***********/
@@ -55,7 +55,7 @@
                     <div id="dipendentiSelezionati">
                         <?= $_SESSION['user_timbrature'] == 'admin' ? '' : "<input style=\"display:none;\" name=\"dipendente_0\" value=\"$_SESSION[user_timbrature]\" readonly>" ?>                    </div>
                     <label>Da</label>
-                    <input type="date" name="da" required>
+                    <input type="date" name="da" required autofocus>
                     <label>A</label>
                     <input type="date" name="a" required>
                     <button type="button" onclick="submitFormForReport();">Crea report</button>
@@ -199,7 +199,7 @@
         <table>
             <tr>
                 <td>Tipo assenza (intera)</td>
-                <td>Occorenze</td>
+                <td>Giorni</td>
             </tr>
         <?php 
         foreach($lib->assenzeIntereStats as $reason => $t) { ?>
@@ -215,9 +215,9 @@
         <table>
             <tr>
                 <td>Tipo assenza (parziale)</td>
-                <td>Occorenze</td>
+                <td>Ore</td>
             </tr>
-        <?php 
+        <?php
         foreach($lib->assenzeParzialiStats as $reason => $t) { ?>
             <tr>
                 <td><?= $reason ?></td>
