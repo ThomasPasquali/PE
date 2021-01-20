@@ -163,7 +163,7 @@ i {
 }
 .wrapper div.inner-wrap h2{
 	font: normal 20px 'Bitter', serif;
-	color: #00000;
+	color: #000000;
 	margin-bottom: 5px;
 }
 .wrapper div.content h1{
@@ -203,4 +203,17 @@ i {
    padding-bottom: 5px;
    margin-left: 10px;
    margin-top: 10px;
+}
+
+#intAnag div.header {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 6%;
+}
+
+#intAnag .grid {
+	display: none;
 }

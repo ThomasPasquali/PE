@@ -107,11 +107,36 @@ if($c->check(['action'], $_POST))
             deleteCalcolo($_POST['calcolo'], $_POST['pe_o_tec'], $c->db);
             exit();
 
+        case 'data':
+            echo sendData($_POST['which'], $c->db);
+            exit();
+
         default:
             header('Content-type: text/plain');
             echo $_POST['action'].' non implementato';
             exit();
     }
+
+function sendData($which, $db) {
+    $data = "{}";
+    switch($which) {
+        case 'persone':
+            $data = $db->ql('SELECT ID, Nome, Cognome, Codice_fiscale FROM intestatari_persone ORDER BY Nome, Cognome');
+            break;
+        case 'societa':
+            $data = $db->ql('SELECT ID, Intestazione, Partita_iva FROM intestatari_societa ORDER BY Intestazione');
+            break;
+        case 'tecnici':
+            $data = $db->ql('SELECT ID, Nome, Cognome, Codice_fiscale, Partita_iva FROM tecnici ORDER BY Nome, Cognome');
+            break;
+        case 'imprese':
+            $data = $db->ql('SELECT ID, Intestazione, Codice_fiscale, Partita_iva FROM imprese ORDER BY Intestazione');
+            break;
+        default:
+            break;
+    }
+    return json_encode($data, TRUE);
+}
 
 function sendHints($table, $column, $search, $c) {
     $description = $c->getParsedTableDescription($table, $column);

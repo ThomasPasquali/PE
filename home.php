@@ -159,7 +159,15 @@
 <html lang="it">
 	<head>
 		<title>PE</title>
-		<script src="lib/jquery-3.3.1.min.js"></script>
+
+        <!-- AG-GRID -->
+        <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+		<!-- JQUERY -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+  				integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+  				crossorigin="anonymous"></script>
+
 		<link rel="stylesheet" href="lib/mini-default.min.css">
 		<link rel="stylesheet" href="lib/fontawesome/css/all.css">
 		<link rel="stylesheet" type="text/css" href="css/home.css">
@@ -175,15 +183,15 @@
     	       display: block;
     	       color: white;
     	   }
-	   </style>
+       </style>
+       
+        <script defer type="text/javascript" src="js/home.js"></script>
 
 		<!-- OTHER -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" type="image/ico" href="favicon.ico">
 	</head>
 	<body>
-        <script type="text/javascript" src="js/home.js"></script>
-        
         <p id="made-by">Made by Thomas P.</p>
 
 		<div id="navbar" class="navbar sticky">
@@ -251,75 +259,16 @@
         ?>
 
         <div id="intAnag" class="content">
-        	<div class="form">
-        		<h1>Report anagrafiche</h1>
-
-            	<form action="" method="post">
-
-            		<div class="section">Tipologia</div>
-            		<script type="text/javascript">
-						function chg(el) {
-							directChg(el.value);
-						}
-						function directChg(val) {
-							switch (val) {
-							case 'impresa':
-								hide('nome-cognome'); show('piva'); show('intestazione'); show('cf');
-								break;
-
-							case 'persona':
-								hide('intestazione'); hide('piva'); show('nome-cognome'); show('cf');
-								break;
-
-							case 'societa':
-								hide('nome-cognome'); show('piva'); show('intestazione'); hide('cf');
-								break;
-
-							case 'tecnico':
-								hide('intestazione'); show('piva'); show('nome-cognome'); show('cf');
-								break;
-
-							default:
-								break;
-							}
-							var sel = document.getElementById('tipo');
-						  	var opts = sel.options;
-						  	for (var opt, j = 0; opt = opts[j]; j++)
-						    	if (opt.value == val) {
-    						      sel.selectedIndex = j;
-    						      break;
-    						    }
-						}
-            		</script>
-            		<div class="inner-wrap">
-							<select id="tipo" name="tipo" onchange="chg(this);">
-								<option value="persona" selected="selected">Intestatario persona</option>
-								<option value="societa">Intestatario società</option>
-                    			<option value="tecnico">Tecnico</option>
-                    			<option value="impresa">Impresa</option>
-                    		</select>
-            		</div>
-
-            		<div class="section">Dati personali</div>
-            		<div class="inner-wrap">
-            			<div id="nome-cognome">
-            				<label>Nome<input type="text" name="nome" value="<?= $_POST['nome']??'' ?>"></label>
-                			<label>Cognome<input type="text" name="cognome" value="<?= $_POST['cognome']??'' ?>"></label>
-            			</div>
-            			<div id="intestazione" style="display: none;">
-            				<label>Intestazione<input type="text" name="intestazione" value="<?= $_POST['intestazione']??'' ?>"></label>
-            			</div>
-            			<div id="cf">
-            				<label>Codice fiscale<input type="text" name="cf" value="<?= $_POST['cf']??'' ?>"></label>
-            			</div>
-                		<div id="piva" style="display: none;">
-            				<label>Partita iva<input type="text" name="piva" value="<?= $_POST['piva']??'' ?>"></label>
-            			</div>
-            		</div>
-
-            		<button type="submit" name="btn" value="report">Cerca</button>
-            	</form>
-        	</div>
+            <div class="header">
+                <button data-target="gridpersone">Persone</button>
+                <button data-target="gridsocieta">Societ&agrave;</button>
+                <button data-target="gridtecnici">Tecnici</button>
+                <button data-target="gridimprese">Imprese</button>
+            </div>
+            <div id="gridpersone" class="grid ag-theme-balham-dark"></div>
+            <div id="gridsocieta" class="grid ag-theme-balham-dark"></div>
+            <div id="gridtecnici" class="grid ag-theme-balham-dark"></div>
+            <div id="gridimprese" class="grid ag-theme-balham-dark"></div>
         </div>
         
         <div id="intPraticheInt" class="content">
