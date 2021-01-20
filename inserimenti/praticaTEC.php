@@ -12,8 +12,19 @@
     $infos = [];
     $errors = [];
     if($c->check(['tipo', 'anno', 'numero'], $_POST)){
+
+      if(isset($_POST['documento_elettronico'])){
+        $relPath = "$_POST[tipo]/$_POST[anno]/$_POST[numero]$_POST[barrato]";
+        $path = $c->doc_el_root_path.'/'.$relPath;
+          if(!file_exists($path))
+              mkdir($path, 0777, TRUE);
+          $_POST['documento_elettronico'] = $relPath;
+          if(file_exists($path)) $infos[] = 'Cartella documenti elettronici creata';
+          else                    $errors[] = 'Errore nella creazione della cartella documenti elettronici';
+      }else
+        $_POST['documento_elettronico'] = '';
         
-        $keys = ['tipo', 'anno', 'numero', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'tipologia_fabbricato', 'cod_int', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica'];
+        $keys = ['tipo', 'anno', 'numero', 'oggetto', 'stradario', 'civico', 'n_protocollo', 'tipologia_fabbricato', 'cod_int', 'n_verbale', 'verbale', 'prescrizioni', 'parere', 'parere_note', 'approvata', 'onerosa', 'beni_ambientali', 'note_pagamenti', 'note_pratica', 'suap', 'documento_elettronico'];
         $cols = [];
         $params = [];
         foreach ($_POST as $key => $value) 
@@ -352,6 +363,18 @@
                                       <input type="date" name="'.$field['Field'].'">
                                     </div>';
           		?>
+          	</div>
+
+            <div class="section">Archivio</div>
+          	<div class="inner-wrap">
+              <div class="field">
+                <label>Codice SUAP</label>
+                <input name="suap" type="text" pattern="\d{11}-\d{8}-\d{4}">
+              </div>
+              <div class="field">
+                <label style="display: inline-flex;">Genera cartella documenti elettronici</label>
+                <input type="checkbox" name="documento_elettronico" checked="checked" style="display: inline-flex;">
+              </div>
           	</div>
 
           <button type="submit">Inserisci pratica</button>

@@ -21,11 +21,11 @@
             if(file_exists($path)) $infos[] = 'Cartella documenti elettronici creata';
             else                    $errors[] = 'Errore nella creazione della cartella documenti elettronici';
         }else
-        $_POST['documento_elettronico'] = '';
+          $_POST['documento_elettronico'] = '';
 
         $res = $c->db->dml(
-            'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, Note)
-              VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :note)',
+            'INSERT INTO pe_pratiche (TIPO, Anno, Numero, Barrato, `Data`, Protocollo, Stradario, Tecnico, Impresa, Direzione_lavori, Intervento, Data_inizio_lavori, Documento_elettronico, SUAP, Note)
+              VALUES (:tipo, :anno, :numero, :barr, :data, :prot, :strad, :tecnico, :imp, :dl, :interv, :data_il, :doc_el, :suap, :note)',
             [':tipo' => $_POST['tipo'],
             ':anno' => $_POST['anno'],
             ':numero' => $_POST['numero'],
@@ -42,6 +42,7 @@
             ':interv' => ifEmptyGet($_POST['intervento']),
             ':data_il' => ifEmptyGet($_POST['data_inizio_lavori']),
             ':doc_el' => ifEmptyGet($_POST['documento_elettronico']),
+            ':suap' => ifEmptyGet($_POST['suap']),
             ':note' => ifEmptyGet($_POST['note'])]);
 
         if($res->errorCode() == 0){
@@ -283,11 +284,6 @@
             </div>
 
             <div class="field">
-              <label style="display: inline-flex;">Genera cartella documenti elettronici</label>
-              <input type="checkbox" name="documento_elettronico" checked="checked" style="display: inline-flex;">
-            </div>
-
-            <div class="field">
               <label>Data inizio lavori</label>
               <input type="date" name="data_inizio_lavori">
             </div>
@@ -296,7 +292,19 @@
               <label>Note</label>
               <textarea rows="3" name="note"></textarea>
             </div>
+          </div>
 
+          <div class="section">Archivio</div>
+          <div class="inner-wrap">
+            <div class="field">
+              <label>Codice SUAP</label>
+              <input name="suap" type="text" pattern="\d{11}-\d{8}-\d{4}">
+            </div>
+
+            <div class="field">
+              <label style="display: inline-flex;">Genera cartella documenti elettronici</label>
+              <input type="checkbox" name="documento_elettronico" checked="checked" style="display: inline-flex;">
+            </div>
           </div>
 
           <button type="submit">Inserisci pratica</button>
