@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <!-- STILE -->
+        <link rel="stylesheet" href="../css/modulistica.css">
+
+        <!-- CODICE -->
+        <script src="../lib/jquery-3.3.1.min.js"></script>
+        <script src="../js/modulistica.js" type="text/javascript"></script>
+
+        <title>Rilascio concessione edilizia</title>
+    </head>
+    <body>
+        <div id="intestazione">
+            <div id="titoli">
+                <h1>Comune di Canale d'Agordo</h1>
+                <h2>Ufficio  tecnico</h2>
+            </div>
+            <a href="../"><img src="../imgs/logo.jpg" id="logo" alt="logo"></a>
+        </div>
+        
+        <p class="sottotitolo centro">Rilascio concessione edilizia</p>
+
+        <p>Prot. n. <VAR>Protocollo</VAR><br>Pratica n. <VAR>Sigla</VAR></p>
+
+        <div class="row">
+            <div><p class="destra">Alla Ditta</p></div>
+            <div><p class="sinistra margin-sx-1"><VAR>Intestatari_persone</VAR><br><VAR>Intestatari_societa</VAR></p></div>
+        </div>
+        <div class="row">
+            <div><p class="destra">p.c. al tecnico</p></div>
+            <div><p class="sinistra margin-sx-1"><VAR>Tecnico</VAR></p></div>
+        </div>
+        
+        <p class="bold">OGGETTO: Comunicazione accoglimento domanda per l'esecuzione di lavori edili.</p>
+        <p class="testo-normale">
+            In riferimento alla domanda assunta al prot. n° <VAR>Protocollo</VAR> in data <VAR>Data</VAR>, con la quale si chiedeva il permesso per eseguire lavori di <VAR>Oggetto</VAR> in località <VAR>Stradario</VAR>, si comunica che la pratica risulta conforme alla normativa di PRG vigente con le seguenti prescrizioni:
+            
+            {pCEVerb} 
+            {pTecNote}
+
+            Si comunica inoltre ai sensi dell’art. 146 comma 7 del DLgs 42/2004 che la proposta di provvedimento risulta favorevole con le seguenti prescrizioni:
+            
+            {eParEspPresc}
+            {pPrescrizioni}
+            {eAut1497presc}
+
+            La pratica dovrà essere perfezionata, con l'acquisizione dei seguenti pareri, nulla-osta e documenti:
+            
+            {pDocRic1}
+
+            Contro la determinazione suddetta è ammesso alternativamente:
+            
+            -	il ricorso giurisdizionale al T.A.R., nel termine perentorio di 60 giorni dal ricevimento della presente comunicazione;
+            -	il ricorso straordinario al Presidente della Repubblica limitatamente ai motivi di legittimità nel termine di 120 giorni dal ricevimento della presente comunicazione.
+            
+            Ai sensi dell’art. 4 e 5  della Legge 07.08.1990, n. 241 e successive modificazioni ed integrazioni, così come accorpato nel vigente Testo Unico sull’Edilizia di cui al D.P.R. 06.06.2001 n. 380 e successive modifiche ed integrazioni, si comunica che il responsabile del procedimento è l’Arch. , Responsabile dell’Area Tecnica del Comune di Canale d'Agordo.
+        </p>
+        
+        <div class="row margin-top-2">
+            <div></div>
+            <div><p class="centro"><span>Il Responsabile dell’Area Tecnica</span><br>Tizio</p></div>
+        </div>
+    </body>
+</html>

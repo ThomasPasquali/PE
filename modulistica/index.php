@@ -10,7 +10,7 @@
 	$file = ($c->check(['file'], $_REQUEST)&&file_exists(__DIR__.'/'.$_REQUEST['file']))?(__DIR__.'/'.$_REQUEST['file']):NULL;
 	$pratica = NULL;
 	if($c->check(['tipo', 'p'], $_REQUEST) && ($_REQUEST['tipo'] == 'pe' || $_REQUEST['tipo'] == 'tec')) 
-		$pratica = $c->db->ql("SELECT * FROM $_REQUEST[tipo]_pratiche_view WHERE ID = ?", [$_REQUEST['p']])[0];
+		$pratica = $c->db->ql("SELECT * FROM $_REQUEST[tipo]_modulistica_view WHERE ID = ?", [$_REQUEST['p']])[0];
     
     if($c->check(['p', 'tipo', 'file'], $_REQUEST) && $pratica) {
         $file = file_get_contents($file);
@@ -18,7 +18,7 @@
         preg_match_all('/<VAR>([^<>\/]+)<\/VAR>/m', $file, $matches);
         if(count($matches) > 1)
             foreach ($matches[1] as $var)
-                $file = str_replace("<VAR>$var</VAR>", $pratica[$var]??'<strong>N/A</strong>', $file);
+                $file = str_replace("<VAR>$var</VAR>", $pratica[$var]??'', $file);
         $file = str_replace("<AUTO>Data</AUTO>", date('d/m/Y'), $file);
         $file = str_replace("<AUTO>Manual</AUTO>", '<p class="manual"><textarea></textarea><button onclick="bloccaTesto($(this));">Blocca testo</button></p>', $file);
         echo $file;

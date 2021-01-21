@@ -1,15 +1,12 @@
 <html>
     <head>
+        <!-- STILE -->
         <link rel="stylesheet" href="../css/modulistica.css">
+
+        <!-- CODICE -->
         <script src="../lib/jquery-3.3.1.min.js"></script>
-        <script type="text/javascript">
-        	function bloccaTesto(el) {
-        		let p = el.parent();
-        		let txt = p.find('textarea').val();
-				p.empty();
-				p.text(txt);
-			}
-        </script>
+        <script src="../js/modulistica.js" type="text/javascript"></script>
+
         <title>Test</title>
     </head>
     <body>
@@ -22,7 +19,7 @@
             </div>
             <a href="../"><img src="../imgs/logo.jpg" id="logo" alt="logo"></a>
         </div>
-        <p class="sottotitolo">CERTIFICATO DI AGIBILITA'</p>
+        <p class="sottotitolo centrato">CERTIFICATO DI AGIBILITA'</p>
         <p>Prot. n. <VAR>Protocollo</VAR><br>Pratica n. <VAR>Sigla</VAR></p>
         <p class="testo-normale">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisl leo, <VAR>Sigla</VAR>lacinia mattis urna nec, pharetra malesuada sem. Donec finibus vitae quam sit amet placerat. Fusce sit amet ullamcorper ex. Nullam blandit magna a lectus fringilla <AUTO>Manual</AUTO> , quis pellentesque lectus viverra. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Proin vestibulum facilisis tincidunt. Nullam eleifend, purus egestas convallis congue, ex nibh viverra mi, ullamcorper congue nisl tellus et tortor. Vestibulum ultricies augue imperdiet elit laoreet convallis. Fusce quis faucibus orci.</p>
         <p><AUTO>Data</AUTO></p>

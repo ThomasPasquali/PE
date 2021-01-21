@@ -7,7 +7,7 @@ p {
   margin: 0px 0px 15px 0px;
   padding: 0px;
   word-wrap: break-word;
-  border-bottom: dotted black 1px;
+  line-height: 90%;
 }
 
 .testo-normale, .manual{
@@ -42,6 +42,7 @@ p > span{
   display: grid;
   grid-template-columns: 4fr 1fr;
   padding: 1% 10% 0px 10%;
+  height: 12%;
 }
 
 #titoli{
@@ -56,4 +57,64 @@ p > span{
 #logo{
     height: 100%;
     width: 100%;
+}
+
+.centro {
+  text-align: center;
+}
+
+.sinistra {
+  text-align: left;
+}
+
+.destra {
+  text-align: right;
+}
+
+.sottolineato {
+  border-bottom: dotted black 1px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.row > div {
+  width: 100%;
+  height: 100%;
+}
+
+.col {
+
+}
+
+.margin-sx-1 {
+  margin-left: 20px;
+}
+
+.margin-top-1 {
+  margin-left: 20px;
+}
+.margin-top-2 {
+  margin-top: 40px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+@media screen {
+
+}
+
+@media print {
+  
+  #logo{
+    height: 50%;
+    width: 50%;
+  }
+  
 }
