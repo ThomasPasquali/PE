@@ -5,6 +5,8 @@ function changeContent(divID) {
 	document.getElementById(divID).classList.add('active');
     document.getElementById(divID).classList.add('flipInX');
 	document.getElementById(divID).classList.add('animated');
+	if(divID == 'intPra')
+		gridOptions['pratiche'].columnApi.sizeColumnsToFit($('#intPra').width());
 }
 
 function hide(id) {
@@ -69,13 +71,26 @@ gridOptions['imprese'].columnDefs = [
 	{field:"Partita_iva"}
 ];
 
+gridOptions['pratiche'] = deepClone(gridOptionsDefault);
+gridOptions['pratiche'].onCellDoubleClicked = function (e) {
+	pe_o_tec = e.data['Archivio'];
+	let win = window.open('reports/pratica'+pe_o_tec+'.php?id='+e.data['ID'], '_blank');
+	win.focus();
+};
+gridOptions['pratiche'].columnDefs = [
+	{field:"ID", filter: 'agNumberColumnFilter', comparator: function(id1, id2) { return parseInt(id1)-parseInt(id2); }},
+	{field:"TIPO"},
+	{field:"Anno"},
+	{field:"Numero"},
+	{field:"Barrato"}
+];
+
 
 $(document).ready(async function () {
 	for (const key in gridOptions) {
 		grids[key] = new agGrid.Grid($('#grid'+key)[0], gridOptions[key]);
 		data[key] = await getData(key);
 		gridOptions[key].api.setRowData(data[key]);
-		
 	}
 });
 

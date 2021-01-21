@@ -168,10 +168,13 @@
         <p><span>Data presentazione:</span> <?= $datiGenericiPratica['Data'] ?></p>
         <p><span>Data inizio lavori:</span> <?= $datiGenericiPratica['Data_inizio_lavori'] ?></p>
     </div>
-    <p class="sottotitolo">Ulteriori informazioni:</p>
+
+    <div style="margin-top:20px;"><p><span style="text-decoration:underline;">Note:</span> <?= $datiGenericiPratica['Note'] ?></p><div>
+
+    <p class="sottotitolo">Archivi:</p>
     <div id="ultInfo">
-    	<p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?><i onclick="copyStringToClipboard('<?= $datiGenericiPratica['Documento_elettronico'] ?>');" style="margin-left:10px;" class="fas fa-clipboard"></i></p>
-        <p><span>Note:</span> <?= $datiGenericiPratica['Note'] ?></p>
+    	<p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
+      <p id="suap"><span>Codice SUAP:</span> <?= $datiGenericiPratica['SUAP'] ?></p>
     </div>
   </body>
 </html>

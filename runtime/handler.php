@@ -132,6 +132,9 @@ function sendData($which, $db) {
         case 'imprese':
             $data = $db->ql('SELECT ID, Intestazione, Codice_fiscale, Partita_iva FROM imprese ORDER BY Intestazione');
             break;
+        case 'pratiche':
+            $data = $db->ql('SELECT ID, TIPO, Anno, Numero, Barrato, \'PE\' Archivio FROM pe_pratiche UNION SELECT ID, TIPO, Anno, Numero, Barrato, \'TEC\' Archivio FROM tec_pratiche');
+            break;
         default:
             break;
     }

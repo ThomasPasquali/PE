@@ -167,5 +167,11 @@
             <p><span>Note pratica:</span> <?= $pratica['Note_pratica'] ?></p>
             <p><span>Note pagamenti:</span> <?= $pratica['Note_pagamenti'] ?></p>
         </div>
+
+        <p class="sottotitolo">Archivi:</p>
+        <div id="ultInfo">
+            <p id="docElettronico"><span>Documento elettronico:</span> <?= $datiGenericiPratica['Documento_elettronico'] ?></p>
+        <p id="suap"><span>Codice SUAP:</span> <?= $datiGenericiPratica['SUAP'] ?></p>
+        </div>
   </body>
 </html>

@@ -202,7 +202,6 @@
                 	<a onclick="changeContent('intAnag');">Anagrafiche</a>
                     <a onclick="changeContent('intPra');">Pratiche</a>
                     <a href="reports/pratiche.php">Pratiche da-a</a>
-                    <a onclick="changeContent('intPraticheInt');">Pratiche intestatario</a>
                 </div>
             </div>
 
@@ -270,111 +269,24 @@
             <div id="gridtecnici" class="grid ag-theme-balham-dark"></div>
             <div id="gridimprese" class="grid ag-theme-balham-dark"></div>
         </div>
-        
-        <div id="intPraticheInt" class="content">
+
+        <div id="intEdificio" class="content">
         	<div class="form">
-        		<h1>Report pratiche intestatario</h1>
+        		<h1>Storico edificio</h1>
 
-            	<form action="" method="post">
-
-            		<div class="section">Tipologia</div>
-            		<script type="text/javascript">
-						function chgPratInt(el) {
-							directChgPratInt(el.value);
-						}
-						function directChgPratInt(val) {
-							switch (val) {
-							case 'persona':
-								hide('intestazione-int-prat'); hide('piva-int-prat'); show('nome-cognome-int-prat'); show('cf-int-prat');
-								break;
-
-							case 'societa':
-								hide('nome-cognome-int-prat'); show('piva-int-prat'); show('intestazione-int-prat'); hide('cf-int-prat');
-								break;
-								
-							default:
-								break;
-							}
-							var sel = document.getElementById('tipo');
-						  	var opts = sel.options;
-						  	for (var opt, j = 0; opt = opts[j]; j++)
-						    	if (opt.value == val) {
-    						      sel.selectedIndex = j;
-    						      break;
-    						    }
-						}
-            		</script>
-            		<input type="hidden" name="tipo" value="praticheIntestatario">
+            	<form action="reports/edificio.php" method="post" target="_blank">
+            		<div class="section">Dati</div>
             		<div class="inner-wrap">
-							<select id="tipo" name="tipologia" onchange="chgPratInt(this);">
-								<option value="persona" selected="selected">Intestatario persona</option>
-								<option value="societa">Intestatario societ&agrave;</option>
-                    		</select>
+            			<label>Foglio<input type="number" name="foglio" required="required" min="1" value="<?= $_POST['foglio']??'' ?>"></label>
+            			<label>Mappale (qualsiasi)<input type="number" name="mappale" required="required" value="<?= $_POST['mappale']??'' ?>"></label>
             		</div>
-
-            		<div class="section">Dati personali</div>
-            		<div class="inner-wrap">
-            			<div id="nome-cognome-int-prat">
-            				<label>Nome<input type="text" name="nome" value="<?= $_POST['nome']??'' ?>"></label>
-                			<label>Cognome<input type="text" name="cognome" value="<?= $_POST['cognome']??'' ?>"></label>
-            			</div>
-            			<div id="intestazione-int-prat" style="display: none;">
-            				<label>Intestazione<input type="text" name="intestazione" value="<?= $_POST['intestazione']??'' ?>"></label>
-            			</div>
-            			<div id="cf-int-prat">
-            				<label>Codice fiscale<input type="text" name="cf" value="<?= $_POST['cf']??'' ?>"></label>
-            			</div>
-                		<div id="piva-int-prat" style="display: none;">
-            				<label>Partita iva<input type="text" name="piva" value="<?= $_POST['piva']??'' ?>"></label>
-            			</div>
-            		</div>
-
-            		<button type="submit" name="btn" value="report">Cerca</button>
-            	</form>
-        	</div>
+            		<button type="submit">Genera report</button>
+				</form>
+			</div>
         </div>
 
         <div id="intPra" class="content">
-        	<div class="form">
-            	<h1>Report pratiche</h1>
-
-            	<form action="" method="post">
-            		<input type="hidden" name="tipo" value="pratica">
-            		<div class="inner-wrap">
-                  <label>Tipologia di pratica</label>
-                  <input type="radio" name="tipologia" value="pe"  <?= ($_REQUEST['tipologia']??'') == 'pe'?'checked':'' ?> onclick="$('#tipo-pratica-tec-reports').hide(); $('#tipo-pratica-pe-reports').show();"> PE
-                  <?php 
-                  $tmp = '';
-                  if(($_REQUEST['tipologia']??'') == 'tec')
-                      $tmp = 'checked';
-                  ?>
-                  <input type="radio" name="tipologia" value="tec" <?= $tmp ?> onclick="$('#tipo-pratica-pe-reports').hide(); $('#tipo-pratica-tec-reports').show();"> TEC
-                  <?php //TODO condoni e rubriche ?>
-                  <label>Tipo</label>
-                  <select id="tipo-pratica-pe-reports" name="tipo_pratica_pe">
-                    <?php 
-                    foreach ($GLOBALS['c']->getEnumValues('pe_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\"".(($_REQUEST['tipo_pratica_pe']??NULL) == $tipo?' selected="selected"':'').">$tipo</option>";
-                    ?>
-                  </select>
-                  <select id="tipo-pratica-tec-reports" name="tipo_pratica_tec" style="display:none;">
-                    <?php 
-                    foreach ($GLOBALS['c']->getEnumValues('tec_pratiche', 'TIPO') as $tipo)  echo "<option value=\"$tipo\">$tipo</option>";
-                    ?>
-                  </select>
-                  <?php 
-                  if(($_REQUEST['tipologia']??'') == 'tec')
-                    echo '<script>$(\'#tipo-pratica-pe-reports\').hide(); $(\'#tipo-pratica-tec-reports\').show();</script>';
-                  ?>
-                  <input type="checkbox" name="considerTipo" checked> Considera tipo
-		               <label>Anno<input type="number" name="anno" pattern="\d{4}" value="<?= $_POST['anno']??date('Y') ?>"></label>
-   	   				     <label>Numero<input type="number" name="numero" value="<?= $_POST['numero']??'' ?>"></label>
-                   <label>Barrato<input type="text" name="barrato" value="<?= $_POST['barrato']??'' ?>"></label>
-                   <label>Foglio<input type="text" maxlength="4" name="foglio" value="<?= $_POST['foglio']??'' ?>"></label>
-                   <label>Mappale<input type="text" maxlength="6" name="mappale" value="<?= $_POST['mappale']??'' ?>"></label>
-            		</div>
-            		<button type="submit" name="btn" value="report">Cerca</button>
-            	</form>
-        	</div>
+            <div id="gridpratiche" class="ag-theme-balham-dark"></div>
         </div>
 
         <div id="insAnagIntestPers" class="content">
@@ -454,21 +366,6 @@
             		    <label>Partita iva<input type="text" name="piva" pattern="\d{11}" value="<?= $_POST['piva']??'' ?>"></label>
             		</div>
             		<button type="submit" name="btn" value="inserimentoAnagrafica">Inserisci</button>
-				</form>
-			</div>
-        </div>
-
-        <div id="intEdificio" class="content">
-        	<div class="form">
-        		<h1>Storico edificio</h1>
-
-            	<form action="reports/edificio.php" method="post" target="_blank">
-            		<div class="section">Dati</div>
-            		<div class="inner-wrap">
-            			<label>Foglio<input type="number" name="foglio" required="required" min="1" value="<?= $_POST['foglio']??'' ?>"></label>
-            			<label>Mappale (qualsiasi)<input type="number" name="mappale" required="required" value="<?= $_POST['mappale']??'' ?>"></label>
-            		</div>
-            		<button type="submit">Genera report</button>
 				</form>
 			</div>
         </div>

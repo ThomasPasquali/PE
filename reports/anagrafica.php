@@ -210,6 +210,9 @@
         foreach ($_REQUEST as $key => $value) 
 				echo "<input type=\"hidden\" name=\"$key\" value=\"$value\">";
         echo '</form>';
+        if($type == 'Intestatario società' || $type == 'Intestatario persona') {
+            echo '<form action="praticheIntestatario.php?p_id=126" method="get"><button type="submit" name="'.($type == 'Intestatario persona'?'p':'s').'_id" value="'.$id.'">Pratiche correlate</button></form>';
+        }
     }
     
     function generateInputFor($key, $val) {
