@@ -1,22 +1,38 @@
+/****************GLOBAL STYLE*****************/
+
+:root {
+  --header-height: 130px;
+  --footer-height: 90px;
+  --m-top: 1cm;
+  --m-right-left: 2cm;
+  --m-bottom: 0.8cm;
+}
+
 body {
-  padding: 0px 2% 0px 2%;
+  margin: 0;
+  padding: 0;
+}
+
+#content-wrap {
+  padding: 0 var(--m-right-left) 0.2cm var(--m-right-left);
 }
 
 p {
-  font-size: 1.3em;
+  font-size: 1em;
   margin: 0px 0px 15px 0px;
   padding: 0px;
   word-wrap: break-word;
   line-height: 90%;
+  width: 100%;
 }
 
-.testo-normale, .manual{
-	font-family: Times New Roman;
-	text-align: justify;
-	font-weight: normal;
-	font-size: 1.2em;
-	border-bottom-width: 0px;
-	white-space: pre-line;
+span {
+  margin: 0;
+  padding: 0;
+}
+
+span.tab {
+  width: 1cm;
 }
 
 a, a:visited{
@@ -25,39 +41,73 @@ a, a:visited{
 	color: black;
 }
 
-.sottotitolo{
-	text-decoration: underline;
-    margin-bottom: 0px;
-    margin-top: 25px;
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    border: 0;
-}
+/****************END GLOBAL STYLE*****************/
 
-p > span{
-  font-weight: bold;
-}
+/****************HEADER*****************/
 
 #intestazione{
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  padding: 1% 10% 0px 10%;
-  height: 12%;
+  display: flex;
+  height: var(--header-height);
 }
 
-#titoli{
+#titoli {
+  width: 100%;
   text-align: center;
 }
 
-#titoli *{
-  margin: 0px;
-  padding-top: 10px;
+#titoli * {
+  padding: 0;
+  margin: 0;
 }
 
-#logo{
-    height: 100%;
-    width: 100%;
+#titoli h1 {
+  font-size: 0.7cm;
 }
+
+#titoli h2 {
+  font-size: 0.5cm;
+}
+
+#logo {
+  position: fixed;
+  margin-left: var(--m-right-left);
+  height: calc(230px*0.4);
+  width: calc(219px*0.4);
+}
+
+/****************END HEADER*****************/
+
+
+/****************CLASSES*****************/
+
+/****************TEXT STYLE***************/
+
+.testo-normale {
+	font-family: "Times New Roman";
+	text-align: justify;
+	font-weight: normal;
+	font-size: 1.2em;
+	white-space: pre-line;
+}
+
+.titolo{
+	text-decoration: underline;
+  margin-top: 25px;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.sottolineato {
+  border-bottom: dotted black 1px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+/****************END TEXT STYLE***************/
+
+/****************TEXT ALIGN***************/
 
 .centro {
   text-align: center;
@@ -71,9 +121,9 @@ p > span{
   text-align: right;
 }
 
-.sottolineato {
-  border-bottom: dotted black 1px;
-}
+/****************END TEXT ALIGN***************/
+
+/****************BLOCKS***************/
 
 .row {
   display: flex;
@@ -87,34 +137,93 @@ p > span{
   height: 100%;
 }
 
-.col {
+/****************END BLOCKS***************/
 
+/****************SPACING***************/
+
+.margin-left-1 {
+  margin-left: 20px;
 }
 
-.margin-sx-1 {
-  margin-left: 20px;
+.margin-right-1 {
+  margin-right: 20px;
+}
+
+.margin-right-2 {
+  margin-right: 40px;
 }
 
 .margin-top-1 {
-  margin-left: 20px;
+  margin-top: 20px;
 }
+
 .margin-top-2 {
   margin-top: 40px;
 }
 
-.bold {
-  font-weight: bold;
+.margin-top-3 {
+  margin-top: 80px;
 }
 
-@media screen {
+/****************END SPACING***************/
 
+/****************END CLASSES*****************/
+
+/****************PRINT TEMPLATE***************/
+
+table {
+  width: 100%;
+}
+
+.page-header, .page-header-space {
+  height: var(--header-height);
+}
+
+.page-footer, .page-footer-space {
+  height: var(--footer-height);
+}
+
+.page-footer {
+  position: fixed;
+  bottom: 0;
+  padding-top: 5px;
+  width: 100%;
+  text-align: center;
+  border-top: dotted black 1px;
+}
+
+.page-footer p {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 120%;
+}
+
+.page-header {
+  position: fixed;
+  top: var(--m-top);
+  width: 100%;
+}
+
+.pageBreak {
+  page-break-before: always;
+  height: 6cm;
+}
+
+@page {
+  margin: 20mm
 }
 
 @media print {
-  
-  #logo{
-    height: 50%;
-    width: 50%;
+   thead {display: table-header-group;} 
+   tfoot {display: table-footer-group;}
+   
+   #content-wrap {
+    padding-top: 10mm;
   }
-  
+   /*body {padding-top: 25mm;}*/
 }
+
+/****************END PRINT TEMPLATE***************/

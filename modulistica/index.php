@@ -13,14 +13,35 @@
 		$pratica = $c->db->ql("SELECT * FROM $_REQUEST[tipo]_modulistica_view WHERE ID = ?", [$_REQUEST['p']])[0];
     
     if($c->check(['p', 'tipo', 'file'], $_REQUEST) && $pratica) {
-        $file = file_get_contents($file);
-        $matches = [];
-        preg_match_all('/<VAR>([^<>\/]+)<\/VAR>/m', $file, $matches);
-        if(count($matches) > 1)
-            foreach ($matches[1] as $var)
-                $file = str_replace("<VAR>$var</VAR>", $pratica[$var]??'', $file);
+		$file = file_get_contents($file);
+		$defaults = [];
+		$matches = [];
+
+		preg_match_all('/<VAR default="(.*)">([^<>\/]+)<\/VAR>/m', $file, $matches);
+        for ($i=0; $i < count($matches[0]); $i++)
+			if($matches[1][$i])
+				$defaults[$matches[2][$i]] = $matches[1][$i];
+
+		preg_match_all('/<VAR([^<>\/]*)>([^<>\/]+)<\/VAR>/m', $file, $matches);
+		for ($i=0; $i < count($matches[0]); $i++) {
+			$var = $matches[2][$i];
+			$replacement = '';
+			if(isset($pratica[$var]))
+				$replacement = $pratica[$var];
+			else if(isset($defaults[$var]))
+				switch($defaults[$var]) {
+					case 'AUTOManual':
+						$replacement = '<AUTO>Manual</AUTO>';
+						break;
+					default:
+						$replacement = $defaults[$var];
+						break;
+				}
+			$file = str_replace($matches[0][$i], $replacement, $file);
+		}
+				
         $file = str_replace("<AUTO>Data</AUTO>", date('d/m/Y'), $file);
-        $file = str_replace("<AUTO>Manual</AUTO>", '<p class="manual"><textarea></textarea><button onclick="bloccaTesto($(this));">Blocca testo</button></p>', $file);
+        $file = str_replace("<AUTO>Manual</AUTO>", '<span><textarea></textarea><button onclick="bloccaTesto($(this));">Blocca testo</button></span>', $file);
         echo $file;
         exit();
     }

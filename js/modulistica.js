@@ -7,4 +7,5 @@ function bloccaTesto(el) {
 
 $(document).ready(function () {
     $('#logo').width($('#logo').height()*(230/219));
+    //window.print();
 });
